@@ -2,7 +2,6 @@
 
 import {useEffect, useState} from "react";
 import {Address, fromNano, OpenedContract} from "@ton/core";
-import {usePathname} from "next/navigation";
 import DisconnectWalletHeader from "@/components/disconnect-wallet-header";
 import {Account} from "@/wrappers/Account";
 import {tonClient} from "@/wrappers/ton-client";
@@ -19,7 +18,6 @@ export default function AccountPage({id}: {id: string}) {
     const [accountOwnerAddr, setAccountOwnerAddr] = useState<Address | null>(null);
     const [accountPrice, setAccountPrice] = useState<bigint | null>(null);
     const [account, setAccount] = useState<OpenedContract<Account> | null>(null)
-    const pathname = usePathname()
 
     useEffect(() => {
         if (id != null) {
