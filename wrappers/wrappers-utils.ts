@@ -7,19 +7,37 @@ export async function getAsignedQuestions(account: OpenedContract<Account>): Pro
     balance: bigint,
     addr: Address,
     isClosed: boolean,
-    isRejected: boolean
+    isRejected: boolean,
+    from: Address,
+    to: Address
 }[]> {
     const count = await account.getNextId()
-    const res: { content: string, balance: bigint, addr: Address, isClosed: boolean, isRejected: boolean }[] = []
+    const res: {
+        content: string,
+        balance: bigint,
+        addr: Address,
+        isClosed: boolean,
+        isRejected: boolean,
+        from: Address,
+        to: Address
+    }[] = []
     for (let i = 0; i < count; i++) {
-        const q = await account.getQuestion(i)
-        const data = await q.getAllData()
-        const content = data.content
-        const balance = await tonClient.getBalance(q.address)
-        const isClosed = data.isClosed
-        const isRejected = data.isRejected
+        //TODO: Add error handling!!!
+        try {
+            const q = await account.getQuestion(i)
+            const data = await q.getAllData()
+            const content = data.content
+            const balance = await tonClient.getBalance(q.address)
+            const isClosed = data.isClosed
+            const isRejected = data.isRejected
+            const from = data.submitterAddr;
+            //TODO: Needs to be fixed, should be receiver account instead
+            const to = data.submitterAddr;
 
-        res.push({content, balance, addr: q.address, isClosed, isRejected})
+            res.push({content, balance, addr: q.address, isClosed, isRejected, from, to})
+        } catch (e) {
+            console.log(`Failed to retrieve question ${i}`, e)
+        }
     }
 
     return res
@@ -30,20 +48,38 @@ export async function getSubmittedQuestions(account: OpenedContract<Account>): P
     balance: bigint,
     addr: Address,
     isClosed: boolean,
-    isRejected: boolean
+    isRejected: boolean,
+    from: Address,
+    to: Address
 }[]> {
     const count = await account.getNextSubmittedQuestionId()
-    const res: { content: string, balance: bigint, addr: Address, isClosed: boolean, isRejected: boolean }[] = []
+    const res: {
+        content: string,
+        balance: bigint,
+        addr: Address,
+        isClosed: boolean,
+        isRejected: boolean,
+        from: Address,
+        to: Address
+    }[] = []
     for (let i = 0; i < count; i++) {
-        const qRef = await account.getQuestionRef(i)
-        const q = await qRef.getQuestion()
-        const data = await q.getAllData()
-        const content = data.content
-        const balance = await tonClient.getBalance(q.address)
-        const isClosed = data.isClosed
-        const isRejected = data.isRejected
+        try {
+            const qRef = await account.getQuestionRef(i)
+            const q = await qRef.getQuestion()
+            const data = await q.getAllData()
+            const content = data.content
+            const balance = await tonClient.getBalance(q.address)
+            const isClosed = data.isClosed
+            const isRejected = data.isRejected
+            const from = data.submitterAddr
+            //TODO: Needs to be fixed, should be receiver account instead
+            const to = data.submitterAddr;
 
-        res.push({content, balance, addr: q.address, isClosed, isRejected})
+            res.push({content, balance, addr: q.address, isClosed, isRejected, from, to})
+        } catch (e) {
+            console.log(`Failed to retrieve submitted question ${i}`, e)
+        }
+
     }
 
     return res

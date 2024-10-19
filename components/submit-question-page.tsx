@@ -46,16 +46,12 @@ export default function CreateQuestionPage({id}: { id: string }) {
             })
     }, [account]);
     const isError = reward === null || minPrice === null || reward < minPrice;
-    const isDisabled = isError || text == null || text.trim() !== ''
-    return <div>
-        <DisconnectWalletHeader/>
-        <textarea
-            placeholder="Your question"
-            onChange={e => setText(e.target.value)}
-            className="textarea textarea-bordered textarea-lg w-full h-[200px] mt-5"></textarea>
-        {minPrice != null && reward != null ? <CurrencyInput
+    const isDisabled = isError || text == null || text.trim() === ''
+
+    const rewardField = minPrice != null && reward != null ? <div className={"flex flex-row mt-5"}>
+        <CurrencyInput
             defaultValue={reward}
-            className={`input text-7xl input-lg max-w-full mt-5${isError ? ' input-error' : ''}`}
+            className={`input w-4/5 align-middle text-7xl input-lg max-w-full${isError ? ' input-error' : ''}`}
             decimalScale={3}
             decimalsLimit={3}
             allowNegativeValue={false}
@@ -64,7 +60,17 @@ export default function CreateQuestionPage({id}: { id: string }) {
                 if (value != undefined) {
                     setReward(parseFloat(value))
                 }
-            }}/> : null}
+            }}/>
+        <img className={"w-[50px] h-[50px] ml-1"} src={"/ton_symbol.png"}/>
+    </div> : null
+
+    return <div>
+        <DisconnectWalletHeader/>
+        <textarea
+            placeholder="Your question"
+            onChange={e => setText(e.target.value)}
+            className="textarea textarea-bordered textarea-lg w-full h-[200px] mt-5"></textarea>
+        {rewardField}
         <div className={`btm-nav w-full`}>
             <button className={`btn btn-block btn-primary h-full rounded-none`} disabled={isDisabled} onClick={onClick}>
                 <h1 className={"text-2xl"}>Submit</h1>

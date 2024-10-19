@@ -1,7 +1,7 @@
 'use client';
 
 import {useEffect, useState} from "react";
-import {Address, fromNano, OpenedContract} from "@ton/core";
+import {Address, OpenedContract} from "@ton/core";
 import DisconnectWalletHeader from "@/components/disconnect-wallet-header";
 import {Account} from "@/wrappers/Account";
 import {tonClient} from "@/wrappers/ton-client";
@@ -9,6 +9,7 @@ import {SERVICE_OWNER_ADDR} from "@/components/utils/constants";
 import {ACCOUNT_CODE, QUESTION_CODE, QUESTION_REF_CODE} from "@/wrappers/contracts-codes";
 import AccountQuestions from "@/components/account-questions-component-v2";
 import Link from "next/link";
+import AccountInfo from "@/components/account-info";
 
 export default function AccountPage({id}: {id: string}) {
     const [accountState, setAccountState] = useState<{
@@ -57,15 +58,12 @@ export default function AccountPage({id}: {id: string}) {
     return <>
         <DisconnectWalletHeader/>
         {accountState.state !== 'active' && alert}
-        {accountState.state === 'active' && <div className="card bg-base-100 w-96 shadow-xl">
-            <div className="card-body">
-                <h2 className="card-title">Account Info</h2>
-                {accountPrice === null && <span className="loading loading-dots loading-xs"></span>}
-                {accountPrice !== null && <h2>Price: {fromNano(accountPrice)} TON</h2>}
-            </div>
-        </div>}
+        {accountState.state === 'active' && accountPrice != null && accountOwnerAddr != null && accountAddress != null && <AccountInfo
+            accountPrice={accountPrice}
+            tonAddr={accountOwnerAddr.toString()}
+            accountAddr={accountAddress.toString()}/>}
         <div className={"mt-5"}>
-            {accountState.state === 'active' && account !== null && <AccountQuestions account={account}/>}
+            {accountState.state === 'active' && account !== null && <AccountQuestions showButtons={false} account={account}/>}
         </div>
         <div className={"btm-nav w-full bg-primary"}>
             {accountAddress !== null && accountPrice !== null && <Link className="btn btn-block btn-primary" href={`/account?id=${id}&command=submit`}>

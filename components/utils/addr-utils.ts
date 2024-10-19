@@ -9,8 +9,8 @@ export function userFriendly(addr: Address): string {
 }
 
 export function userFriendlyStr(str: string): string {
-    const left = str.substring(0, 4)
-    const right = str.substring(str.length - 4, str.length)
+    const left = str.substring(0, 8)
+    const right = str.substring(str.length - 8, str.length)
 
     return `${left}...${right}`
 }

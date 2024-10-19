@@ -9,7 +9,9 @@ type QData = {
     balance: bigint,
     addr: Address,
     isRejected: boolean,
-    isClosed: boolean
+    isClosed: boolean,
+    from: Address,
+    to: Address
 }
 
 type TabData = {
@@ -21,14 +23,39 @@ type TabData = {
     fetch: () => Promise<QData[]>
 }
 
-export default function AccountQuestions({account}: { account: OpenedContract<Account> }) {
+function Tab({tab, showFrom, showTo, showButtons}: {
+    tab: TabData,
+    showFrom: boolean,
+    showTo: boolean,
+    showButtons: boolean
+}) {
+    if (tab.isLoading) {
+        return <div><span className="loading loading-dots loading-lg"></span></div>
+    }
+    return <div>
+        {tab.data.map(q => <QuestionComponent
+            key={q.addr.toRawString()}
+            question={q}
+            showFrom={showFrom}
+            showTo={showTo}
+            showButtons={showButtons}/>)}
+    </div>
+}
+
+export default function AccountQuestions({account, showButtons}: {
+    account: OpenedContract<Account>,
+    showButtons: boolean
+}) {
     const [tabs, setTabs] = useState<{
         title: string,
         data: QData[],
         isLoading: boolean,
         isReady: boolean,
         isActive: boolean,
-        fetch: () => Promise<QData[]>
+        fetch: () => Promise<QData[]>,
+        showTo: boolean,
+        showFrom: boolean,
+        showActionButtons: boolean
     }[]>([
         {
             title: "Assigned",
@@ -36,6 +63,9 @@ export default function AccountQuestions({account}: { account: OpenedContract<Ac
             isLoading: false,
             isActive: true,
             data: [],
+            showTo: false,
+            showFrom: true,
+            showActionButtons: showButtons,
             fetch: () => getAsignedQuestions(account)
         },
         {
@@ -44,6 +74,9 @@ export default function AccountQuestions({account}: { account: OpenedContract<Ac
             isLoading: false,
             isActive: false,
             data: [],
+            showTo: true,
+            showFrom: false,
+            showActionButtons: false,
             fetch: () => getSubmittedQuestions(account)
         }
     ])
@@ -78,10 +111,10 @@ export default function AccountQuestions({account}: { account: OpenedContract<Ac
         })
     }
 
-    function setActive(idx: number){
+    function setActive(idx: number) {
         setTabs(state => {
             const tabs = [...state]
-            for(let i = 0; i < tabs.length; i++) {
+            for (let i = 0; i < tabs.length; i++) {
                 tabs[i].isActive = i === idx;
             }
 
@@ -101,15 +134,6 @@ export default function AccountQuestions({account}: { account: OpenedContract<Ac
         }
     }, [tabs]);
 
-    function Tab({tab}: { tab: TabData }) {
-        if (tab.isLoading) {
-            return <div><span className="loading loading-dots loading-lg"></span></div>
-        }
-        return <div>
-            {tab.data.map(q => <QuestionComponent key={q.addr.toRawString()} question={q} showButtons={false}/>)}
-        </div>
-    }
-
     return <div>
         <div role="tablist" className="tabs tabs-bordered">
             {tabs.map((tab, idx) => <a role={"tab"} key={tab.title}
@@ -117,7 +141,12 @@ export default function AccountQuestions({account}: { account: OpenedContract<Ac
                                        className={"tab" + (tab.isActive ? " tab-active" : "")}>{tab.title}</a>)}
         </div>
         <div>
-            {tabs.filter(tab => tab.isActive).map(tab => <Tab key={tab.title} tab={tab}/>)}
+            {tabs.filter(tab => tab.isActive)
+                .map(tab => <Tab key={tab.title}
+                                 showButtons={tab.showActionButtons}
+                                 showTo={tab.showTo}
+                                 showFrom={tab.showFrom}
+                                 tab={tab}/>)}
         </div>
     </div>
 }

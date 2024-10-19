@@ -42,13 +42,13 @@ export const createQuestionTransaction = (msg: string, amount: bigint, accountAd
 }
 
 export const rejectQuestionTransaction = (questionAddr: Address) => {
-    const msg = beginCell().storeUint(21, 32).endCell()
+    const msg = beginCell().storeUint(BigInt("0xa5c566b9"), 32).endCell()
 
     return {
         validUntil: Math.floor(Date.now() / 1000) + 60,
         messages: [{
             address: questionAddr.toRawString(),
-            amount: toNano("0.1").toString(),
+            amount: toNano("0.01").toString(),
             payload: msg.toBoc().toString('base64')
         }]
     }

@@ -2,7 +2,7 @@
 
 import {useTonAddress} from "@tonconnect/ui-react";
 import {useEffect, useState} from "react";
-import {Address, fromNano, OpenedContract} from "@ton/core";
+import {Address, OpenedContract} from "@ton/core";
 import CreateAccount from "@/components/create-account";
 import DisconnectWalletHeader from "@/components/disconnect-wallet-header";
 import {tonClient} from "@/wrappers/ton-client";
@@ -10,6 +10,7 @@ import {SERVICE_OWNER_ADDR} from "@/components/utils/constants";
 import {Account} from "@/wrappers/Account";
 import {ACCOUNT_CODE, QUESTION_CODE, QUESTION_REF_CODE} from "@/wrappers/contracts-codes";
 import AccountQuestions from "@/components/account-questions-component-v2";
+import AccountInfo from "@/components/account-info";
 
 export default function MyAccountPage() {
     const tonAddr = useTonAddress();
@@ -57,18 +58,13 @@ export default function MyAccountPage() {
         <div><DisconnectWalletHeader/></div>
         {accountState.state !== 'active' && alert}
         {accountState.state !== 'active' && <div className={"mt-2"}><CreateAccount/></div>}
-        {accountState.state === 'active' && <div className="card bg-base-100 w-96 shadow-xl">
-            <div className="card-body">
-                <h2 className="card-title">Account Info</h2>
-                {accountPrice === null && <span className="loading loading-dots loading-xs"></span>}
-                {accountPrice !== null && <h2>Price: {fromNano(accountPrice)} TON</h2>}
-                <div className="card-actions justify-end">
-                    <button className="btn btn-primary">Settings</button>
-                </div>
-            </div>
-        </div>}
+        {accountState.state === 'active' && accountPrice != null && account?.address != null && <AccountInfo
+            accountPrice={accountPrice}
+            tonAddr={tonAddr}
+            accountAddr={account?.address?.toString()}/>}
         <div className={"mt-5"}>
-            {accountState.state === 'active' && account !== null && <AccountQuestions account={account}/>}
+            {accountState.state === 'active' && account !== null &&
+                <AccountQuestions showButtons={true} account={account}/>}
         </div>
     </>
 }
