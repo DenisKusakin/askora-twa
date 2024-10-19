@@ -105,7 +105,7 @@ export default function Wrapper({
                     actionsConfiguration={{
                         twaReturnUrl: 'http://localhost:3001/'
                     }}
-                    manifestUrl={"https://gist.githubusercontent.com/DenisKusakin/de24b720a1cf30fb37a6e3f081e534c1/raw/5ab9448366149533f586cb77c43aa66768a455cf/gistfile1.txt"}>
+                    manifestUrl={"/manifest.json"}>
                     {children}
                 </TonConnectUIProvider>
             </main>

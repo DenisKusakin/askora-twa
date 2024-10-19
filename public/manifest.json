@@ -1,7 +1,7 @@
 {
-  "url": "http://localhost:3001/",
-  "name": "Paynquiry",
+  "url": "https://deniskusakin.github.io/askora-twa/",
+  "name": "Askora",
   "iconUrl": "https://ton-connect.github.io/demo-dapp-with-react-ui/apple-touch-icon.png",
-  "termsOfUseUrl": "http://localhost:3000/terms.html",
-  "privacyPolicyUrl": "http://localhost:3000/test.html"
+  "termsOfUseUrl": "https://deniskusakin.github.io/askora-twa/terms.html",
+  "privacyPolicyUrl": "https://deniskusakin.github.io/askora-twa/privacy-policy.html"
 }
