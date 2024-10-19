@@ -1,7 +1,6 @@
 'use client';
 
 import DisconnectWalletHeader from "@/components/disconnect-wallet-header";
-import {useParams} from "next/navigation";
 import {useEffect, useState} from "react";
 import {Address, fromNano, OpenedContract, toNano} from "@ton/core";
 import {tonClient} from "@/wrappers/ton-client";
@@ -12,8 +11,7 @@ import {useTonConnectUI} from "@tonconnect/ui-react";
 import {createQuestionTransaction} from "@/components/utils/transaction-utils";
 import CurrencyInput from "react-currency-input-field";
 
-export default function CreateQuestionPage() {
-    const params = useParams<{ id: string }>();
+export default function CreateQuestionPage({id}: { id: string }) {
     const [account, setAccount] = useState<OpenedContract<Account> | null>(null)
 
     const [tonConnectUi] = useTonConnectUI()
@@ -30,13 +28,13 @@ export default function CreateQuestionPage() {
     }
 
     useEffect(() => {
-        if (params.id != null) {
+        if (id != null) {
             setAccount(tonClient.open(Account.createFromConfig({
-                owner: Address.parse(params.id),
+                owner: Address.parse(id),
                 serviceOwner: Address.parse(SERVICE_OWNER_ADDR)
             }, ACCOUNT_CODE, QUESTION_CODE, QUESTION_REF_CODE)))
         }
-    }, [params.id]);
+    }, [id]);
     useEffect(() => {
         console.log("Transaction")
         account?.getPrice()
