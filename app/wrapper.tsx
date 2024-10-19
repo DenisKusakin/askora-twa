@@ -105,7 +105,7 @@ export default function Wrapper({
                     actionsConfiguration={{
                         twaReturnUrl: 'http://localhost:3001/'
                     }}
-                    manifestUrl={"/manifest.json"}>
+                    manifestUrl={"/askora-twa/manifest.json"}>
                     {children}
                 </TonConnectUIProvider>
             </main>
