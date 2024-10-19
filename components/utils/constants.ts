@@ -1,0 +1,2 @@
+export const APP_CONTRACT_ADDR = "kQAi74fhFHRl1hOwjXRmV6osnehJSwDtG9AWuU3HcEbMW8ed"
+export const SERVICE_OWNER_ADDR = "0QDn0gtzvZX-A0jf1Y4uLgL7eNNJdPMt9RoONn9kGETbGNZB"
