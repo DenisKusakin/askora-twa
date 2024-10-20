@@ -10,7 +10,8 @@ export async function getAsignedQuestions(account: OpenedContract<Account>): Pro
     isClosed: boolean,
     isRejected: boolean,
     from: Address,
-    to: Address
+    to: Address,
+    id: number
 }[]> {
     const count = await account.getNextId()
     const res: {
@@ -21,7 +22,8 @@ export async function getAsignedQuestions(account: OpenedContract<Account>): Pro
         isClosed: boolean,
         isRejected: boolean,
         from: Address,
-        to: Address
+        to: Address,
+        id: number
     }[] = []
     for (let i = 0; i < count; i++) {
         //TODO: Add error handling!!!
@@ -36,7 +38,7 @@ export async function getAsignedQuestions(account: OpenedContract<Account>): Pro
             const from = data.submitterAddr;
             const to = data.ownerAddr;
 
-            res.push({content, replyContent, balance, addr: q.address, isClosed, isRejected, from, to})
+            res.push({content, replyContent, balance, addr: q.address, isClosed, isRejected, from, to, id: i})
         } catch (e) {
             console.log(`Failed to retrieve question ${i}`, e)
         }
@@ -53,7 +55,8 @@ export async function getSubmittedQuestions(account: OpenedContract<Account>): P
     isRejected: boolean,
     from: Address,
     replyContent: string,
-    to: Address
+    to: Address,
+    id: number
 }[]> {
     const count = await account.getNextSubmittedQuestionId()
     const res: {
@@ -64,7 +67,8 @@ export async function getSubmittedQuestions(account: OpenedContract<Account>): P
         isRejected: boolean,
         from: Address,
         replyContent: string,
-        to: Address
+        to: Address,
+        id: number
     }[] = []
     for (let i = 0; i < count; i++) {
         try {
@@ -79,7 +83,7 @@ export async function getSubmittedQuestions(account: OpenedContract<Account>): P
             const from = data.submitterAddr
             const to = data.ownerAddr;
 
-            res.push({content, balance, addr: q.address, isClosed, isRejected, from, to, replyContent})
+            res.push({content, balance, addr: q.address, isClosed, isRejected, from, to, replyContent, id: i})
         } catch (e) {
             console.log(`Failed to retrieve submitted question ${i}`, e)
         }

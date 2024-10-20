@@ -14,7 +14,8 @@ export function QuestionView({question, showButtons = false, showFrom = false, s
         isClosed: boolean,
         from: Address,
         to: Address,
-        replyContent: string
+        replyContent: string,
+        id: number
     },
     showButtons: boolean,
     showFrom: boolean,
@@ -52,7 +53,7 @@ export function QuestionView({question, showButtons = false, showFrom = false, s
         </div>
         {!question.isClosed && showButtons && <div className="card-actions justify-end mb-2 mr-2">
             <button className={"btn btn-secondary btn-sm"} onClick={onRejectClick}>Reject</button>
-            <button className={"btn btn-primary btn-sm"}>Reply</button>
+            <Link href={`/my-question?id=${question.id}command=reply`} className={"btn btn-primary btn-sm"}>Reply</Link>
         </div>}
         {question.replyContent}
     </div>

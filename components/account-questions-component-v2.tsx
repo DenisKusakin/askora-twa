@@ -12,7 +12,8 @@ type QData = {
     isRejected: boolean,
     isClosed: boolean,
     from: Address,
-    to: Address
+    to: Address,
+    id: number
 }
 
 type TabData = {
