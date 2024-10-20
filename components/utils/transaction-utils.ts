@@ -48,6 +48,40 @@ export const rejectQuestionTransaction = (questionAddr: Address) => {
         validUntil: Math.floor(Date.now() / 1000) + 60,
         messages: [{
             address: questionAddr.toRawString(),
+            amount: toNano("0.03").toString(),
+            payload: msg.toBoc().toString('base64')
+        }]
+    }
+}
+
+export const updatePriceTransaction = (accountAddr: Address, price: bigint) => {
+    const msg = beginCell()
+        .storeUint(BigInt("0xaaacc05b"), 32)
+        .storeCoins(price)
+        .endCell()
+
+    return {
+        validUntil: Math.floor(Date.now() / 1000) + 60,
+        messages: [{
+            address: accountAddr.toRawString(),
+            amount: toNano("0.02").toString(),
+            payload: msg.toBoc().toString('base64')
+        }]
+    }
+}
+
+export const replyTransaction = (questionAddr: Address, replyContent: string) => {
+    const msg = beginCell()
+        .storeUint(BigInt("0xfda8c6e0"), 32)
+        .storeRef(
+            beginCell()
+                .storeStringTail(replyContent)
+                .endCell()
+        ).endCell()
+    return {
+        validUntil: Math.floor(Date.now() / 1000) + 60,
+        messages: [{
+            address: questionAddr.toRawString(),
             amount: toNano("0.01").toString(),
             payload: msg.toBoc().toString('base64')
         }]

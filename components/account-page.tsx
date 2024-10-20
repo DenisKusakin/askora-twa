@@ -60,6 +60,7 @@ export default function AccountPage({id}: {id: string}) {
         {accountState.state !== 'active' && alert}
         {accountState.state === 'active' && accountPrice != null && accountOwnerAddr != null && accountAddress != null && <AccountInfo
             accountPrice={accountPrice}
+            editable={false}
             tonAddr={accountOwnerAddr.toString()}
             accountAddr={accountAddress.toString()}/>}
         <div className={"mt-5"}>

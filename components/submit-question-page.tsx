@@ -40,7 +40,7 @@ export default function CreateQuestionPage({id}: { id: string }) {
         account?.getPrice()
             .then(x => parseFloat(fromNano(x)))
             .then(x => {
-                const min = parseFloat(fromNano(x)) + 0.06;
+                const min = x + 0.06;
                 setMinPrice(min);
                 setReward(min);
             })

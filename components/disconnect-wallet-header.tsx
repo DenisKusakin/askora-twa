@@ -38,7 +38,7 @@ export default function DisconnectWalletHeader() {
             <a className="btn btn-ghost text-sm">Askora</a>
         </div>
         <div className="navbar-end">
-            {tonAddr !== '' && <a className="btn btn-warning ml-1" onClick={() => {tonConnectUi.disconnect(); console.log("Disconnect")}}>Disconnect</a>}
+            {tonAddr !== '' && <a className="btn btn-warning ml-1" onClick={() => tonConnectUi.disconnect()}>Disconnect</a>}
         </div>
     </div>
 }

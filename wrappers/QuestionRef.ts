@@ -6,11 +6,10 @@ export type QuestionRefConfig = {
     id: number
 }
 
-function questionRefConfigToCell(config: QuestionRefConfig, code: Cell): Cell{
+function questionRefConfigToCell(config: QuestionRefConfig): Cell{
     return beginCell()
         .storeAddress(config.accountAddr)
         .storeUint(config.id, 32)
-        .storeRef(code)
         .endCell()
 }
 
@@ -23,7 +22,7 @@ export class QuestionRef implements Contract {
     }
 
     static createFromConfig(config: QuestionConfig, code: Cell, workchain = 0) {
-        const data = questionRefConfigToCell(config, code);
+        const data = questionRefConfigToCell(config);
         const init = { code, data };
         return new QuestionRef(contractAddress(workchain, init), init);
     }

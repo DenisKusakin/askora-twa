@@ -6,6 +6,7 @@ import {getAsignedQuestions, getSubmittedQuestions} from "@/wrappers/wrappers-ut
 
 type QData = {
     content: string,
+    replyContent: string,
     balance: bigint,
     addr: Address,
     isRejected: boolean,
@@ -30,8 +31,11 @@ function Tab({tab, showFrom, showTo, showButtons}: {
     showButtons: boolean
 }) {
     if (tab.isLoading) {
-        return <div><span className="loading loading-dots loading-lg"></span></div>
+        return <div>
+            <span className="loading loading-dots loading-lg"></span>
+        </div>
     }
+    console.log(tab.data)
     return <div>
         {tab.data.map(q => <QuestionComponent
             key={q.addr.toRawString()}
