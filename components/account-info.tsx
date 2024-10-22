@@ -3,8 +3,8 @@ import {userFriendlyStr} from "@/components/utils/addr-utils";
 import CopyIcon from "@/components/copy-icon";
 import CurrencyInput from "react-currency-input-field";
 import {useState} from "react";
-import {useTonConnectUI} from "@tonconnect/ui-react";
 import {updatePriceTransaction} from "@/components/utils/transaction-utils";
+import {tonConnectUI} from "@/stores/ton-connect";
 
 export default function AccountInfo({accountPrice, tonAddr, accountAddr, editable}: {
     accountPrice: bigint | null,
@@ -12,14 +12,13 @@ export default function AccountInfo({accountPrice, tonAddr, accountAddr, editabl
     accountAddr: string | null,
     editable: boolean
 }) {
-    const [tonConnectUI] = useTonConnectUI();
     const [newPrice, setNewPrice] = useState<number | null>(accountPrice != null ? parseFloat(fromNano(accountPrice)) : null);
 
     const onSaveClick = () => {
         if(accountAddr == null || newPrice == null) {
             return;
         }
-        tonConnectUI.sendTransaction(updatePriceTransaction(Address.parse(accountAddr), toNano(newPrice)))
+        tonConnectUI?.sendTransaction(updatePriceTransaction(Address.parse(accountAddr), toNano(newPrice)))
     }
 
     return <div className="card bg-base-100 w-full shadow-xl rounded-none">

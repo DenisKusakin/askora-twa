@@ -1,13 +1,15 @@
-import {useTonAddress, useTonConnectUI} from "@tonconnect/ui-react";
 import {Account} from "@/wrappers/Account";
 import {Address, beginCell, SenderArguments, storeStateInit, toNano} from "@ton/core";
 import {SERVICE_OWNER_ADDR} from "@/components/utils/constants";
 import {ACCOUNT_CODE, QUESTION_CODE, QUESTION_REF_CODE} from "@/wrappers/contracts-codes";
 import {tonClient} from "@/wrappers/ton-client";
+import {useStoreClient} from "@/components/hooks/use-store-client";
+import {$myProfile} from "@/stores/profile-store";
+import {tonConnectUI} from "@/stores/ton-connect";
 
 export default function CreateAccount() {
-    const [tonConnectUI] = useTonConnectUI()
-    const tonAddr = useTonAddress()
+    const tonAddr = useStoreClient($myProfile)?.address?.toString() || ''
+
     const realSender = {
         address: tonAddr === '' ? undefined : Address.parse(tonAddr),
         async send(args: SenderArguments): Promise<void> {
@@ -26,7 +28,7 @@ export default function CreateAccount() {
                 }]
             }
 
-            await tonConnectUI.sendTransaction(transaction)
+            await tonConnectUI?.sendTransaction(transaction)
         }
     }
 

@@ -1,44 +1,16 @@
 'use client';
 
-import {useTonAddress} from "@tonconnect/ui-react";
-import {useEffect, useState} from "react";
-import {Address, OpenedContract} from "@ton/core";
 import CreateAccount from "@/components/create-account";
 import DisconnectWalletHeader from "@/components/disconnect-wallet-header";
-import {tonClient} from "@/wrappers/ton-client";
-import {SERVICE_OWNER_ADDR} from "@/components/utils/constants";
-import {Account} from "@/wrappers/Account";
-import {ACCOUNT_CODE, QUESTION_CODE, QUESTION_REF_CODE} from "@/wrappers/contracts-codes";
 import AccountQuestions from "@/components/account-questions-component-v2";
 import AccountInfo from "@/components/account-info";
+import {$myProfile, $myAccountInfo} from "@/stores/profile-store";
+import {useStoreClient} from "@/components/hooks/use-store-client";
+import {$myAssignedQuestions, $mySubmittedQuestions} from "@/stores/questions-store";
 
 export default function MyAccountPage() {
-    const tonAddr = useTonAddress();
-    const [accountState, setAccountState] = useState<{
-        isLoading: boolean,
-        state: "active" | "uninitialized" | "frozen" | null
-    }>({isLoading: true, state: null});
-    const [accountPrice, setAccountPrice] = useState<null | bigint>(null)
-    const [account, setAccount] = useState<OpenedContract<Account> | null>(null)
-
-    useEffect(() => {
-        if (tonAddr == null || tonAddr === '') {
-            return;
-        }
-        const account = tonClient.open(Account.createFromConfig({
-            owner: Address.parse(tonAddr),
-            serviceOwner: Address.parse(SERVICE_OWNER_ADDR)
-        }, ACCOUNT_CODE, QUESTION_CODE, QUESTION_REF_CODE))
-        tonClient.getContractState(account.address)
-            .then(state => {
-                setAccountState({isLoading: false, state: state.state})
-                if (state.state === 'active') {
-                    account.getPrice().then(setAccountPrice)
-                }
-            })
-        setAccount(account)
-    }, [tonAddr]);
-
+    const myAccountInfo = useStoreClient($myAccountInfo)
+    const myAddr = useStoreClient($myProfile)?.address?.toString()
     const alert = <div role="alert" className="alert alert-warning mt-10 flex flex-row">
         <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -55,17 +27,34 @@ export default function MyAccountPage() {
     </div>
 
     return <>
-        <div><DisconnectWalletHeader/></div>
-        {accountState.state !== 'active' && alert}
-        {accountState.state !== 'active' && <div className={"mt-2"}><CreateAccount/></div>}
-        <AccountInfo
-            accountPrice={accountPrice}
+        {/*<div className={"drawer"}>*/}
+        {/*    <input id="my-drawer" type="checkbox" className="drawer-toggle"/>*/}
+        {/*    /!*<HamburgerButton id="my-drawer" className="drawer-toggle"/>*!/*/}
+        {/*    <div className="drawer-content">*/}
+        {/*        <HamburgerButton htmlFor="my-drawer" id="my-drawer" className="drawer-toggle"/>*/}
+        {/*        /!*<label htmlFor="my-drawer" className="btn btn-primary drawer-button">Open drawer</label>*!/*/}
+        {/*    </div>*/}
+        {/*    <div className="drawer-side z-20">*/}
+        {/*        <label htmlFor="my-drawer" aria-label="close sidebar" className="drawer-overlay"></label>*/}
+        {/*        <ul className="menu bg-base-200 text-base-content min-h-full w-80 p-4">*/}
+        {/*            <li><a>Sidebar Item 1</a></li>*/}
+        {/*            <li><a>Sidebar Item 2</a></li>*/}
+        {/*        </ul>*/}
+        {/*    </div>*/}
+        {/*</div>*/}
+        <DisconnectWalletHeader/>
+        {myAccountInfo?.status !== 'active' && alert}
+        {myAccountInfo?.status !== 'active' && <div className={"mt-2"}><CreateAccount/></div>}
+        {myAccountInfo != null && myAddr != null && <AccountInfo
+            accountPrice={myAccountInfo.price}
             editable={true}
-            tonAddr={tonAddr}
-            accountAddr={account?.address != null ? account.address.toString() : null}/>
+            tonAddr={myAddr}
+            accountAddr={myAccountInfo?.address.toString()}/>}
         <div className={"mt-5"}>
-            {accountState.state === 'active' && account !== null &&
-                <AccountQuestions showButtons={true} account={account}/>}
+            {myAccountInfo?.status === 'active' &&
+                <AccountQuestions showButtons={true}
+                                  submittedQuestionsStore={$mySubmittedQuestions}
+                                  assignedQuestionsStore={$myAssignedQuestions}/>}
         </div>
     </>
 }

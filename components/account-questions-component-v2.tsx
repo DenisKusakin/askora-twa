@@ -1,44 +1,25 @@
-import {Address, OpenedContract} from "@ton/core";
-import {Account} from "@/wrappers/Account";
-import {useEffect, useState} from "react";
+import {useState} from "react";
 import {QuestionView as QuestionComponent} from "@/components/question-component";
-import {getAsignedQuestions, getSubmittedQuestions} from "@/wrappers/wrappers-utils";
-
-type QData = {
-    content: string,
-    replyContent: string,
-    balance: bigint,
-    addr: Address,
-    isRejected: boolean,
-    isClosed: boolean,
-    from: Address,
-    to: Address,
-    id: number
-}
-
-type TabData = {
-    title: string,
-    data: QData[],
-    isLoading: boolean,
-    isReady: boolean,
-    isActive: boolean,
-    fetch: () => Promise<QData[]>
-}
+import {Store} from "nanostores";
+import {QuestionData} from "@/stores/questions-store";
+import {useStoreClient} from "@/components/hooks/use-store-client";
 
 function Tab({tab, showFrom, showTo, showButtons}: {
-    tab: TabData,
+    tab: Store<{ isLoading: boolean, data: QuestionData[] }>,
     showFrom: boolean,
     showTo: boolean,
     showButtons: boolean
 }) {
-    if (tab.isLoading) {
+    const data = useStoreClient(tab)
+
+    if (data === null || data?.isLoading) {
         return <div>
             <span className="loading loading-dots loading-lg"></span>
         </div>
     }
-    console.log(tab.data)
+
     return <div>
-        {tab.data.map(q => <QuestionComponent
+        {data.data.map(q => <QuestionComponent
             key={q.addr.toRawString()}
             question={q}
             showFrom={showFrom}
@@ -47,97 +28,40 @@ function Tab({tab, showFrom, showTo, showButtons}: {
     </div>
 }
 
-export default function AccountQuestions({account, showButtons}: {
-    account: OpenedContract<Account>,
+export default function AccountQuestions({assignedQuestionsStore, submittedQuestionsStore, showButtons}: {
+    assignedQuestionsStore: Store<{ isLoading: boolean, data: QuestionData[] }>,
+    submittedQuestionsStore: Store<{ isLoading: boolean, data: QuestionData[] }>,
     showButtons: boolean
 }) {
-    const [tabs, setTabs] = useState<{
-        title: string,
-        data: QData[],
-        isLoading: boolean,
-        isReady: boolean,
-        isActive: boolean,
-        fetch: () => Promise<QData[]>,
-        showTo: boolean,
-        showFrom: boolean,
-        showActionButtons: boolean
-    }[]>([
+    const [tabs, setTabs] = useState([
         {
             title: "Assigned",
-            isReady: false,
-            isLoading: false,
+            store: assignedQuestionsStore,
             isActive: true,
-            data: [],
             showTo: false,
             showFrom: true,
-            showActionButtons: showButtons,
-            fetch: () => getAsignedQuestions(account)
+            showActionButtons: showButtons
         },
         {
             title: "Submitted",
-            isReady: false,
-            isLoading: false,
+            store: submittedQuestionsStore,
             isActive: false,
-            data: [],
             showTo: true,
             showFrom: false,
-            showActionButtons: false,
-            fetch: () => getSubmittedQuestions(account)
+            showActionButtons: false
         }
     ])
 
-    function updateTab(idx: number, info: {
-        data?: QData[],
-        isLoading?: boolean,
-        isReady?: boolean,
-        isActive?: boolean
-    }) {
-        setTabs(state => {
-            const newTabs = [...state];
-
-            if (newTabs[idx].isLoading != undefined) {
-                // @ts-expect-error todo
-                newTabs[idx].isLoading = info.isLoading
-            }
-            if (newTabs[idx].isActive != undefined) {
-                // @ts-expect-error todo
-                newTabs[idx].isActive = info.isActive
-            }
-            if (newTabs[idx].isReady != undefined) {
-                // @ts-expect-error todo
-                newTabs[idx].isReady = info.isReady
-            }
-            if (newTabs[idx].data != undefined) {
-                // @ts-expect-error todo
-                newTabs[idx].data = info.data
-            }
-
-            return newTabs;
-        })
-    }
-
     function setActive(idx: number) {
-        setTabs(state => {
-            const tabs = [...state]
-            for (let i = 0; i < tabs.length; i++) {
-                tabs[i].isActive = i === idx;
+        setTabs(currentState => {
+            const newState = [...currentState];
+            for (let i = 0; i < newState.length; i++) {
+                newState[i].isActive = i === idx
             }
 
-            return tabs
+            return newState
         })
     }
-
-    useEffect(() => {
-        for (let i = 0; i < tabs.length; i++) {
-            const tab = tabs[i]
-            if (tab.isActive && !tab.isLoading && !tab.isReady) {
-                updateTab(i, {data: [], isLoading: true, isReady: false, isActive: true})
-                tab.fetch().then(data => {
-                    updateTab(i, {data, isLoading: false, isReady: true, isActive: true})
-                })
-            }
-        }
-    }, [tabs]);
 
     return <div>
         <div role="tablist" className="tabs tabs-bordered">
@@ -151,7 +75,7 @@ export default function AccountQuestions({account, showButtons}: {
                                  showButtons={tab.showActionButtons}
                                  showTo={tab.showTo}
                                  showFrom={tab.showFrom}
-                                 tab={tab}/>)}
+                                 tab={tab.store}/>)}
         </div>
     </div>
 }
