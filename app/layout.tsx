@@ -1,4 +1,5 @@
 import "./globals.css";
+import "./global";
 
 export const metadata = {
     title: 'Next.js',
@@ -12,6 +13,9 @@ export default function RootLayout({
 }) {
     return (
         <html lang="en" className={"bg-base-100 p-4"}>
+        <head>
+            <script src={"https://telegram.org/js/telegram-web-app.js"}></script>
+        </head>
         <body>
         {children}
         </body>
