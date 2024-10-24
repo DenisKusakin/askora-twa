@@ -1,5 +1,6 @@
 import "./globals.css";
-import "./global";
+import Script from "next/script";
+import {router} from "next/client";
 
 export const metadata = {
     title: 'Next.js',
@@ -14,7 +15,16 @@ export default function RootLayout({
     return (
         <html lang="en" className={"bg-base-100 p-4"}>
         <head>
-            <script src={"https://telegram.org/js/telegram-web-app.js"}></script>
+            <Script src="https://telegram.org/js/telegram-web-app.js" onReady={() => {
+                if (typeof window !== 'undefined') {
+                    // @ts-expect-error todo
+                    window.Telegram.WebApp.BackButton.isVisible = true
+                    // @ts-expect-error todo
+                    window.Telegram.WebApp.BackButton.onClick(() => {
+                        router.back()
+                    })
+                }
+            }}></Script>
         </head>
         <body>
         {children}
