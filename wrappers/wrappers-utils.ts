@@ -11,7 +11,8 @@ export async function getAsignedQuestions(account: OpenedContract<Account>): Pro
     isRejected: boolean,
     from: Address,
     to: Address,
-    id: number
+    id: number,
+    createdAt: number
 }[]> {
     const count = await account.getNextId()
     const res: {
@@ -23,7 +24,8 @@ export async function getAsignedQuestions(account: OpenedContract<Account>): Pro
         isRejected: boolean,
         from: Address,
         to: Address,
-        id: number
+        id: number,
+        createdAt: number
     }[] = []
     for (let i = 0; i < count; i++) {
         //TODO: Add error handling!!!
@@ -37,8 +39,20 @@ export async function getAsignedQuestions(account: OpenedContract<Account>): Pro
             const isRejected = data.isRejected
             const from = data.submitterAddr;
             const to = data.ownerAddr;
+            const createdAt = data.createdAt
 
-            res.push({content, replyContent, balance, addr: q.address, isClosed, isRejected, from, to, id: i})
+            res.push({
+                content,
+                replyContent,
+                balance,
+                addr: q.address,
+                isClosed,
+                isRejected,
+                from,
+                to,
+                id: i,
+                createdAt
+            })
         } catch (e) {
             console.log(`Failed to retrieve question ${i}`, e)
         }
@@ -56,7 +70,8 @@ export async function getSubmittedQuestions(account: OpenedContract<Account>): P
     from: Address,
     replyContent: string,
     to: Address,
-    id: number
+    id: number,
+    createdAt: number
 }[]> {
     const count = await account.getNextSubmittedQuestionId()
     const res: {
@@ -68,7 +83,8 @@ export async function getSubmittedQuestions(account: OpenedContract<Account>): P
         from: Address,
         replyContent: string,
         to: Address,
-        id: number
+        id: number,
+        createdAt: number
     }[] = []
     for (let i = 0; i < count; i++) {
         try {
@@ -82,8 +98,20 @@ export async function getSubmittedQuestions(account: OpenedContract<Account>): P
             const isRejected = data.isRejected
             const from = data.submitterAddr
             const to = data.ownerAddr;
+            const createdAt = data.createdAt
 
-            res.push({content, balance, addr: q.address, isClosed, isRejected, from, to, replyContent, id: i})
+            res.push({
+                content,
+                balance,
+                addr: q.address,
+                isClosed,
+                isRejected,
+                from,
+                to,
+                replyContent,
+                id: i,
+                createdAt
+            })
         } catch (e) {
             console.log(`Failed to retrieve submitted question ${i}`, e)
         }

@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@nanostores/react": "^0.8.0",
+    "@nanostores/router": "^0.16.1",
     "@ton/core": "^0.58.1",
     "@ton/crypto": "^3.3.0",
     "@ton/ton": "^15.0.0",
@@ -20,7 +21,8 @@
     "next": "14.2.14",
     "react": "^18",
     "react-currency-input-field": "^3.8.0",
-    "react-dom": "^18"
+    "react-dom": "^18",
+    "timeago.js": "^4.0.2"
   },
   "devDependencies": {
     "@tailwindcss/typography": "^0.5.15",

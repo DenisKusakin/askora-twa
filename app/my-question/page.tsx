@@ -2,17 +2,19 @@
 
 import {useSearchParams} from "next/navigation";
 import {Suspense} from "react";
-import ReplyQuestionPage from "@/components/reply-question-page";
+// import ReplyQuestionPage from "@/components/reply-question-page";
+import MyQuestionDetails from "@/components/v2/my-question-details";
 
 function Comp() {
     const searchParams = useSearchParams()
     const id = searchParams.get('id')
-    const isReply = searchParams.get('command') === 'reply'
+    // const isReply = searchParams.get('command') === 'reply'
 
     let res = <h1>Something wrong</h1>;
 
-    if (isReply && id !== null) {
-        res = <ReplyQuestionPage id={parseInt(id)}/>
+    if (id !== null) {
+        res = <MyQuestionDetails id={parseInt(id)}/>
+        // res = <ReplyQuestionPage id={parseInt(id)}/>
     }
 
     return res;

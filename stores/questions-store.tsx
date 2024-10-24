@@ -7,6 +7,7 @@ import {ACCOUNT_CODE, QUESTION_CODE, QUESTION_REF_CODE} from "@/wrappers/contrac
 import {tonClient} from "@/wrappers/ton-client";
 import {getAsignedQuestions, getSubmittedQuestions} from "@/wrappers/wrappers-utils";
 import {Question} from "@/wrappers/Question";
+// import {$router} from "@/stores/router-store";
 
 export type QuestionData = {
     content: string,
@@ -17,13 +18,15 @@ export type QuestionData = {
     isClosed: boolean,
     from: Address,
     to: Address,
-    id: number
+    id: number,
+    createdAt: number
 }
 
 export const $myAssignedQuestions = atom<{ isLoading: boolean, data: QuestionData[] }>({isLoading: true, data: []})
 export const $mySubmittedQuestions = atom<{ isLoading: boolean, data: QuestionData[] }>({isLoading: true, data: []})
 
 onMount($myAssignedQuestions, () => {
+    console.log("My assigned questions mount")
     const myProfile = $myProfile.get()
     if (myProfile === null) {
         $myAssignedQuestions.set({isLoading: true, data: []})
@@ -34,13 +37,15 @@ onMount($myAssignedQuestions, () => {
         }, ACCOUNT_CODE, QUESTION_CODE, QUESTION_REF_CODE)
         const accountContract = tonClient.open(account)
         $myAssignedQuestions.set({isLoading: true, data: []})
-        getAsignedQuestions(accountContract).then(data => {
-            $myAssignedQuestions.set({isLoading: false, data})
-        })
+        getAsignedQuestions(accountContract)
+            .then(data => {
+                $myAssignedQuestions.set({isLoading: false, data})
+            })
     }
 })
 
 onMount($mySubmittedQuestions, () => {
+    console.log("My submitted questions mount")
     const myProfile = $myProfile.get()
     if (myProfile === null) {
         $mySubmittedQuestions.set({isLoading: true, data: []})
@@ -51,7 +56,8 @@ onMount($mySubmittedQuestions, () => {
         }, ACCOUNT_CODE, QUESTION_CODE, QUESTION_REF_CODE)
         const accountContract = tonClient.open(account)
         $mySubmittedQuestions.set({isLoading: true, data: []})
-        getSubmittedQuestions(accountContract).then(data => $mySubmittedQuestions.set({isLoading: false, data}))
+        getSubmittedQuestions(accountContract)
+            .then(data => $mySubmittedQuestions.set({isLoading: false, data}))
     }
 })
 
@@ -78,6 +84,18 @@ export const $questionDetailsData = computed(
         const questionContract = tonClient.open(question)
         const data = await questionContract.getAllData()
 
-        return data
+        return {...data, from: data.submitterAddr, to: data.ownerAddr}
     })
 )
+
+export async function fetchQuestionData(ownerAddress: Address, qId: number) {
+    const account = Account.createFromConfig({
+        owner: ownerAddress,
+        serviceOwner: Address.parse(SERVICE_OWNER_ADDR)
+    }, ACCOUNT_CODE, QUESTION_CODE, QUESTION_REF_CODE)
+    const question = Question.createFromConfig({accountAddr: account.address, id: qId}, QUESTION_CODE)
+    const questionContract = tonClient.open(question)
+    const data = await questionContract.getAllData()
+
+    return {...data, from: data.submitterAddr, to: data.ownerAddr}
+}

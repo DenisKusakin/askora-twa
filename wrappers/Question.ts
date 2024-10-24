@@ -48,7 +48,8 @@ export class Question implements Contract {
         return {
             id, isClosed, isRejected,
             content, replyContent, submitterAddr,
-            accountAddr, balance, createdAt, ownerAddr
+            accountAddr, balance, createdAt, ownerAddr,
+            addr: this.address
         }
     }
 }
