@@ -1,7 +1,6 @@
 'use client';
 
 import Script from "next/script";
-import Router from 'next/router'
 
 export default function MyHead(){
     // const router = useRouter()
@@ -11,8 +10,8 @@ export default function MyHead(){
             window.Telegram.WebApp.BackButton.isVisible = true
             // @ts-expect-error todo
             window.Telegram.WebApp.BackButton.onClick(() => {
-                Router.back()
+                window.history.back()
             })
         }
-    }}></Script>
+    }}/>
 }
