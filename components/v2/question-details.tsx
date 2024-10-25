@@ -9,7 +9,7 @@ export default function QuestionDetails({question}: { question: QuestionData }) 
     const myProfile = useStoreClient($myProfile)
     const [myReply, setMyReply] = useState<string>('')
 
-    let additional_class = "text-base"
+    let additional_class = ""
     if (question.isRejected) {
         additional_class = "text-error"
     } else if (question.isClosed) {
@@ -27,7 +27,7 @@ export default function QuestionDetails({question}: { question: QuestionData }) 
         </div>
         <div className={"flex flex-col"}>
             <span className={"text-sm font-light"}>Sender</span>
-            <div>
+            <div  onClick={() => {navigator.clipboard.writeText(question.from.toString())}}>
                 <span className={"text-base break-all"}>{question.from.toString()}</span>
                 {isYou(question.from) && <span className={"text-base italic font-bold ml-1"}>(You)</span>}
             </div>
@@ -35,7 +35,7 @@ export default function QuestionDetails({question}: { question: QuestionData }) 
         <div className={"divider m-1"}></div>
         <div className={"flex flex-col mt-2"}>
             <span className={"text-sx font-light"}>Receiver</span>
-            <div>
+            <div onClick={() => {navigator.clipboard.writeText(question.to.toString())}}>
                 <span className={"text-base break-all"}>{question.to.toString()}</span>
                 {isYou(question.to) && <span className={"text-base italic font-bold ml-1"}>(You)</span>}
             </div>
