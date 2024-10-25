@@ -14,6 +14,9 @@ export default function MyProfile() {
         // tonConnectUI?.openModal()
         tonConnectUI?.modal?.open()
     }
+    const onShareClick = () => {
+        navigator.share({url: `${window.location.origin}/account?id=${connectedProfile?.address.toString()}`})
+    }
     if (connectedProfile === null) {
         return <div className={"pt-10"}>
             <button className={"btn btn-outline btn-block btn-primary btn-lg mt-50"} onClick={onConnectClick}>Connect
@@ -29,14 +32,16 @@ export default function MyProfile() {
                 <span className={"text-3xl ml-2"}>TON</span>
             </div>
             <div className={"mt-10 flex flex-row"}>
-                <Link href={"/configure"} className={"btn btn-sm btn-primary btn-outline ml-4"}>Configure</Link>
-                <button className={"btn btn-sm btn-primary btn-outline ml-4"}>Share</button>
                 <button className={"btn btn-sm btn-error btn-outline ml-4"} onClick={onDisconnectClick}>Disconnect
+                </button>
+                <Link href={"/configure"} className={"btn btn-sm btn-primary btn-outline ml-4"}>Configure</Link>
+                <Link href={"/my-details"} className={"btn btn-sm btn-primary btn-outline ml-4"}>Details</Link>
+                <button className={"btn btn-sm btn-primary btn-outline ml-4"} onClick={onShareClick}>Share
                 </button>
             </div>
             <div className={"mt-10 w-full"}>
                 <Link href={"/inbox"} className="btn btn-block">
-                    <span className={"text-2xl"}>Inbox</span>
+                <span className={"text-2xl"}>Inbox</span>
                     <div className="badge badge-secondary">+99</div>
                 </Link>
                 <Link href={"/sent"} className="btn btn-block mt-5">

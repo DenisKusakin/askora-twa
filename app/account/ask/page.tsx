@@ -1,9 +1,9 @@
-'use client';
+'use client'
 
 import {useSearchParams} from "next/navigation";
-import {Suspense} from "react";
-import Profile from "@/components/v2/profile";
 import {Address} from "@ton/core";
+import {Suspense} from "react";
+import Ask from "@/components/v2/ask";
 
 function Comp() {
     const searchParams = useSearchParams()
@@ -12,13 +12,14 @@ function Comp() {
     let res = <h1>Something wrong</h1>;
 
     if (id !== null) {
-        res = <Profile owner={Address.parse(id)}/>
+        res = <Ask addr={Address.parse(id)}/>
     }
 
     return res;
 }
 
-export default function AccountPage() {
+export default function AskPage(){
+
     return <Suspense>
         <Comp/>
     </Suspense>

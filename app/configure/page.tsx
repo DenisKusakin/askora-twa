@@ -11,7 +11,7 @@ import {updatePriceTransaction} from "@/components/utils/transaction-utils";
 
 export default function ConfigurePrice() {
     const myProfileInfo = useStoreClient($myAccountInfo)
-    const [newPrice, setNewPrice] = useState(parseFloat(fromNano(myProfileInfo?.price != null ? myProfileInfo.price : 0)))
+    const [newPrice, setNewPrice] = useState(0)
 
     const onClick = () => {
         if (myProfileInfo?.address != null) {
@@ -23,9 +23,9 @@ export default function ConfigurePrice() {
         <div className={"flex flex-col items-center"}>
             <div className={"text-neutral text-xl"}>Price</div>
             <div className={"w-full flex justify-center"}>
-                <CurrencyInput
-                    defaultValue={newPrice?.toString() || 0}
-                    className={`input text-3xl font-bold w-1/2`}
+                {myProfileInfo != null && !myProfileInfo.isLoading && <CurrencyInput
+                    defaultValue={parseFloat(fromNano(myProfileInfo.price))}
+                    className={`input text-3xl font-bold w-full text-center`}
                     readOnly={false}
                     decimalScale={3}
                     decimalsLimit={3}
@@ -41,7 +41,8 @@ export default function ConfigurePrice() {
                         } else {
                             setNewPrice(0)
                         }
-                    }}/>
+                    }}/>}
+                {(myProfileInfo == null || myProfileInfo.isLoading) && <div className={"loading loading-lg loading-dots"}></div>}
             </div>
             <div className={"mt-10 flex flex-row"}>
                 <Link href="/" className={"btn btn-sm btn-error btn-outline ml-4"}>Cancel</Link>

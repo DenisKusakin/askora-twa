@@ -7,15 +7,15 @@ import {SERVICE_OWNER_ADDR} from "@/components/utils/constants";
 import {ACCOUNT_CODE, QUESTION_CODE, QUESTION_REF_CODE} from "@/wrappers/contracts-codes";
 import {tonClient} from "@/wrappers/ton-client";
 import {tonConnectUI} from "@/stores/ton-connect";
+import {QuestionData} from "@/stores/questions-store";
+import {getAsignedQuestions, getSubmittedQuestions} from "@/wrappers/wrappers-utils";
 
 export const $myProfile = atom<{
     address: Address
 } | null>(tonConnectUI != null && tonConnectUI.wallet != null ? {address: Address.parse(tonConnectUI.wallet.account.address)} : null)
 
 if (tonConnectUI != null) {
-    console.log("Subscribed on status change")
     tonConnectUI.onStatusChange(wallet => {
-        console.log("Status changed", wallet)
         if (wallet === null) {
             $myProfile.set(null);
         } else {
@@ -65,3 +65,67 @@ onSet($myProfile, ({newValue, abort}) => {
         })
     }
 })
+
+export type AccountInfo = {
+    price: bigint,
+    assignedCount: number,
+    submittedCount: number,
+    status: 'active' | 'non-active',
+    address: Address
+}
+
+export async function fetchAccountInfo(ownerAddr: Address): Promise<AccountInfo> {
+    const account = Account.createFromConfig({
+        owner: ownerAddr,
+        serviceOwner: Address.parse(SERVICE_OWNER_ADDR)
+    }, ACCOUNT_CODE, QUESTION_CODE, QUESTION_REF_CODE)
+    const accountContract = tonClient.open(account)
+
+    return tonClient.getContractState(account.address).then(({state}) => {
+        if (state === "active") {
+            return accountContract.getAllData().then(data => ({
+                price: data.minPrice,
+                assignedCount: data.assignedQuestionsCount,
+                submittedCount: data.submittedQuestionsCount,
+                status: 'active',
+                address: account.address
+            }))
+        } else {
+            return {
+                price: BigInt(0),
+                assignedCount: 0,
+                submittedCount: 0,
+                status: 'non-active',
+                address: account.address
+            }
+        }
+    })
+}
+
+export async function fetchAccountQuestions(ownerAddr: Address): Promise<QuestionData[]> {
+    if (tonClient == null) {
+        return Promise.resolve([])
+    }
+    const accountInfo = await fetchAccountInfo(ownerAddr)
+    const account = Account.createFromConfig({
+        owner: ownerAddr,
+        serviceOwner: Address.parse(SERVICE_OWNER_ADDR)
+    }, ACCOUNT_CODE, QUESTION_CODE, QUESTION_REF_CODE)
+    const accountContract = tonClient.open(account)
+
+    return getAsignedQuestions(accountContract)
+}
+
+export async function fetchAccountSubmittedQuestions(ownerAddr: Address): Promise<QuestionData[]> {
+    if (tonClient == null) {
+        return Promise.resolve([])
+    }
+    const accountInfo = await fetchAccountInfo(ownerAddr)
+    const account = Account.createFromConfig({
+        owner: ownerAddr,
+        serviceOwner: Address.parse(SERVICE_OWNER_ADDR)
+    }, ACCOUNT_CODE, QUESTION_CODE, QUESTION_REF_CODE)
+    const accountContract = tonClient.open(account)
+
+    return getSubmittedQuestions(accountContract)
+}

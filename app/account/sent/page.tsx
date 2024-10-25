@@ -2,8 +2,8 @@
 
 import {useSearchParams} from "next/navigation";
 import {Suspense} from "react";
-import Profile from "@/components/v2/profile";
 import {Address} from "@ton/core";
+import AccountSent from "@/components/v2/account-sent";
 
 function Comp() {
     const searchParams = useSearchParams()
@@ -12,13 +12,13 @@ function Comp() {
     let res = <h1>Something wrong</h1>;
 
     if (id !== null) {
-        res = <Profile owner={Address.parse(id)}/>
+        res = <AccountSent owner={Address.parse(id)}/>
     }
 
     return res;
 }
 
-export default function AccountPage() {
+export default function AccountSentPage() {
     return <Suspense>
         <Comp/>
     </Suspense>
