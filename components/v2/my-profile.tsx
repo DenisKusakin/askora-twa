@@ -24,10 +24,10 @@ export default function MyProfile() {
         }
         navigator.share({url: `${window.location.origin}/account?id=${connectedProfile.address.toString()}`})
     }
-    if (myAccountInfo == null || myAccountInfo?.isLoading === true){
+    if (myAccountInfo == null || myAccountInfo?.isLoading === true) {
         return <div className={"pt-10 loading loading-lg loading-dots"}></div>
     }
-    if (myAccountInfo?.isLoading === false && myAccountInfo?.data == null) {
+    if (connectedProfile != null && !connectedProfile.isLoading && connectedProfile.address != null && myAccountInfo?.isLoading === false && myAccountInfo?.data == null) {
         return <CreateAccount/>
     }
     if (connectedProfile?.isLoading === false && connectedProfile.address === null) {
@@ -73,7 +73,8 @@ export default function MyProfile() {
                         <div className="badge badge-secondary">{myQuestionsNotReplied}</div>}
                 </Link>
                 <Link href={"/find"} className={"btn btn-primary btn-outline btn-lg mt-10 btn-block"}>Find User</Link>
-                <button className={"btn btn-error btn-outline btn-block btn-lg mt-4"} onClick={onDisconnectClick}>Disconnect
+                <button className={"btn btn-error btn-outline btn-block btn-lg mt-4"}
+                        onClick={onDisconnectClick}>Disconnect
                 </button>
             </div>
         </div>

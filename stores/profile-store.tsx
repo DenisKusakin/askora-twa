@@ -17,7 +17,6 @@ export const $myProfile = atom<{
 
 if (tonConnectUI != null) {
     tonConnectUI.onStatusChange(wallet => {
-        console.log("Wallet status changed", wallet)
         if (wallet === null) {
             $myProfile.set({isLoading: false, address: null});
         } else {
@@ -38,10 +37,8 @@ export const $myAccountInfo = computed($myProfile, newValue => task(async () => 
         const {state} = await tonClient.getContractState(newValue.address)
 
         if (state === "active") {
-            console.log("Active")
             try{
                 const data = await accountContract.getAllData()
-                console.log("Data received")
                 return {
                     data: {
                         price: data.minPrice,
@@ -53,14 +50,12 @@ export const $myAccountInfo = computed($myProfile, newValue => task(async () => 
                     isLoading: false
                 }
             } catch {
-                console.log("Failed to receive")
                 return {
                     isLoading: false,
                     data: null
                 }
             }
         } else {
-            console.log("non-Active")
             return {
                 isLoading: false,
                 data: null
@@ -68,8 +63,6 @@ export const $myAccountInfo = computed($myProfile, newValue => task(async () => 
         }
     }
 }))
-
-$myAccountInfo.listen(x => console.log("!!!", x))
 
 export type AccountInfo = {
     price: bigint,

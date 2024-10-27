@@ -48,6 +48,8 @@ export default function CreateAccount() {
             {/*</div>*/}
         </div>
         <button className={"btn btn-block btn-lg btn-primary mt-2"} onClick={onClick}>Submit</button>
-        <button className={"btn btn-block btn-outline btn-lg btn-error mt-2"} onClick={() => tonConnectUI?.disconnect()}>Disconnect</button>
+        <button className={"btn btn-block btn-outline btn-lg btn-error mt-2"}
+                onClick={() => tonConnectUI?.disconnect()}>Disconnect
+        </button>
     </div>
 }

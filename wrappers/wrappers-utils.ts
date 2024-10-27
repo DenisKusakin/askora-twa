@@ -53,7 +53,6 @@ export async function getAsignedQuestions(account: OpenedContract<Account>): Pro
                 createdAt
             })
         } catch (e) {
-            console.log(`Failed to retrieve question ${i}`, e)
         }
     }
 
@@ -111,8 +110,7 @@ export async function getSubmittedQuestions(account: OpenedContract<Account>): P
                 id: i,
                 createdAt
             })
-        } catch (e) {
-            console.log(`Failed to retrieve submitted question ${i}`, e)
+        } catch {
         }
 
     }
