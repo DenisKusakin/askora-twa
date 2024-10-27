@@ -35,11 +35,9 @@ export default function Profile({owner}: { owner: Address }) {
             <div className={"mt-10 w-full"}>
                 <Link href={`/account/inbox?id=${owner.toString()}`} className="btn btn-block">
                     <span className={"text-2xl"}>Inbox</span>
-                    <div className="badge badge-secondary">+99</div>
                 </Link>
                 <Link href={`/account/sent?id=${owner.toString()}`} className="btn btn-block mt-5">
                     <span className={"text-2xl"}>Sent</span>
-                    <div className="badge badge-secondary">3</div>
                 </Link>
             </div>
             <div className={"mt-10 w-full"}>

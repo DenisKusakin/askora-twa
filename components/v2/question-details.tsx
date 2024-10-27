@@ -9,6 +9,7 @@ import {showSuccessNotification} from "@/stores/notifications-store";
 
 export default function QuestionDetails({question}: { question: QuestionData }) {
     const myProfile = useStoreClient($myProfile)
+    const [replyShown, setReplyShown] = useState(false)
     const [myReply, setMyReply] = useState<string>('')
 
     let additional_class = ""
@@ -34,10 +35,10 @@ export default function QuestionDetails({question}: { question: QuestionData }) 
 
     return <div className={"pt-10"}>
         <div className={""}>
-            <span className={`text-5xl ${additional_class}`}>{parseFloat(fromNano(question.minPrice)).toFixed(3)}</span>
-            <span className={`ml-2 text-3xl ${additional_class}`}>TON</span>
+            <span className={`${!replyShown ? 'text-5xl' : 'text-xl'} ${additional_class}`}>{parseFloat(fromNano(question.minPrice)).toFixed(3)}</span>
+            <span className={`${!replyShown ? 'text-3xl' : 'text-base'} text-3xl ml-2 ${additional_class}`}>TON</span>
         </div>
-        <div className={"flex flex-col"}>
+        {!replyShown && <div className={"flex flex-col"}>
             <span className={"text-sm font-light"}>Sender</span>
             <div onClick={() => {
                 navigator.clipboard.writeText(question.from.toString())
@@ -48,9 +49,9 @@ export default function QuestionDetails({question}: { question: QuestionData }) 
                     <Link href={`/account?id=${question.from.toString()}`} className={"ml-2 link link-primary italic"}>Open
                         Profile</Link>}
             </div>
-        </div>
-        <div className={"divider m-1"}></div>
-        <div className={"flex flex-col mt-2"}>
+        </div>}
+        {!replyShown && <div className={"divider m-1"}></div>}
+        {!replyShown && <div className={"flex flex-col mt-2"}>
             <span className={"text-sx font-light"}>Receiver</span>
             <div onClick={() => {
                 navigator.clipboard.writeText(question.to.toString())
@@ -61,37 +62,46 @@ export default function QuestionDetails({question}: { question: QuestionData }) 
                     <Link href={`/account?id=${question.to.toString()}`} className={"ml-2 link link-primary italic"}>Open
                         Profile</Link>}
             </div>
-        </div>
-        <div className={"divider m-1"}></div>
+            <div className={"divider m-1"}></div>
+        </div>}
         <div className={"flex flex-col mt-2"}>
             <span className={"text-sx font-light"}>Message</span>
             <span className={"text-base break-all"}>{question.content}</span>
         </div>
-        {question.isClosed && !question.isRejected && <>
+        {replyShown && isMyQuestion && question.isClosed && !question.isRejected && <>
             <div className={"divider m-1"}></div>
             <div className={"flex flex-col mt-2"}>
                 <span className={"text-sx font-light"}>Reply</span>
                 <span className={"text-base break-all"}>{question.replyContent}</span>
             </div>
         </>}
-        {!question.isClosed && isMyQuestion && <>
+        {!replyShown && isMyQuestion && !question.isClosed && <div className={"flex flex-col mt-4"}>
+            <button className={"btn btn-outline btn-block btn-lg btn-primary mt-2"}
+                    onClick={() => setReplyShown(true)}>
+                Reply
+            </button>
+            <button className={"btn btn-block btn-lg btn-error mt-2"}
+                    onClick={onRejectClick}>Reject
+            </button>
+        </div>}
+        {replyShown && !question.isClosed && isMyQuestion && <>
             <div className={"flex flex-col mt-2"}>
                 <div className={"divider m-1"}></div>
-                <span className={"text-sx font-light"}>Reply</span>
-                <textarea
-                    placeholder="Your response"
-                    onChange={e => setMyReply(e.target.value)}
-                    className="textarea mt-2 textarea-bordered textarea-lg w-full h-[200px]"></textarea>
-            </div>
-            <div className={"mt-4 flex flex-row items-center justify-between"}>
-                <button className={"btn btn-outline btn-xl btn-error"}
-                        onClick={onRejectClick}>Reject
-                </button>
-                <button className={"btn btn-outline btn-xl btn-primary"}
-                        onClick={onReplyClick}
-                        disabled={myReply.trim() === ''}>Send Reply
-                </button>
-            </div>
-        </>}
-    </div>
-}
+                    <span className={"text-sx font-light"}>Reply</span>
+                    <textarea
+                        placeholder="Your response"
+                        onChange={e => setMyReply(e.target.value)}
+                        className="textarea mt-2 textarea-bordered textarea-lg w-full h-[200px]"></textarea>
+                </div>
+                <div className={"mt-4"}>
+                    <button className={"btn btn-block btn-lg btn-primary"}
+                            onClick={onReplyClick}
+                            disabled={myReply.trim() === ''}>Send Reply
+                    </button>
+                    <button className={"btn btn-outline btn-block btn-lg btn-error mt-2"}
+                            onClick={() => setReplyShown(false)}>Cancel
+                    </button>
+                </div>
+            </>}
+        </div>
+        }
