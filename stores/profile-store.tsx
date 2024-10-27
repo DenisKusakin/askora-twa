@@ -1,70 +1,75 @@
-'use client';
-
-import {atom, onSet} from "nanostores";
+import {atom, computed, task} from "nanostores";
 import {Address} from "@ton/core";
-import {Account} from "@/wrappers/Account";
-import {SERVICE_OWNER_ADDR} from "@/components/utils/constants";
-import {ACCOUNT_CODE, QUESTION_CODE, QUESTION_REF_CODE} from "@/wrappers/contracts-codes";
+import {APP_CONTRACT_ADDR} from "@/components/utils/constants";
 import {tonClient} from "@/wrappers/ton-client";
 import {tonConnectUI} from "@/stores/ton-connect";
 import {QuestionData} from "@/stores/questions-store";
 import {getAsignedQuestions, getSubmittedQuestions} from "@/wrappers/wrappers-utils";
+import {Root} from "@/wrappers/Root";
 
 export const $myProfile = atom<{
-    address: Address
-} | null>(tonConnectUI != null && tonConnectUI.wallet != null ? {address: Address.parse(tonConnectUI.wallet.account.address)} : null)
+    address: Address | null,
+    isLoading: boolean
+}>(tonConnectUI != null ? {
+    address: tonConnectUI.wallet != null ? Address.parse(tonConnectUI.wallet.account.address) : null,
+    isLoading: false
+} : {isLoading: true, address: null})
 
 if (tonConnectUI != null) {
     tonConnectUI.onStatusChange(wallet => {
+        console.log("Wallet status changed", wallet)
         if (wallet === null) {
-            $myProfile.set(null);
+            $myProfile.set({isLoading: false, address: null});
         } else {
-            $myProfile.set({address: Address.parse(wallet.account.address)})
+            $myProfile.set({address: Address.parse(wallet.account.address), isLoading: false})
         }
     })
 }
 
-export const $myAccountInfo = atom<{
-    price: bigint,
-    assignedCount: number,
-    submittedCount: number,
-    status: 'active' | 'non-active',
-    isLoading: boolean,
-    address: Address
-} | null>(null)
-
-onSet($myProfile, ({newValue, abort}) => {
-    if (newValue === null) {
-        $myAccountInfo.set(null)
+export const $myAccountInfo = computed($myProfile, newValue => task(async () => {
+    if (newValue.isLoading) {
+        return {isLoading: true, data: null}
     } else {
-        const account = Account.createFromConfig({
-            owner: newValue.address,
-            serviceOwner: Address.parse(SERVICE_OWNER_ADDR)
-        }, ACCOUNT_CODE, QUESTION_CODE, QUESTION_REF_CODE)
-        const accountContract = tonClient.open(account)
+        const rootContract = tonClient.open(Root.createFromAddress(APP_CONTRACT_ADDR))
+        if (newValue.address == null) {
+            return {isLoading: false, data: null}
+        }
+        const accountContract = await rootContract.getAccount(newValue.address)
+        const {state} = await tonClient.getContractState(newValue.address)
 
-        $myAccountInfo.set({
-            price: BigInt(0),
-            assignedCount: 0,
-            submittedCount: 0,
-            isLoading: true,
-            status: 'non-active',
-            address: account.address
-        })
-        tonClient.getContractState(newValue.address).then(({state}) => {
-            if (state === "active") {
-                accountContract.getAllData().then(data => $myAccountInfo.set({
-                    price: data.minPrice,
-                    assignedCount: data.assignedQuestionsCount,
-                    submittedCount: data.submittedQuestionsCount,
+        if (state === "active") {
+            console.log("Active")
+            try{
+                const data = await accountContract.getAllData()
+                console.log("Data received")
+                return {
+                    data: {
+                        price: data.minPrice,
+                        assignedCount: data.assignedQuestionsCount,
+                        submittedCount: data.submittedQuestionsCount,
+                        status: 'active',
+                        address: accountContract.address
+                    },
+                    isLoading: false
+                }
+            } catch {
+                console.log("Failed to receive")
+                return {
                     isLoading: false,
-                    status: 'active',
-                    address: account.address
-                }))
+                    data: null
+                }
             }
-        })
+        } else {
+            console.log("non-Active")
+            return {
+                isLoading: false,
+                data: null
+            }
+        }
     }
-})
+}))
+
+$myAccountInfo.listen(x => console.log("!!!", x))
 
 export type AccountInfo = {
     price: bigint,
@@ -75,29 +80,20 @@ export type AccountInfo = {
 }
 
 export async function fetchAccountInfo(ownerAddr: Address): Promise<AccountInfo> {
-    const account = Account.createFromConfig({
-        owner: ownerAddr,
-        serviceOwner: Address.parse(SERVICE_OWNER_ADDR)
-    }, ACCOUNT_CODE, QUESTION_CODE, QUESTION_REF_CODE)
-    const accountContract = tonClient.open(account)
+    const rootContract = tonClient.open(Root.createFromAddress(APP_CONTRACT_ADDR))
+    const accountContract = await rootContract.getAccount(ownerAddr)
 
-    return tonClient.getContractState(account.address).then(({state}) => {
+    return tonClient.getContractState(accountContract.address).then(({state}) => {
         if (state === "active") {
             return accountContract.getAllData().then(data => ({
                 price: data.minPrice,
                 assignedCount: data.assignedQuestionsCount,
                 submittedCount: data.submittedQuestionsCount,
                 status: 'active',
-                address: account.address
+                address: accountContract.address
             }))
         } else {
-            return {
-                price: BigInt(0),
-                assignedCount: 0,
-                submittedCount: 0,
-                status: 'non-active',
-                address: account.address
-            }
+            return Promise.reject()
         }
     })
 }
@@ -106,12 +102,8 @@ export async function fetchAccountQuestions(ownerAddr: Address): Promise<Questio
     if (tonClient == null) {
         return Promise.resolve([])
     }
-    const accountInfo = await fetchAccountInfo(ownerAddr)
-    const account = Account.createFromConfig({
-        owner: ownerAddr,
-        serviceOwner: Address.parse(SERVICE_OWNER_ADDR)
-    }, ACCOUNT_CODE, QUESTION_CODE, QUESTION_REF_CODE)
-    const accountContract = tonClient.open(account)
+    const rootContract = tonClient.open(Root.createFromAddress(APP_CONTRACT_ADDR))
+    const accountContract = await rootContract.getAccount(ownerAddr)
 
     return getAsignedQuestions(accountContract)
 }
@@ -120,12 +112,8 @@ export async function fetchAccountSubmittedQuestions(ownerAddr: Address): Promis
     if (tonClient == null) {
         return Promise.resolve([])
     }
-    const accountInfo = await fetchAccountInfo(ownerAddr)
-    const account = Account.createFromConfig({
-        owner: ownerAddr,
-        serviceOwner: Address.parse(SERVICE_OWNER_ADDR)
-    }, ACCOUNT_CODE, QUESTION_CODE, QUESTION_REF_CODE)
-    const accountContract = tonClient.open(account)
+    const rootContract = tonClient.open(Root.createFromAddress(APP_CONTRACT_ADDR))
+    const accountContract = await rootContract.getAccount(ownerAddr)
 
     return getSubmittedQuestions(accountContract)
 }

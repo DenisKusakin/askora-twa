@@ -10,9 +10,6 @@ if (typeof window != 'undefined') {
         // TODO: Make it available under root
         manifestUrl: 'https://deniskusakin.github.io/askora-twa/manifest.json',
     })
-    console.log("INit ", tonConnectUI2.wallet)
-} else {
-    console.log("TON CONNECT not created")
 }
 
 export const tonConnectUI = tonConnectUI2

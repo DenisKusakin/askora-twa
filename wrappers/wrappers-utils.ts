@@ -1,11 +1,10 @@
 import {Address, OpenedContract} from "@ton/core";
 import {Account} from "@/wrappers/Account";
-import {tonClient} from "@/wrappers/ton-client";
 
 export async function getAsignedQuestions(account: OpenedContract<Account>): Promise<{
     content: string,
     replyContent: string,
-    balance: bigint,
+    minPrice: bigint,
     addr: Address,
     isClosed: boolean,
     isRejected: boolean,
@@ -18,7 +17,7 @@ export async function getAsignedQuestions(account: OpenedContract<Account>): Pro
     const res: {
         content: string,
         replyContent: string,
-        balance: bigint,
+        minPrice: bigint,
         addr: Address,
         isClosed: boolean,
         isRejected: boolean,
@@ -34,7 +33,7 @@ export async function getAsignedQuestions(account: OpenedContract<Account>): Pro
             const data = await q.getAllData()
             const content = data.content
             const replyContent = data.replyContent
-            const balance = await tonClient.getBalance(q.address)
+            const minPrice = data.minPrice
             const isClosed = data.isClosed
             const isRejected = data.isRejected
             const from = data.submitterAddr;
@@ -44,7 +43,7 @@ export async function getAsignedQuestions(account: OpenedContract<Account>): Pro
             res.push({
                 content,
                 replyContent,
-                balance,
+                minPrice,
                 addr: q.address,
                 isClosed,
                 isRejected,
@@ -63,7 +62,7 @@ export async function getAsignedQuestions(account: OpenedContract<Account>): Pro
 
 export async function getSubmittedQuestions(account: OpenedContract<Account>): Promise<{
     content: string,
-    balance: bigint,
+    minPrice: bigint,
     addr: Address,
     isClosed: boolean,
     isRejected: boolean,
@@ -76,7 +75,7 @@ export async function getSubmittedQuestions(account: OpenedContract<Account>): P
     const count = await account.getNextSubmittedQuestionId()
     const res: {
         content: string,
-        balance: bigint,
+        minPrice: bigint,
         addr: Address,
         isClosed: boolean,
         isRejected: boolean,
@@ -93,7 +92,7 @@ export async function getSubmittedQuestions(account: OpenedContract<Account>): P
             const data = await q.getAllData()
             const content = data.content
             const replyContent = data.replyContent
-            const balance = await tonClient.getBalance(q.address)
+            const minPrice = data.minPrice
             const isClosed = data.isClosed
             const isRejected = data.isRejected
             const from = data.submitterAddr
@@ -102,7 +101,7 @@ export async function getSubmittedQuestions(account: OpenedContract<Account>): P
 
             res.push({
                 content,
-                balance,
+                minPrice,
                 addr: q.address,
                 isClosed,
                 isRejected,

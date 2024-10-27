@@ -22,7 +22,7 @@ export default function AccountSent({owner}: { owner: Address }) {
                                                                                isRejected={x.isRejected}
                                                                                className={"mt-1"}
                                                                                createdAt={x.createdAt * 1000}
-                                                                               amount={x.balance}/>)}
+                                                                               amount={x.minPrice}/>)}
         </div>
     </div>
 }

@@ -21,7 +21,7 @@ export default function Ask({addr}: { addr: Address }) {
     if (accountInfo.isLoading || accountInfo.data == null || myProfile == null) {
         return <div className={"pt-10 loading loading-lg loading-dots"}/>
     }
-    if (myProfile.address.equals(addr)) {
+    if (myProfile.address != null && myProfile.address.equals(addr)) {
         return <>
             <h1 className={"pt-10 text-xl text-error"}>This is your account</h1>
             <Link href={"/"} className={"link link-primary link-lg"}>My Profile</Link>

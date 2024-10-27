@@ -34,7 +34,7 @@ export default function QuestionDetails({question}: { question: QuestionData }) 
 
     return <div className={"pt-10"}>
         <div className={""}>
-            <span className={`text-5xl ${additional_class}`}>{parseFloat(fromNano(question.balance)).toFixed(3)}</span>
+            <span className={`text-5xl ${additional_class}`}>{parseFloat(fromNano(question.minPrice)).toFixed(3)}</span>
             <span className={`ml-2 text-3xl ${additional_class}`}>TON</span>
         </div>
         <div className={"flex flex-col"}>

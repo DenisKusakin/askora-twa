@@ -9,6 +9,7 @@ export default function MySent() {
         <div className={"text-xl"}>Sent</div>
         <div className={"flex w-full mt-4 flex-col"}>
             {assigned?.isLoading && <div className={"loading loading-dots loading-xl"}></div>}
+            {!assigned?.isLoading && assigned?.data?.length === 0 && <h2 className={"text text-sm font-italic"}>No sent messages</h2>}
             {!assigned?.isLoading && assigned?.data?.map(x => <MessageListItem key={x.addr.toString()}
                                                                                addr={x.to}
                                                                                link={`/q-details?owner_id=${x.to.toString()}&q_id=${x.id}`}
@@ -16,7 +17,7 @@ export default function MySent() {
                                                                                isRejected={x.isRejected}
                                                                                className={"mt-1"}
                                                                                createdAt={x.createdAt * 1000}
-                                                                               amount={x.balance}/>)}
+                                                                               amount={x.minPrice}/>)}
         </div>
     </div>
 }

@@ -11,7 +11,7 @@ function Comp() {
 
     let res = <h1>Something wrong</h1>;
 
-    if (id !== null) {
+    if (id !== null && (Address.isRaw(id) || Address.isFriendly(id))) {
         res = <Profile owner={Address.parse(id)}/>
     }
 

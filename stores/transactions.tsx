@@ -1,5 +1,6 @@
 import {Address} from "@ton/core";
 import {
+    createAccountTransaction,
     createQuestionTransaction,
     rejectQuestionTransaction,
     replyTransaction
@@ -27,4 +28,11 @@ export function rejectQuestion(qContractAddr: Address) {
         return Promise.reject()
     }
     return tonConnectUI?.sendTransaction(rejectQuestionTransaction(qContractAddr))
+}
+
+export function createAccount(price: bigint){
+    if (tonConnectUI == null) {
+        return Promise.reject()
+    }
+    return tonConnectUI?.sendTransaction(createAccountTransaction(price))
 }

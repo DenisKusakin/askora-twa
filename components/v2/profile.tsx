@@ -5,19 +5,25 @@ import {useEffect, useState} from "react";
 
 export default function Profile({owner}: { owner: Address }) {
     const [data, setData] = useState<{ isLoading: boolean, data: AccountInfo | null }>({isLoading: true, data: null})
-    // const connectedProfile = useStoreClient($myProfile)
 
     useEffect(() => {
         setData({isLoading: true, data: null})
-        fetchAccountInfo(owner).then(data => setData({isLoading: false, data}))
+        fetchAccountInfo(owner)
+            .then(data => setData({isLoading: false, data}))
+            .catch(() => setData({isLoading: false, data: null}))
     }, [owner]);
     if (data.isLoading) {
         return <div className={"pt-10"}>
             <div className={"loading loading-dots loading-lg"}></div>
         </div>
     }
+    if (data.data == null) {
+        return <div className={"pt-10 text text-error text-xl"}>
+            Account does not exist
+        </div>
+    }
 
-    const priceUserFriendly = data?.data != null ? parseFloat(fromNano(data.data.price)) : 0
+    const priceUserFriendly = parseFloat(fromNano(data.data.price))
 
     return <div className={"pt-10"}>
         <div className={"flex flex-col items-center"}>
@@ -37,7 +43,8 @@ export default function Profile({owner}: { owner: Address }) {
                 </Link>
             </div>
             <div className={"mt-10 w-full"}>
-                <Link href={`/account/ask?id=${owner.toString()}`} className={"btn btn-primary btn-block btn-lg"}>Ask</Link>
+                <Link href={`/account/ask?id=${owner.toString()}`}
+                      className={"btn btn-primary btn-block btn-lg"}>Ask</Link>
             </div>
         </div>
     </div>

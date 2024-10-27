@@ -28,47 +28,11 @@ export class Account implements Contract {
         readonly init?: {
             code: Cell;
             data: Cell;
-        },
-        readonly questionCode?: Cell,
-        readonly questionRefCode?: Cell,
+        }
     ) {}
 
     static createFromAddress(address: Address) {
         return new Account(address);
-    }
-
-    static createFromConfig(
-        config: AccountConfig,
-        code: Cell,
-        questionCode: Cell,
-        questionRefCode: Cell,
-        workchain = 0,
-    ) {
-        const data = accountConfigToCell(config);
-        const init = { code, data };
-        return new Account(contractAddress(workchain, init), init, questionCode, questionRefCode);
-    }
-
-    async sendDeploy(
-        provider: ContractProvider,
-        via: Sender,
-        value: bigint,
-        conf: {
-            minPrice: bigint;
-            questionCode: Cell;
-            questionRefCode: Cell;
-        },
-    ) {
-        await provider.internal(via, {
-            value,
-            sendMode: SendMode.PAY_GAS_SEPARATELY,
-            body: beginCell()
-                .storeUint(BigInt('0x3922d770'), 32)
-                .storeCoins(conf.minPrice)
-                .storeRef(conf.questionCode)
-                .storeRef(conf.questionRefCode)
-                .endCell(),
-        });
     }
 
     async getNextId(provider: ContractProvider) {
@@ -85,14 +49,10 @@ export class Account implements Contract {
     }
 
     async getQuestionRefAddress(provider: ContractProvider, id: number) {
-        if (!this.questionRefCode) {
-            let tb = new TupleBuilder();
-            tb.writeNumber(id);
-            let getRes = (await provider.get('get_submitted_question_address', tb.build())).stack;
-            return getRes.readAddress();
-        } else {
-            return QuestionRef.createFromConfig({ accountAddr: this.address, id }, this.questionRefCode).address;
-        }
+        let tb = new TupleBuilder();
+        tb.writeNumber(id);
+        let getRes = (await provider.get('get_submitted_question_address', tb.build())).stack;
+        return getRes.readAddress();
     }
 
     async getPrice(provider: ContractProvider) {
@@ -119,14 +79,10 @@ export class Account implements Contract {
     }
 
     async getQuestionAccAddr(provider: ContractProvider, id: number) {
-        if (this.questionCode) {
-            return Question.createFromConfig({ accountAddr: this.address, id }, this.questionCode).address;
-        } else {
-            let tb = new TupleBuilder();
-            tb.writeNumber(id);
-            let getRes = (await provider.get('get_question_addr', tb.build())).stack;
-            return getRes.readAddress();
-        }
+        let tb = new TupleBuilder();
+        tb.writeNumber(id);
+        let getRes = (await provider.get('get_question_addr', tb.build())).stack;
+        return getRes.readAddress();
     }
 
     async getQuestion(provider: ContractProvider, id: number) {
