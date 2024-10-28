@@ -24,15 +24,13 @@ export const $mySubmittedQuestions = atom<{ isLoading: boolean, data: QuestionDa
 
 onMount($myAssignedQuestions, () => {
     const myProfile = $myProfile.get()
-    if (myProfile === null) {
+    if (myProfile === null || myProfile.address === null) {
         $myAssignedQuestions.set({isLoading: true, data: []})
     } else {
         const rootContract = tonClient.open(Root.createFromAddress(APP_CONTRACT_ADDR))
 
         $myAssignedQuestions.set({isLoading: true, data: []})
-        if (myProfile.address === null) {
-            return;
-        }
+
         rootContract.getAccount(myProfile.address)
             .then(accountContract => getAsignedQuestions(accountContract)
                 .then(data => {
