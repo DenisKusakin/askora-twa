@@ -1,4 +1,4 @@
-import {atom, onMount, onSet} from "nanostores";
+import {computed, task} from "nanostores";
 import {Address} from "@ton/core";
 import {$myProfile} from "@/stores/profile-store";
 import {APP_CONTRACT_ADDR} from "@/components/utils/constants";
@@ -19,48 +19,34 @@ export type QuestionData = {
     createdAt: number
 }
 
-export const $myAssignedQuestions = atom<{ isLoading: boolean, data: QuestionData[] }>({isLoading: true, data: []})
-export const $mySubmittedQuestions = atom<{ isLoading: boolean, data: QuestionData[] }>({isLoading: true, data: []})
-
-onMount($myAssignedQuestions, () => {
-    const myProfile = $myProfile.get()
+export const $myAssignedQuestions = computed($myProfile, myProfile => task(async () => {
     if (myProfile === null || myProfile.address === null) {
-        $myAssignedQuestions.set({isLoading: true, data: []})
+        return {isLoading: true, data: []}
     } else {
         const rootContract = tonClient.open(Root.createFromAddress(APP_CONTRACT_ADDR))
 
-        $myAssignedQuestions.set({isLoading: true, data: []})
-
-        rootContract.getAccount(myProfile.address)
+        return rootContract.getAccount(myProfile.address)
             .then(accountContract => getAsignedQuestions(accountContract)
                 .then(data => {
-                    $myAssignedQuestions.set({isLoading: false, data})
+                    return {isLoading: false, data}
                 }))
     }
-})
+}))
 
-onMount($mySubmittedQuestions, () => {
-    const myProfile = $myProfile.get()
+export const $mySubmittedQuestions = computed($myProfile, myProfile => task(async () => {
     if (myProfile === null) {
-        $mySubmittedQuestions.set({isLoading: true, data: []})
+        return {isLoading: true, data: []}
     } else {
         const rootContract = tonClient.open(Root.createFromAddress(APP_CONTRACT_ADDR))
-        $mySubmittedQuestions.set({isLoading: true, data: []})
-        if (myProfile.address === null) {
-            return;
-        }
-        rootContract.getAccount(myProfile.address)
-            .then(accountContract => getSubmittedQuestions(accountContract)
-                .then(data => $mySubmittedQuestions.set({isLoading: false, data})))
-    }
-})
 
-onSet($myProfile, (newValue) => {
-    if (newValue === null) {
-        $myAssignedQuestions.set({isLoading: true, data: []})
-        $mySubmittedQuestions.set({isLoading: true, data: []})
+        if (myProfile.address === null) {
+            return {isLoading: false, data: []};
+        }
+        return rootContract.getAccount(myProfile.address)
+            .then(accountContract => getSubmittedQuestions(accountContract)
+                .then(data => ({isLoading: false, data})))
     }
-})
+}))
 
 export async function fetchQuestionData(ownerAddress: Address, qId: number) {
     const rootContract = tonClient.open(Root.createFromAddress(APP_CONTRACT_ADDR))

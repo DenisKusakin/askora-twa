@@ -4,12 +4,12 @@ import MessageListItem from "@/components/v2/msg-list-item";
 
 export default function MyInbox() {
     const assigned = useStoreClient($myAssignedQuestions)
-
+    console.log("Assigned", assigned)
     return <div className={"pt-10"}>
         <div className={"text-xl"}>Inbox</div>
         <div className={"flex w-full mt-4 flex-col"}>
-            {assigned?.isLoading && <div className={"loading loading-dots loading-xl"}></div>}
-            {!assigned?.isLoading && assigned?.data?.length === 0 && <h2 className={"text text-sm font-italic"}>No incoming messages</h2>}
+            {(assigned == null || assigned?.isLoading) && <div className={"loading loading-dots loading-xl"}></div>}
+            {(assigned != null && !assigned.isLoading) && assigned?.data?.length === 0 && <h2 className={"text text-sm font-italic"}>No incoming messages</h2>}
             {!assigned?.isLoading && assigned?.data?.map(x => <MessageListItem key={x.addr.toString()} addr={x.from}
                                                                                link={`/my-question?id=${x.id}`}
                                                                                isClosed={x.isClosed}

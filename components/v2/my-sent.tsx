@@ -8,7 +8,7 @@ export default function MySent() {
     return <div className={"pt-10"}>
         <div className={"text-xl"}>Sent</div>
         <div className={"flex w-full mt-4 flex-col"}>
-            {assigned?.isLoading && <div className={"loading loading-dots loading-xl"}></div>}
+            {(assigned == null || assigned?.isLoading) && <div className={"loading loading-dots loading-xl"}></div>}
             {!assigned?.isLoading && assigned?.data?.length === 0 && <h2 className={"text text-sm font-italic"}>No sent messages</h2>}
             {!assigned?.isLoading && assigned?.data?.map(x => <MessageListItem key={x.addr.toString()}
                                                                                addr={x.to}
