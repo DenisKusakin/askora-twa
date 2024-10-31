@@ -1,5 +1,5 @@
-import {useStoreClient} from "@/components/hooks/use-store-client";
-import {$myAccountInfo, $myProfile} from "@/stores/profile-store";
+import {useStoreClient, useStoreClientV2} from "@/components/hooks/use-store-client";
+import {$myAccountInfo2, $myConnectedWallet} from "@/stores/profile-store";
 import {fromNano} from "@ton/core";
 import Link from "next/link";
 import {tonConnectUI} from "@/stores/ton-connect";
@@ -7,8 +7,9 @@ import CreateAccount from "@/components/v2/create-account";
 import {$myAssignedQuestions, $mySubmittedQuestions} from "@/stores/questions-store";
 
 export default function MyProfile() {
-    const connectedProfile = useStoreClient($myProfile)
-    const myAccountInfo = useStoreClient($myAccountInfo)
+    const myConnectedWallet = useStoreClientV2($myConnectedWallet)
+    const myAccountInfo = useStoreClientV2($myAccountInfo2)
+
     const myQuestionsAssigned = useStoreClient($myAssignedQuestions)
     const myQuestionsSubmitted = useStoreClient($mySubmittedQuestions)
 
@@ -19,18 +20,19 @@ export default function MyProfile() {
         tonConnectUI?.modal?.open()
     }
     const onShareClick = () => {
-        if (connectedProfile?.address == null) {
+        if (myConnectedWallet == null) {
             return
         }
-        navigator.share({url: `${window.location.origin}/account?id=${connectedProfile.address.toString()}`})
+        navigator.share({url: `${window.location.origin}/account?id=${myConnectedWallet.toString()}`})
     }
-    if (myAccountInfo == null || myAccountInfo?.isLoading === true) {
+    if (myConnectedWallet === undefined || myAccountInfo === undefined) {
         return <div className={"pt-10 loading loading-lg loading-dots"}></div>
     }
-    if (connectedProfile != null && !connectedProfile.isLoading && connectedProfile.address != null && myAccountInfo?.isLoading === false && myAccountInfo?.data == null) {
+    if (myConnectedWallet !== null && myAccountInfo === null) {
+        console.log("!!!", myConnectedWallet, myAccountInfo)
         return <CreateAccount/>
     }
-    if (connectedProfile?.isLoading === false && connectedProfile.address === null) {
+    if (myConnectedWallet === null) {
         return <div className={"pt-10 text-center"}>
             <h1 className={"text text-center text-xl"}>Askora</h1>
             <h2 className={"text text-xl mt-4"}>Open Q&N platform powered by TON</h2>
@@ -50,8 +52,8 @@ export default function MyProfile() {
     return <div className={"pt-10"}>
         <div className={"flex flex-col items-center"}>
             <div className={"text-neutral text-xl"}>Price</div>
-            {myAccountInfo?.data != null && <div>
-                <span className={"text-5xl font-bold"}>{parseFloat(fromNano(myAccountInfo.data.price))}</span>
+            {myAccountInfo !== null && <div>
+                <span className={"text-5xl font-bold"}>{parseFloat(fromNano(myAccountInfo.price))}</span>
                 <span className={"text-3xl ml-2"}>TON</span>
             </div>}
             <div className={"mt-10 flex flex-row"}>

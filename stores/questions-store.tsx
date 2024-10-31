@@ -1,6 +1,6 @@
 import {computed, task} from "nanostores";
 import {Address} from "@ton/core";
-import {$myProfile} from "@/stores/profile-store";
+import {$myConnectedWallet} from "@/stores/profile-store";
 import {APP_CONTRACT_ADDR} from "@/components/utils/constants";
 import {tonClient} from "@/wrappers/ton-client";
 import {getAsignedQuestions, getSubmittedQuestions} from "@/wrappers/wrappers-utils";
@@ -19,32 +19,39 @@ export type QuestionData = {
     createdAt: number
 }
 
-export const $myAssignedQuestions = computed($myProfile, myProfile => task(async () => {
-    if (myProfile === null || myProfile.address === null) {
+export const $myAssignedQuestions = computed($myConnectedWallet, myConnectedWallet => task(async () => {
+    if (myConnectedWallet === undefined) {
         return {isLoading: true, data: []}
-    } else {
+    } else if (myConnectedWallet !== null){
         const rootContract = tonClient.open(Root.createFromAddress(APP_CONTRACT_ADDR))
 
-        return rootContract.getAccount(myProfile.address)
+        return rootContract.getAccount(myConnectedWallet)
             .then(accountContract => getAsignedQuestions(accountContract)
                 .then(data => {
                     return {isLoading: false, data}
                 }))
+    } else {
+        return {
+            isLoading: false,
+            data: []
+        }
     }
 }))
 
-export const $mySubmittedQuestions = computed($myProfile, myProfile => task(async () => {
-    if (myProfile === null) {
+export const $mySubmittedQuestions = computed($myConnectedWallet, myConnectedWallet => task(async () => {
+    if (myConnectedWallet === undefined) {
         return {isLoading: true, data: []}
-    } else {
+    } else if(myConnectedWallet !== null){
         const rootContract = tonClient.open(Root.createFromAddress(APP_CONTRACT_ADDR))
 
-        if (myProfile.address === null) {
-            return {isLoading: false, data: []};
-        }
-        return rootContract.getAccount(myProfile.address)
+        return rootContract.getAccount(myConnectedWallet)
             .then(accountContract => getSubmittedQuestions(accountContract)
                 .then(data => ({isLoading: false, data})))
+    } else {
+        return {
+            isLoading: false,
+            data: []
+        }
     }
 }))
 

@@ -11,3 +11,13 @@ export function useStoreClient<T>($store: Store<T>) {
 
     return data;
 }
+
+export function useStoreClientV2<T>($store: Store<T>) {
+    const [data, setData] = useState<T | undefined>(undefined);
+    const store = useStore($store)
+    useEffect(() => {
+        setData(store)
+    }, [store])
+
+    return data;
+}

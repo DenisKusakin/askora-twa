@@ -7,59 +7,54 @@ import {QuestionData} from "@/stores/questions-store";
 import {getAsignedQuestions, getSubmittedQuestions} from "@/wrappers/wrappers-utils";
 import {Root} from "@/wrappers/Root";
 
-export const $myProfile = atom<{
-    address: Address | null,
-    isLoading: boolean
-}>(tonConnectUI != null ? {
-    address: tonConnectUI.wallet != null ? Address.parse(tonConnectUI.wallet.account.address) : null,
-    isLoading: false
-} : {isLoading: true, address: null})
+export const $myConnectedWallet = atom<Address | null | undefined>(undefined)
+
+if (tonConnectUI != null) {
+    if (tonConnectUI.connected && tonConnectUI.wallet !== null) {
+        $myConnectedWallet.set(Address.parse(tonConnectUI.wallet.account.address))
+    } else {
+        tonConnectUI.connectionRestored.then(isConnected => {
+            if (isConnected && tonConnectUI !== null && tonConnectUI.wallet !== null) {
+                $myConnectedWallet.set(Address.parse(tonConnectUI.wallet.account.address))
+            } else {
+                $myConnectedWallet.set(null)
+            }
+        })
+    }
+}
 
 if (tonConnectUI != null) {
     tonConnectUI.onStatusChange(wallet => {
         if (wallet === null) {
-            $myProfile.set({isLoading: false, address: null});
+            $myConnectedWallet.set(null)
         } else {
-            $myProfile.set({address: Address.parse(wallet.account.address), isLoading: false})
+            $myConnectedWallet.set(Address.parse(wallet.account.address))
         }
     })
 }
 
-export const $myAccountInfo = computed($myProfile, newValue => task(async () => {
-    if (newValue.isLoading) {
-        return {isLoading: true, data: null}
+export const $myAccountInfo2 = computed($myConnectedWallet, newValue => task(async () => {
+    if (newValue === undefined) {
+        return undefined
+    }
+    if (newValue === null) {
+        return null
     } else {
         const rootContract = tonClient.open(Root.createFromAddress(APP_CONTRACT_ADDR))
-        if (newValue.address == null) {
-            return {isLoading: false, data: null}
-        }
-        const accountContract = await rootContract.getAccount(newValue.address)
-        const {state} = await tonClient.getContractState(newValue.address)
+        const accountContract = await rootContract.getAccount(newValue)
+        const {state} = await tonClient.getContractState(newValue)
 
         if (state === "active") {
-            try{
-                const data = await accountContract.getAllData()
-                return {
-                    data: {
-                        price: data.minPrice,
-                        assignedCount: data.assignedQuestionsCount,
-                        submittedCount: data.submittedQuestionsCount,
-                        status: 'active',
-                        address: accountContract.address
-                    },
-                    isLoading: false
-                }
-            } catch {
-                return {
-                    isLoading: false,
-                    data: null
-                }
+            const data = await accountContract.getAllData()
+            return {
+                price: data.minPrice,
+                assignedCount: data.assignedQuestionsCount,
+                submittedCount: data.submittedQuestionsCount,
+                status: 'active',
+                address: accountContract.address
             }
         } else {
-            return {
-                isLoading: false,
-                data: null
-            }
+            return null
         }
     }
 }))

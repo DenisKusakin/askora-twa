@@ -1,16 +1,16 @@
 import {Address, fromNano, toNano} from "@ton/core";
 import {useEffect, useState} from "react";
-import {$myProfile, AccountInfo, fetchAccountInfo} from "@/stores/profile-store";
+import {$myConnectedWallet, AccountInfo, fetchAccountInfo} from "@/stores/profile-store";
 import {userFriendlyStr} from "@/components/utils/addr-utils";
 import {submitQuestion} from "@/stores/transactions";
-import {useStoreClient} from "@/components/hooks/use-store-client";
+import {useStoreClientV2} from "@/components/hooks/use-store-client";
 import {showSuccessNotification} from "@/stores/notifications-store";
 import {useRouter} from "next/navigation";
 import Link from "next/link";
 
 export default function Ask({addr}: { addr: Address }) {
     const [text, setText] = useState("")
-    const myProfile = useStoreClient($myProfile)
+    const myConnectedWallet = useStoreClientV2($myConnectedWallet)
     const [accountInfo, setAccountInfo] = useState<{ isLoading: boolean, data?: AccountInfo }>({isLoading: true})
     const router = useRouter()
     useEffect(() => {
@@ -18,10 +18,10 @@ export default function Ask({addr}: { addr: Address }) {
         fetchAccountInfo(addr)
             .then(data => setAccountInfo({isLoading: false, data}))
     }, [addr]);
-    if (accountInfo.isLoading || accountInfo.data == null || myProfile == null) {
+    if (accountInfo.isLoading || accountInfo.data == null || myConnectedWallet === undefined) {
         return <div className={"pt-10 loading loading-lg loading-dots"}/>
     }
-    if (myProfile.address != null && myProfile.address.equals(addr)) {
+    if (myConnectedWallet !== null && myConnectedWallet.equals(addr)) {
         return <>
             <h1 className={"pt-10 text-xl text-error"}>This is your account</h1>
             <Link href={"/"} className={"link link-primary link-lg"}>My Profile</Link>

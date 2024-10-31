@@ -2,13 +2,13 @@ import {QuestionData} from "@/stores/questions-store";
 import {Address, fromNano} from "@ton/core";
 import {useState} from "react";
 import {rejectQuestion, replyToQuestion} from "@/stores/transactions";
-import {useStoreClient} from "@/components/hooks/use-store-client";
-import {$myProfile} from "@/stores/profile-store";
+import {useStoreClientV2} from "@/components/hooks/use-store-client";
+import {$myConnectedWallet} from "@/stores/profile-store";
 import Link from "next/link";
 import {showSuccessNotification} from "@/stores/notifications-store";
 
 export default function QuestionDetails({question}: { question: QuestionData }) {
-    const myProfile = useStoreClient($myProfile)
+    const myConnectedWallet = useStoreClientV2($myConnectedWallet)
     const [replyShown, setReplyShown] = useState(false)
     const [myReply, setMyReply] = useState<string>('')
 
@@ -18,10 +18,10 @@ export default function QuestionDetails({question}: { question: QuestionData }) 
     } else if (question.isClosed) {
         additional_class = "text-success"
     }
-    const isMyQuestion = myProfile?.address?.toRawString() === question.to.toRawString()
+    const isMyQuestion = myConnectedWallet?.toRawString() === question.to.toRawString()
 
     function isYou(addr: Address) {
-        return myProfile?.address != null && addr.equals(myProfile?.address)
+        return myConnectedWallet != null && addr.equals(myConnectedWallet)
     }
 
     const onRejectClick = () => {

@@ -1,6 +1,6 @@
 import CurrencyInput from "react-currency-input-field";
-import {useStoreClient} from "@/components/hooks/use-store-client";
-import {$myProfile} from "@/stores/profile-store";
+import {useStoreClientV2} from "@/components/hooks/use-store-client";
+import {$myConnectedWallet} from "@/stores/profile-store";
 import {useState} from "react";
 import {toNano} from "@ton/core";
 import {createAccount} from "@/stores/transactions";
@@ -8,11 +8,11 @@ import {showSuccessNotification} from "@/stores/notifications-store";
 import {tonConnectUI} from "@/stores/ton-connect";
 
 export default function CreateAccount() {
-    const myProfile = useStoreClient($myProfile)
+    const myConnectedWallet = useStoreClientV2($myConnectedWallet)
     const [price, setPrice] = useState(0)
 
     const onClick = () => {
-        if (myProfile?.address != null) {
+        if (myConnectedWallet !== null) {
             createAccount(toNano(price))
                 .then(() => showSuccessNotification('Account created successfully'))
         }
