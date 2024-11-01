@@ -1,6 +1,6 @@
-import {computed, task} from "nanostores";
+import {batched, computed, task} from "nanostores";
 import {Address} from "@ton/core";
-import {$myAccount, $myConnectedWallet} from "@/stores/profile-store";
+import {$myAccount, $myAccountInfo} from "@/stores/profile-store";
 import {APP_CONTRACT_ADDR} from "@/components/utils/constants";
 import {tonClient} from "@/wrappers/ton-client";
 import {getAsignedQuestions, getSubmittedQuestions} from "@/wrappers/wrappers-utils";
@@ -19,12 +19,12 @@ export type QuestionData = {
     createdAt: number
 }
 
-export const $myAssignedQuestions = computed($myAccount, myAccount => task(async () => {
-    if (myAccount === undefined) {
+export const $myAssignedQuestions = batched([$myAccount, $myAccountInfo], (myAccount, myAccountInfo) => task(async () => {
+    if (myAccount === undefined || myAccountInfo === undefined) {
         return {isLoading: true, data: []}
-    } else if (myAccount !== null) {
+    } else if (myAccount !== null && myAccountInfo !== null) {
 
-        return getAsignedQuestions(myAccount)
+        return getAsignedQuestions(myAccount, {from: 0, limit: myAccountInfo.assignedCount})
             .then(data => {
                 return {isLoading: false, data}
             })
@@ -36,11 +36,11 @@ export const $myAssignedQuestions = computed($myAccount, myAccount => task(async
     }
 }))
 
-export const $mySubmittedQuestions = computed($myAccount, myAccount => task(async () => {
-    if (myAccount === undefined) {
+export const $mySubmittedQuestions = batched([$myAccount, $myAccountInfo], (myAccount, myAccountInfo) => task(async () => {
+    if (myAccount === undefined || myAccountInfo === undefined) {
         return {isLoading: true, data: []}
-    } else if (myAccount !== null) {
-        return getSubmittedQuestions(myAccount)
+    } else if (myAccount !== null && myAccountInfo !== null) {
+        return getSubmittedQuestions(myAccount, {from: 0, limit: myAccountInfo.submittedCount})
             .then(data => ({isLoading: false, data}))
     } else {
         return {

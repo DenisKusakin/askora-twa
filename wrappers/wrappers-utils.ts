@@ -1,7 +1,10 @@
 import {Address, OpenedContract} from "@ton/core";
 import {Account} from "@/wrappers/Account";
 
-export async function getAsignedQuestions(account: OpenedContract<Account>): Promise<{
+export async function getAsignedQuestions(account: OpenedContract<Account>, params: {
+    from: number,
+    limit: number
+} | undefined = undefined): Promise<{
     content: string,
     replyContent: string,
     minPrice: bigint,
@@ -13,7 +16,9 @@ export async function getAsignedQuestions(account: OpenedContract<Account>): Pro
     id: number,
     createdAt: number
 }[]> {
-    const count = await account.getNextId()
+    const fromIdx = params === undefined ? 0 : params.from
+    const toIdx = params === undefined ? await account.getNextId() : params.from + params.limit
+
     const res: {
         content: string,
         replyContent: string,
@@ -26,7 +31,7 @@ export async function getAsignedQuestions(account: OpenedContract<Account>): Pro
         id: number,
         createdAt: number
     }[] = []
-    for (let i = 0; i < count; i++) {
+    for (let i = fromIdx; i < toIdx; i++) {
         //TODO: Add error handling!!!
         try {
             const q = await account.getQuestion(i)
@@ -52,14 +57,17 @@ export async function getAsignedQuestions(account: OpenedContract<Account>): Pro
                 id: i,
                 createdAt
             })
-        } catch (e) {
+        } catch {
         }
     }
 
     return res
 }
 
-export async function getSubmittedQuestions(account: OpenedContract<Account>): Promise<{
+export async function getSubmittedQuestions(account: OpenedContract<Account>, params: {
+    from: number,
+    limit: number
+} | undefined = undefined): Promise<{
     content: string,
     minPrice: bigint,
     addr: Address,
@@ -71,7 +79,9 @@ export async function getSubmittedQuestions(account: OpenedContract<Account>): P
     id: number,
     createdAt: number
 }[]> {
-    const count = await account.getNextSubmittedQuestionId()
+    const fromIdx = params === undefined ? 0 : params.from
+    const toIdx = params === undefined ? await account.getNextSubmittedQuestionId() : params.from + params.limit
+
     const res: {
         content: string,
         minPrice: bigint,
@@ -84,7 +94,7 @@ export async function getSubmittedQuestions(account: OpenedContract<Account>): P
         id: number,
         createdAt: number
     }[] = []
-    for (let i = 0; i < count; i++) {
+    for (let i = fromIdx; i < toIdx; i++) {
         try {
             const qRef = await account.getQuestionRef(i)
             const q = await qRef.getQuestion()

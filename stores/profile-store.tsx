@@ -40,20 +40,20 @@ export const $myAccount = computed($myConnectedWallet, walletAddr => task(async 
         return null
     }
     const rootContract = tonClient.open(Root.createFromAddress(APP_CONTRACT_ADDR))
-    const accountContract = await rootContract.getAccount(walletAddr)
-
-    return accountContract
+    return await rootContract.getAccount(walletAddr)
 }))
 
-export const $myAccountInfo = computed($myAccount, newValue => task(async () => {
-    if (newValue === undefined) {
+export const $myAccountRefresh = atom(false)
+
+export const $myAccountInfo = computed([$myAccount, $myAccountRefresh], (myAccount) => task(async () => {
+    if (myAccount === undefined) {
         return undefined
     }
-    if (newValue === null) {
+    if (myAccount === null) {
         return null
     } else {
-        const accountContract = newValue
-        const {state} = await tonClient.getContractState(newValue.address)
+        const accountContract = myAccount
+        const {state} = await tonClient.getContractState(myAccount.address)
 
         if (state === "active") {
             const data = await accountContract.getAllData()
@@ -82,15 +82,16 @@ export async function fetchAccountInfo(ownerAddr: Address): Promise<AccountInfo>
     const rootContract = tonClient.open(Root.createFromAddress(APP_CONTRACT_ADDR))
     const accountContract = await rootContract.getAccount(ownerAddr)
 
-    return tonClient.getContractState(accountContract.address).then(({state}) => {
+    return tonClient.getContractState(accountContract.address).then(async ({state}) => {
         if (state === "active") {
-            return accountContract.getAllData().then(data => ({
+            const data = await accountContract.getAllData();
+            return ({
                 price: data.minPrice,
                 assignedCount: data.assignedQuestionsCount,
                 submittedCount: data.submittedQuestionsCount,
                 status: 'active',
                 address: accountContract.address
-            }))
+            });
         } else {
             return Promise.reject()
         }

@@ -5,6 +5,7 @@ import Link from "next/link";
 import {tonConnectUI} from "@/stores/ton-connect";
 import CreateAccount from "@/components/v2/create-account";
 import {$myAssignedQuestions, $mySubmittedQuestions} from "@/stores/questions-store";
+import copyTextHandler from "@/utils/copy-util";
 
 export default function MyProfile() {
     const myConnectedWallet = useStoreClientV2($myConnectedWallet)
@@ -26,10 +27,11 @@ export default function MyProfile() {
         navigator.share({url: `${window.location.origin}/account?id=${myConnectedWallet.toString()}`})
     }
     if (myConnectedWallet === undefined || myAccountInfo === undefined) {
-        return <div className={"pt-10 loading loading-lg loading-dots"}></div>
+        return <div className={"w-full mt-[50%] flex justify-center"}>
+            <div className={"loading loading-ring w-[125px] h-[125px]"}></div>
+        </div>
     }
     if (myConnectedWallet !== null && myAccountInfo === null) {
-        console.log("!!!", myConnectedWallet, myAccountInfo)
         return <CreateAccount/>
     }
     if (myConnectedWallet === null) {
@@ -58,7 +60,6 @@ export default function MyProfile() {
             </div>}
             <div className={"mt-10 flex flex-row"}>
                 <Link href={"/configure"} className={"btn btn-sm btn-primary btn-outline ml-4"}>Configure</Link>
-                <Link href={"/my-details"} className={"btn btn-sm btn-primary btn-outline ml-4"}>Details</Link>
                 <button className={"btn btn-sm btn-primary btn-outline ml-4"}
                         onClick={onShareClick}>Share
                 </button>
@@ -82,6 +83,12 @@ export default function MyProfile() {
                 <button className={"btn btn-error btn-outline btn-block btn-lg mt-4"}
                         onClick={onDisconnectClick}>Disconnect
                 </button>
+            </div>
+            <div className={"absolute bottom-2"}>
+                <div className={"text-xs break-all font-light mb-1"}
+                     onClick={copyTextHandler(myConnectedWallet.toString())}>{myConnectedWallet.toString()}</div>
+                {myAccountInfo != null && <div className={"text-xs break-all font-light"}
+                                               onClick={copyTextHandler(myAccountInfo?.address?.toString())}>{myAccountInfo?.address?.toString()}</div>}
             </div>
         </div>
     </div>

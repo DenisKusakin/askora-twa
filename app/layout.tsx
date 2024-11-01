@@ -1,6 +1,5 @@
 import "./globals.css";
 import MyHead from "@/app/head";
-import Notification from "@/components/v2/notification";
 
 export const metadata = {
     title: 'Askora',
@@ -19,7 +18,6 @@ export default function RootLayout({
         </head>
         <body>
         {children}
-        <Notification/>
         </body>
         </html>
     )
