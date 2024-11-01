@@ -1,9 +1,8 @@
 'use client';
 
-import CurrencyInput from "react-currency-input-field";
 import {useStoreClientV2} from "@/components/hooks/use-store-client";
 import {$myAccountInfo, $myConnectedWallet} from "@/stores/profile-store";
-import {useState} from "react";
+import {useEffect, useState} from "react";
 import {fromNano, toNano} from "@ton/core";
 import Link from "next/link";
 import {tonConnectUI} from "@/stores/ton-connect";
@@ -14,8 +13,12 @@ import TransactionSucceedDialog from "@/components/v2/transaction-suceed-dialog"
 export default function ConfigurePrice() {
     const myConnectedWallet = useStoreClientV2($myConnectedWallet)
     const myProfileInfo = useStoreClientV2($myAccountInfo)
-    const [newPrice, setNewPrice] = useState(0)
+    const [newPrice, setNewPrice] = useState(myProfileInfo != null ? parseFloat(fromNano(myProfileInfo.price)) : 0)
     const [isSuccessDialogVisible, setSuccessDialogVisible] = useState(false)
+
+    useEffect(() => {
+        setNewPrice(myProfileInfo != null ? parseFloat(fromNano(myProfileInfo.price)) : 0)
+    }, [myProfileInfo]);
 
     const onClick = () => {
         if (myProfileInfo?.address != null) {
@@ -30,7 +33,8 @@ export default function ConfigurePrice() {
     }
     if (myConnectedWallet === null) {
         return <div className={"pt-10"}>
-            <button className={"btn btn-outline btn-block btn-primary btn-lg mt-50"} onClick={onConnectClick}>Connect
+            <button className={"btn btn-outline btn-block btn-primary btn-lg mt-50"}
+                    onClick={onConnectClick}>Connect
             </button>
         </div>
     }
@@ -42,30 +46,51 @@ export default function ConfigurePrice() {
     }
     const dialogContent = <Link href={"/"} className={"btn btn-outline btn-primary"}>My Account</Link>
     return <>
-        {isSuccessDialogVisible && <TransactionSucceedDialog content={dialogContent}/>}
+    {isSuccessDialogVisible && <TransactionSucceedDialog content={dialogContent}/>}
         <div className={"pt-10"}>
             <div className={"flex flex-col items-center"}>
-                <div className={"text-neutral text-xl"}>Price</div>
+                <div className={"text-neutral text-xl"}>Price (TON)</div>
                 <div className={"w-full flex justify-center"}>
-                    <CurrencyInput
-                        defaultValue={parseFloat(fromNano(myProfileInfo.price))}
+                    <input
+                        value={newPrice}
+                        type={"number"}
+                        min={"0"}
                         className={`input text-5xl font-bold w-full text-center`}
-                        readOnly={false}
-                        decimalScale={3}
-                        decimalsLimit={3}
-                        suffix={" TON"}
-                        allowNegativeValue={false}
-                        min={0.0}
-                        onValueChange={(value) => {
+                        onChange={(e) => {
+                            const value = e.target.value
                             if (value != undefined) {
                                 const valueParsed = parseFloat(value)
                                 if (!isNaN(valueParsed)) {
-                                    setNewPrice(valueParsed)
+                                    if (valueParsed < 0) {
+                                        e.target.value = "0"
+                                        setNewPrice(0)
+                                    } else {
+                                        setNewPrice(valueParsed)
+                                    }
                                 }
                             } else {
                                 setNewPrice(0)
                             }
                         }}/>
+                    {/*<CurrencyInput*/}
+                    {/*    defaultValue={parseFloat(fromNano(myProfileInfo.price))}*/}
+                    {/*    className={`input text-5xl font-bold w-full text-center`}*/}
+                    {/*    readOnly={false}*/}
+                    {/*    decimalScale={3}*/}
+                    {/*    decimalsLimit={3}*/}
+                    {/*    suffix={" TON"}*/}
+                    {/*    allowNegativeValue={false}*/}
+                    {/*    min={0.0}*/}
+                    {/*    onValueChange={(value) => {*/}
+                    {/*        if (value != undefined) {*/}
+                    {/*            const valueParsed = parseFloat(value)*/}
+                    {/*            if (!isNaN(valueParsed)) {*/}
+                    {/*                setNewPrice(valueParsed)*/}
+                    {/*            }*/}
+                    {/*        } else {*/}
+                    {/*            setNewPrice(0)*/}
+                    {/*        }*/}
+                    {/*    }}/>*/}
                 </div>
             </div>
             <button className={"btn btn-lg btn-outline btn-block btn-primary mt-4"} onClick={onClick}>Save</button>

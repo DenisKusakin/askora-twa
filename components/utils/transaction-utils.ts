@@ -51,6 +51,7 @@ export const rejectQuestionTransaction = (questionAddr: Address) => {
 }
 
 export const updatePriceTransaction = (accountAddr: Address, price: bigint) => {
+    console.log("New price", price)
     const msg = beginCell()
         .storeUint(BigInt("0xaaacc05b"), 32)
         .storeCoins(price)
