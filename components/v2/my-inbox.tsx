@@ -4,7 +4,6 @@ import MessageListItem from "@/components/v2/msg-list-item";
 
 export default function MyInbox() {
     const assigned = useStoreClient($myAssignedQuestions)
-    console.log("Assigned", assigned)
     return <div className={"pt-10"}>
         <div className={"text-xl"}>Inbox</div>
         <div className={"flex w-full mt-4 flex-col"}>

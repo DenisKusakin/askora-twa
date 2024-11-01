@@ -1,5 +1,5 @@
 import {useStoreClient, useStoreClientV2} from "@/components/hooks/use-store-client";
-import {$myAccountInfo2, $myConnectedWallet} from "@/stores/profile-store";
+import {$myAccountInfo, $myConnectedWallet} from "@/stores/profile-store";
 import {fromNano} from "@ton/core";
 import Link from "next/link";
 import {tonConnectUI} from "@/stores/ton-connect";
@@ -8,7 +8,7 @@ import {$myAssignedQuestions, $mySubmittedQuestions} from "@/stores/questions-st
 
 export default function MyProfile() {
     const myConnectedWallet = useStoreClientV2($myConnectedWallet)
-    const myAccountInfo = useStoreClientV2($myAccountInfo2)
+    const myAccountInfo = useStoreClientV2($myAccountInfo)
 
     const myQuestionsAssigned = useStoreClient($myAssignedQuestions)
     const myQuestionsSubmitted = useStoreClient($mySubmittedQuestions)

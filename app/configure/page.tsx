@@ -2,7 +2,7 @@
 
 import CurrencyInput from "react-currency-input-field";
 import {useStoreClientV2} from "@/components/hooks/use-store-client";
-import {$myAccountInfo2, $myConnectedWallet} from "@/stores/profile-store";
+import {$myAccountInfo, $myConnectedWallet} from "@/stores/profile-store";
 import {useState} from "react";
 import {fromNano, toNano} from "@ton/core";
 import Link from "next/link";
@@ -12,7 +12,7 @@ import CreateAccount from "@/components/v2/create-account";
 
 export default function ConfigurePrice() {
     const myConnectedWallet = useStoreClientV2($myConnectedWallet)
-    const myProfileInfo = useStoreClientV2($myAccountInfo2)
+    const myProfileInfo = useStoreClientV2($myAccountInfo)
     const [newPrice, setNewPrice] = useState(0)
 
     const onClick = () => {

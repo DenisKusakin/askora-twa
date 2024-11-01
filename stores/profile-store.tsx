@@ -33,16 +33,27 @@ if (tonConnectUI != null) {
     })
 }
 
-export const $myAccountInfo2 = computed($myConnectedWallet, newValue => task(async () => {
+export const $myAccount = computed($myConnectedWallet, walletAddr => task(async () => {
+    if (walletAddr === undefined) {
+        return undefined
+    } else if (walletAddr === null) {
+        return null
+    }
+    const rootContract = tonClient.open(Root.createFromAddress(APP_CONTRACT_ADDR))
+    const accountContract = await rootContract.getAccount(walletAddr)
+
+    return accountContract
+}))
+
+export const $myAccountInfo = computed($myAccount, newValue => task(async () => {
     if (newValue === undefined) {
         return undefined
     }
     if (newValue === null) {
         return null
     } else {
-        const rootContract = tonClient.open(Root.createFromAddress(APP_CONTRACT_ADDR))
-        const accountContract = await rootContract.getAccount(newValue)
-        const {state} = await tonClient.getContractState(newValue)
+        const accountContract = newValue
+        const {state} = await tonClient.getContractState(newValue.address)
 
         if (state === "active") {
             const data = await accountContract.getAllData()
