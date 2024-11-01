@@ -10,8 +10,8 @@ export default function MyProfile() {
     const myConnectedWallet = useStoreClientV2($myConnectedWallet)
     const myAccountInfo = useStoreClientV2($myAccountInfo)
 
-    const myQuestionsAssigned = useStoreClient($myAssignedQuestions)
-    const myQuestionsSubmitted = useStoreClient($mySubmittedQuestions)
+    const myQuestionsAssigned = useStoreClientV2($myAssignedQuestions)
+    const myQuestionsSubmitted = useStoreClientV2($mySubmittedQuestions)
 
     const onDisconnectClick = () => {
         tonConnectUI?.disconnect()
@@ -66,13 +66,17 @@ export default function MyProfile() {
             <div className={"mt-10 w-full"}>
                 <Link href={"/inbox"} className="btn btn-block">
                     <span className={"text-2xl"}>Inbox</span>
-                    {newQuestionsToMe != null && newQuestionsToMe !== 0 &&
+                    {myQuestionsAssigned !== undefined && !myQuestionsAssigned.isLoading && newQuestionsToMe != null && newQuestionsToMe !== 0 &&
                         <div className="badge badge-secondary">+{newQuestionsToMe}</div>}
+                    {myQuestionsAssigned === undefined || myQuestionsAssigned.isLoading &&
+                        <div className={"loading loading-xs loading-dots"}></div>}
                 </Link>
                 <Link href={"/sent"} className="btn btn-block mt-5">
                     <span className={"text-2xl"}>Sent</span>
-                    {myQuestionsNotReplied != null && myQuestionsNotReplied !== 0 &&
+                    {myQuestionsSubmitted !== undefined && !myQuestionsSubmitted.isLoading && myQuestionsNotReplied !== 0 &&
                         <div className="badge badge-secondary">{myQuestionsNotReplied}</div>}
+                    {myQuestionsSubmitted === undefined || myQuestionsSubmitted.isLoading &&
+                        <div className={"loading loading-xs loading-dots"}></div>}
                 </Link>
                 <Link href={"/find"} className={"btn btn-primary btn-outline btn-lg mt-10 btn-block"}>Find User</Link>
                 <button className={"btn btn-error btn-outline btn-block btn-lg mt-4"}
