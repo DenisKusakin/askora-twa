@@ -52,25 +52,13 @@ export default function ConfigurePrice() {
                 <div className={"text-neutral text-xl"}>Price (TON)</div>
                 <div className={"w-full flex justify-center"}>
                     <input
-                        value={newPrice}
+                        value={isNaN(newPrice) ? '' : newPrice}
                         type={"number"}
-                        inputMode="numeric"
+                        inputMode="decimal"
                         min={"0"}
                         className={`input text-5xl font-bold w-full text-center`}
                         onChange={(e) => {
-                            const value = e.target.value
-                            if (value != undefined) {
-                                const valueParsed = parseFloat(value)
-                                if (!isNaN(valueParsed)) {
-                                    if (valueParsed < 0) {
-                                        setNewPrice(0)
-                                    } else {
-                                        setNewPrice(valueParsed)
-                                    }
-                                }
-                            } else {
-                                setNewPrice(0)
-                            }
+                            setNewPrice(e.target.valueAsNumber)
                         }}/>
                     {/*<CurrencyInput*/}
                     {/*    defaultValue={parseFloat(fromNano(myProfileInfo.price))}*/}
@@ -93,7 +81,7 @@ export default function ConfigurePrice() {
                     {/*    }}/>*/}
                 </div>
             </div>
-            <button className={"btn btn-lg btn-outline btn-block btn-primary mt-4"} onClick={onClick}>Save</button>
+            <button className={"btn btn-lg btn-outline btn-block btn-primary mt-4"} disabled={isNaN(newPrice)} onClick={onClick}>Save</button>
             <Link href="/" className={"btn btn-lg btn-error btn-block btn-outline mt-2"}>Cancel</Link>
         </div>
     </>
