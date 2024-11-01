@@ -1,4 +1,4 @@
-import {useStoreClient, useStoreClientV2} from "@/components/hooks/use-store-client";
+import {useStoreClientV2} from "@/components/hooks/use-store-client";
 import {$myAccountInfo, $myConnectedWallet} from "@/stores/profile-store";
 import {fromNano} from "@ton/core";
 import Link from "next/link";
