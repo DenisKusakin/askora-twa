@@ -54,6 +54,7 @@ export default function ConfigurePrice() {
                     <input
                         value={newPrice}
                         type={"number"}
+                        inputMode="numeric"
                         min={"0"}
                         className={`input text-5xl font-bold w-full text-center`}
                         onChange={(e) => {
@@ -62,7 +63,6 @@ export default function ConfigurePrice() {
                                 const valueParsed = parseFloat(value)
                                 if (!isNaN(valueParsed)) {
                                     if (valueParsed < 0) {
-                                        e.target.value = "0"
                                         setNewPrice(0)
                                     } else {
                                         setNewPrice(valueParsed)
