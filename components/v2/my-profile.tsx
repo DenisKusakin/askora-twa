@@ -79,7 +79,8 @@ export default function MyProfile() {
                     {myQuestionsSubmitted === undefined || myQuestionsSubmitted.isLoading &&
                         <div className={"loading loading-xs loading-dots"}></div>}
                 </Link>
-                <Link href={"/find"} className={"btn btn-primary btn-outline btn-lg mt-10 btn-block"}>Find User</Link>
+                <Link href={"/about"} className={"btn btn-outline btn-info btn-lg btn-block mt-10"}>About</Link>
+                <Link href={"/find"} className={"btn btn-primary btn-outline btn-lg mt-4 btn-block"}>Find User</Link>
                 <button className={"btn btn-error btn-outline btn-block btn-lg mt-4"}
                         onClick={onDisconnectClick}>Disconnect
                 </button>

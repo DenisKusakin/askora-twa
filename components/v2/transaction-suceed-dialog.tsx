@@ -1,7 +1,7 @@
 import {ReactElement} from "react";
 
 export default function TransactionSucceedDialog({content}: {content: ReactElement}) {
-    return <div className={"min-w-full min-h-full w-full h-full absolute z-30 bg-white left-0 top-0 flex items-start"}>
+    return <div className={"min-w-full min-h-full w-full h-full absolute z-30 bg-base-100 left-0 top-0 flex items-start"}>
         <div className={"flex flex-col items-center justify-center mt-20 w-full"}>
             <svg
                 xmlns="http://www.w3.org/2000/svg"
