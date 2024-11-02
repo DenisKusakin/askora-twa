@@ -41,7 +41,7 @@ export default function QuestionDetails({question}: { question: QuestionData }) 
     return <>
         {isSuccessDialogVisible && <TransactionSucceedDialog content={dialogContent}/>}
         <div className={"pt-10"}>
-            <div className={"flex flex-row"}>
+            <div className={"flex flex-row mb-2"}>
                 <div className={"w-8/12"}>
                     <span
                         className={`${!replyShown ? 'text-3xl' : 'text-xl'} ${additional_class}`}>{parseFloat(fromNano(question.minPrice)).toFixed(3)}</span>
@@ -89,7 +89,7 @@ export default function QuestionDetails({question}: { question: QuestionData }) 
                 <span className={"text-sx font-light"}>Message</span>
                 <span className={"text-base break-all"}>{question.content}</span>
             </div>
-            {replyShown && isMyQuestion && question.isClosed && !question.isRejected && <>
+            {question.isClosed && !question.isRejected && <>
                 <div className={"divider m-1"}></div>
                 <div className={"flex flex-col mt-2"}>
                     <span className={"text-sx font-light"}>Reply</span>

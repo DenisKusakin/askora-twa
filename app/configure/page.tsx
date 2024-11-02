@@ -60,25 +60,6 @@ export default function ConfigurePrice() {
                         onChange={(e) => {
                             setNewPrice(e.target.valueAsNumber)
                         }}/>
-                    {/*<CurrencyInput*/}
-                    {/*    defaultValue={parseFloat(fromNano(myProfileInfo.price))}*/}
-                    {/*    className={`input text-5xl font-bold w-full text-center`}*/}
-                    {/*    readOnly={false}*/}
-                    {/*    decimalScale={3}*/}
-                    {/*    decimalsLimit={3}*/}
-                    {/*    suffix={" TON"}*/}
-                    {/*    allowNegativeValue={false}*/}
-                    {/*    min={0.0}*/}
-                    {/*    onValueChange={(value) => {*/}
-                    {/*        if (value != undefined) {*/}
-                    {/*            const valueParsed = parseFloat(value)*/}
-                    {/*            if (!isNaN(valueParsed)) {*/}
-                    {/*                setNewPrice(valueParsed)*/}
-                    {/*            }*/}
-                    {/*        } else {*/}
-                    {/*            setNewPrice(0)*/}
-                    {/*        }*/}
-                    {/*    }}/>*/}
                 </div>
             </div>
             <button className={"btn btn-lg btn-outline btn-block btn-primary mt-4"} disabled={isNaN(newPrice)} onClick={onClick}>Save</button>

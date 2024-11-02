@@ -1,6 +1,10 @@
 import {Address, OpenedContract} from "@ton/core";
 import {Account} from "@/wrappers/Account";
 
+function sleep(delay: number): Promise<void> {
+    return new Promise<void>(resolve => setTimeout(resolve, delay))
+}
+
 export async function getAsignedQuestions(account: OpenedContract<Account>, params: {
     from: number,
     limit: number
@@ -45,6 +49,8 @@ export async function getAsignedQuestions(account: OpenedContract<Account>, para
             const to = data.ownerAddr;
             const createdAt = data.createdAt
 
+            await sleep(1000)
+
             res.push({
                 content,
                 replyContent,
@@ -81,7 +87,7 @@ export async function getSubmittedQuestions(account: OpenedContract<Account>, pa
 }[]> {
     const fromIdx = params === undefined ? 0 : params.from
     const toIdx = params === undefined ? await account.getNextSubmittedQuestionId() : params.from + params.limit
-
+    console.log("from-to submitted", fromIdx, toIdx)
     const res: {
         content: string,
         minPrice: bigint,
@@ -108,6 +114,8 @@ export async function getSubmittedQuestions(account: OpenedContract<Account>, pa
             const to = data.ownerAddr;
             const createdAt = data.createdAt
 
+            await sleep(1000)
+
             res.push({
                 content,
                 minPrice,
@@ -121,6 +129,7 @@ export async function getSubmittedQuestions(account: OpenedContract<Account>, pa
                 createdAt
             })
         } catch {
+            console.log("Failed")
         }
 
     }

@@ -2,6 +2,7 @@ import {AccountInfo, fetchAccountInfo} from "@/stores/profile-store";
 import {Address, fromNano} from "@ton/core";
 import Link from "next/link";
 import {useEffect, useState} from "react";
+import copyTextHandler from "@/utils/copy-util";
 
 export default function Profile({owner}: { owner: Address }) {
     const [data, setData] = useState<{ isLoading: boolean, data: AccountInfo | null }>({isLoading: true, data: null})
@@ -43,6 +44,12 @@ export default function Profile({owner}: { owner: Address }) {
             <div className={"mt-10 w-full"}>
                 <Link href={`/account/ask?id=${owner.toString()}`}
                       className={"btn btn-primary btn-block btn-lg"}>Ask</Link>
+            </div>
+            <div className={"absolute bottom-2 text-center"}>
+                <div className={"text-xs break-all font-light mb-1"}
+                     onClick={copyTextHandler(owner.toString())}>{owner.toString()}</div>
+                <div className={"text-xs break-all font-light"}
+                     onClick={copyTextHandler(data.data.address.toString())}>{data.data.address.toString()}</div>
             </div>
         </div>
     </div>

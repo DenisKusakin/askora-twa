@@ -1,3 +1,3 @@
 import {Address} from "@ton/core";
 
-export const APP_CONTRACT_ADDR = Address.parse("EQDUE6mFWRnOnPj2cSygAbYUpiof_A6PHAPSazrnRmp351P3")
+export const APP_CONTRACT_ADDR = Address.parse("EQBDOVd3VVShgopHOHo-hzSJnw8rsOfznxWUIiaGSbfrsXHU")
