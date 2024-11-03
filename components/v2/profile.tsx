@@ -45,7 +45,7 @@ export default function Profile({owner}: { owner: Address }) {
                 <Link href={`/account/ask?id=${owner.toString()}`}
                       className={"btn btn-primary btn-block btn-lg"}>Ask</Link>
             </div>
-            <div className={"absolute bottom-2 text-center"}>
+            <div className={"mt-20"}>
                 <div className={"text-xs break-all font-light mb-1"}
                      onClick={copyTextHandler(owner.toString())}>{owner.toString()}</div>
                 <div className={"text-xs break-all font-light"}

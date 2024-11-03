@@ -24,7 +24,7 @@ export default function MyProfile() {
         if (myConnectedWallet == null) {
             return
         }
-        navigator.share({url: `${window.location.origin}/account?id=${myConnectedWallet.toString()}`})
+        navigator.share({url: `https://t.me/AskoraBot?startapp=${myConnectedWallet.toString()}`})
     }
     if (myConnectedWallet === undefined || myAccountInfo === undefined) {
         return <div className={"w-full mt-[50%] flex justify-center"}>
@@ -59,8 +59,8 @@ export default function MyProfile() {
                 <span className={"text-3xl ml-2"}>TON</span>
             </div>}
             <div className={"mt-10 flex flex-row"}>
-                <Link href={"/configure"} className={"btn btn-sm btn-primary btn-outline ml-4"}>Configure</Link>
-                <button className={"btn btn-sm btn-primary btn-outline ml-4"}
+                <Link href={"/configure"} className={"btn btn-sm btn-primary btn-outline ml-4"}>Settings</Link>
+                <button className={"btn btn-sm btn-primary ml-4"}
                         onClick={onShareClick}>Share
                 </button>
             </div>
@@ -85,7 +85,7 @@ export default function MyProfile() {
                         onClick={onDisconnectClick}>Disconnect
                 </button>
             </div>
-            <div className={"absolute bottom-2"}>
+            <div className={"mt-20"}>
                 <div className={"text-xs break-all font-light mb-1"}
                      onClick={copyTextHandler(myConnectedWallet.toString())}>{myConnectedWallet.toString()}</div>
                 {myAccountInfo != null && <div className={"text-xs break-all font-light"}
