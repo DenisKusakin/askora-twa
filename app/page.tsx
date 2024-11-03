@@ -9,7 +9,11 @@ export default function Home() {
     const [accountId, setAccountId] = useState<string | null>(null)
     useEffect(() => {
         // @ts-expect-error todo
-        const startParam = window.Telegram?.WebApp?.initDataUnsafe?.start_param
+        let startParam = window.Telegram?.WebApp?.initDataUnsafe?.start_param
+        if (startParam == null) {
+            const params = new URL(document.location.toString()).searchParams;
+            startParam = params.get('startapp')
+        }
         if (startParam != null) {
             setAccountId(startParam)
         }
