@@ -1,29 +1,25 @@
 'use client';
 
 import MyProfile from "@/components/v2/my-profile";
-import {useEffect, useState} from "react";
 import Profile from "@/components/v2/profile";
 import {Address} from "@ton/core";
+import {useStoreClientV2} from "@/components/hooks/use-store-client";
+import {$tgStartParam} from "@/stores/tg-store";
 
 export default function Home() {
-    const [accountId, setAccountId] = useState<string | null>(null)
-    useEffect(() => {
-        // @ts-expect-error todo
-        let startParam = window.Telegram.WebApp.initDataUnsafe.start_param
-        if (startParam == null) {
-            const params = new URL(document.location.toString()).searchParams;
-            startParam = params.get('startapp')
-        }
-        if (startParam != null) {
-            setAccountId(startParam)
-        }
-    }, []);
+    const tgStartParam = useStoreClientV2($tgStartParam)
+
+    if (tgStartParam === undefined || tgStartParam.isLoading) {
+        return <div className={"w-full mt-[50%] flex justify-center"}>
+            <div className={"loading loading-ring w-[125px] h-[125px]"}></div>
+        </div>
+    }
     let comp = <MyProfile/>;
-    if (accountId !== null) {
-        comp = <Profile owner={Address.parse(accountId)}/>
+    if (tgStartParam.startParam != null) {
+        comp = <Profile owner={Address.parse(tgStartParam.startParam)}/>
     }
     return <div>
-        <p className={"text text-sm"}>Start: {accountId}</p>
+        <p className={"text text-sm"}>Start: {tgStartParam?.startParam}</p>
         {comp}
     </div>
 }
