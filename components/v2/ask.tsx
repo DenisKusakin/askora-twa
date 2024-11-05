@@ -29,7 +29,7 @@ export default function Ask({addr}: { addr: Address }) {
     }
 
     const isDisabled = text === ''
-    const transactionFee = toNano(0.06)
+    const transactionFee = toNano(0.1)
     //@ts-expect-error todo
     const serviceFee = (accountInfo.data.price / 100n) * 5n
     const totalFee = accountInfo.data.price + transactionFee + serviceFee
@@ -62,6 +62,7 @@ export default function Ask({addr}: { addr: Address }) {
                 <div className={"text text-sm"}>reward + service fee + transaction const</div>
                 <div
                     className={"text"}>{totalFeeFormatted}={accountRewardFormatted} + {serviceFeeFormatted} + {transactionFeeFormatted}</div>
+                <div className={"text text-sm"}>unused transaction fees are refunded instantly</div>
             </div>
             <textarea className={"textarea textarea-bordered textarea-lg mt-4 w-full h-[200px]"} value={text}
                       onChange={e => setText(e.target.value)}/>

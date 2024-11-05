@@ -44,6 +44,7 @@ export default function ConfigurePrice() {
     if (myProfileInfo === null) {
         return <CreateAccount/>
     }
+    const priceChanged = toNano(newPrice) !== myProfileInfo.price
     const dialogContent = <Link href={"/"} className={"btn btn-outline btn-primary"}>My Account</Link>
     return <>
     {isSuccessDialogVisible && <TransactionSucceedDialog content={dialogContent}/>}
@@ -62,7 +63,8 @@ export default function ConfigurePrice() {
                         }}/>
                 </div>
             </div>
-            <button className={"btn btn-lg btn-outline btn-block btn-primary mt-4"} disabled={isNaN(newPrice)} onClick={onClick}>Save</button>
+            <p className={"text text-sm font-light text-center mt-2"}>You could update the price, it will be applied to all new messages</p>
+            <button className={"btn btn-lg btn-outline btn-block btn-primary mt-4"} disabled={isNaN(newPrice) || !priceChanged} onClick={onClick}>Save</button>
             <Link href="/" className={"btn btn-lg btn-error btn-block btn-outline mt-2"}>Cancel</Link>
         </div>
     </>

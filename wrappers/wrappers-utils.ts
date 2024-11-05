@@ -87,7 +87,6 @@ export async function getSubmittedQuestions(account: OpenedContract<Account>, pa
 }[]> {
     const fromIdx = params === undefined ? 0 : params.from
     const toIdx = params === undefined ? await account.getNextSubmittedQuestionId() : params.from + params.limit
-    console.log("from-to submitted", fromIdx, toIdx)
     const res: {
         content: string,
         minPrice: bigint,

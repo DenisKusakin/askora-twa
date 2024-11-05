@@ -38,13 +38,16 @@ export default function MyProfile() {
         return <div className={"pt-10 text-center"}>
             <h1 className={"text text-center text-xl"}>Askora</h1>
             <h2 className={"text text-xl mt-4"}>Open Q&N platform powered by TON</h2>
-            <h2 className={"text text-sm mt-4"}>Connect your TON Wallet</h2>
-            <h2 className={"text text-sm mt-4"}>Create an account and set a price of your reply</h2>
-            <h2 className={"text text-sm mt-4"}>Share link with your audience and receive questions</h2>
-            <h2 className={"text text-sm mt-4"}>Reply and get reward</h2>
-            <Link href={"/about"} className={"btn btn-outline btn-success btn-xl btn-block mt-5"}>About</Link>
+            <div className={"mt-20 mb-20"}>
+                <h2 className={"text text-xl mt-2"}>Connect TON Wallet</h2>
+                <h2 className={"text text-xl mt-2"}>Create an account and set a price</h2>
+                <h2 className={"text text-xl mt-2"}>Share link with your audience</h2>
+                <h2 className={"text text-xl mt-2"}>💰 Reply and earn reward</h2>
+            </div>
             <button className={"btn btn-block btn-primary btn-lg mt-4"} onClick={onConnectClick}>Connect
             </button>
+            <Link href={"/find"} className={"btn btn-primary btn-outline btn-lg mt-4 btn-block"}>Find User</Link>
+            <Link href={"/about"} className={"btn btn-outline btn-success btn-lg btn-block mt-5"}>About</Link>
         </div>
     }
 

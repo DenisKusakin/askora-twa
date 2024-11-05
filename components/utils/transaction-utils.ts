@@ -4,6 +4,7 @@ import {APP_CONTRACT_ADDR} from "@/components/utils/constants";
 export const createAccountTransaction = (price: bigint) => {
     const createAccountMsg = beginCell()
         .storeUint(BigInt("0x5f0ec1a3"), 32)
+        // .storeUint(BigInt("0x74385f77"), 32)
         .storeUint(123, 64)
         .storeCoins(price)
         .endCell()
@@ -12,7 +13,8 @@ export const createAccountTransaction = (price: bigint) => {
         validUntil: Math.floor(Date.now() / 1000) + 60, // 60 sec,
         messages: [{
             address: APP_CONTRACT_ADDR.toRawString(),
-            amount: toNano(0.07).toString(),
+            amount: toNano(0.1).toString(),
+            // amount: toNano(0.01).toString(),
             payload: createAccountMsg.toBoc().toString('base64')
         }]
     }
@@ -44,7 +46,7 @@ export const rejectQuestionTransaction = (questionAddr: Address) => {
         validUntil: Math.floor(Date.now() / 1000) + 60,
         messages: [{
             address: questionAddr.toRawString(),
-            amount: toNano("0.03").toString(),
+            amount: toNano("0.01").toString(),
             payload: msg.toBoc().toString('base64')
         }]
     }
@@ -61,7 +63,7 @@ export const updatePriceTransaction = (accountAddr: Address, price: bigint) => {
         validUntil: Math.floor(Date.now() / 1000) + 60,
         messages: [{
             address: accountAddr.toRawString(),
-            amount: toNano("0.02").toString(),
+            amount: toNano("0.01").toString(),
             payload: msg.toBoc().toString('base64')
         }]
     }
