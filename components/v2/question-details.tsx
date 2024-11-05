@@ -36,7 +36,10 @@ export default function QuestionDetails({question}: { question: QuestionData }) 
     }
 
     const dialogContent = <button className={"btn btn-block btn-primary"}
-                                  onClick={() => setSuccessDialogVisible(false)}>Close</button>
+                                  onClick={() => {
+                                      setSuccessDialogVisible(false);
+                                      setReplyShown(false);
+                                  }}>Close</button>
 
     return <>
         {isSuccessDialogVisible && <TransactionSucceedDialog content={dialogContent}/>}

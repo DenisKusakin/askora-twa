@@ -6,6 +6,7 @@ import {submitQuestion} from "@/stores/transactions";
 import {useStoreClientV2} from "@/components/hooks/use-store-client";
 import Link from "next/link";
 import TransactionSucceedDialog from "@/components/v2/transaction-suceed-dialog";
+import {tonConnectUI} from "@/stores/ton-connect";
 
 export default function Ask({addr}: { addr: Address }) {
     const [text, setText] = useState("")
@@ -47,10 +48,12 @@ export default function Ask({addr}: { addr: Address }) {
     }
     const transactionSuccessLinks = <>
         <Link href={`/account?id=${addr}`}
-              className={"btn btn-block btn-outline btn-primary"}>Account
-            Page</Link>
+              className={"btn btn-block btn-primary"}>Close</Link>
         <Link href={`/`} className={"btn btn-block btn-outline btn-primary mt-5"}>My Account Page</Link>
     </>
+    const onConnectClick = () => {
+        tonConnectUI?.modal?.open()
+    }
 
     return <>
         {isSuccessDialogVisible && <TransactionSucceedDialog content={transactionSuccessLinks}/>}
@@ -66,9 +69,12 @@ export default function Ask({addr}: { addr: Address }) {
             </div>
             <textarea className={"textarea textarea-bordered textarea-lg mt-4 w-full h-[200px]"} value={text}
                       onChange={e => setText(e.target.value)}/>
-            <button disabled={isDisabled} onClick={onSubmit}
-                    className={"btn btn-primary btn-block btn-lg mt-4"}>Submit
-            </button>
+            {myConnectedWallet != null && <button disabled={isDisabled} onClick={onSubmit}
+                                                  className={"btn btn-primary btn-block btn-lg mt-4"}>Submit
+            </button>}
+            {myConnectedWallet === null &&
+                <button className={"btn btn-block btn-primary btn-lg mt-4"} onClick={onConnectClick}>Connect
+                </button>}
         </div>
     </>
 }
