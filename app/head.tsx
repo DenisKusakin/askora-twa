@@ -18,7 +18,7 @@ export default function MyHead() {
             // @ts-expect-error todo
             if (window.Telegram.WebApp?.initDataUnsafe?.user?.id != null){
                 // @ts-expect-error todo
-                $tgId.set(window.Telegram.WebApp.user.id.toString())
+                $tgId.set(window.Telegram.WebApp.initDataUnsafe.user.id.toString())
             } else {
                 $tgId.set(null)
             }
