@@ -2,8 +2,8 @@
 const basePath = "http://localhost:3002"
 
 export async function fetchSubscriptions(tgId: string): Promise<string[]> {
-    const response = await fetch(`${basePath}/subscriptions?tgId=${tgId}`)
-    return response.json()
+    const response = await fetch(`${basePath}/subscriptions?tg_id=${tgId}`)
+    return response.json().then(x => x.members)
 }
 
 export async function subscribe(tgId: string, walletAddr: string): Promise<void> {
