@@ -76,6 +76,7 @@ export default function MyProfile() {
             tgConnectionBadge = <div className={"badge badge-outline badge-error"} onClick={onTgConnectClick}>Not Connected</div>
         }
     }
+    const tgIdBadge = <div className={"text-sm font-light mt-2"}>Tg: {tgId}</div>
 
     const newQuestionsToMe = myQuestionsAssigned?.data?.filter(x => !x.isClosed)?.length
     const myQuestionsNotReplied = myQuestionsSubmitted?.data?.filter(x => !x.isClosed)?.length
@@ -93,6 +94,7 @@ export default function MyProfile() {
                         onClick={onShareClick}>Share
                 </button>
             </div>
+            {tgIdBadge}
             {tgConnectionBadge != null && <div className={"mt-5"}>{tgConnectionBadge}</div>}
             <div className={"mt-10 w-full"}>
                 <Link href={"/inbox"} className="btn btn-block">
