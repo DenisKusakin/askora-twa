@@ -87,6 +87,12 @@ export default function MyProfile() {
                 <button className={"btn btn-error btn-outline btn-block btn-lg mt-4"}
                         onClick={onDisconnectClick}>Disconnect
                 </button>
+                <button className={"btn btn-secondary btn-block btn-lg mt-4"}
+                        onClick={() => {
+                            // @ts-expect-error todo
+                            window.Telegram.WebApp.sendData(myConnectedWallet)
+                        }}>Connect My Telegram
+                </button>
             </div>
             <div className={"mt-20"}>
                 <div className={"text-xs break-all font-light mb-1"}
