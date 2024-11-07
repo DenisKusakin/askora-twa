@@ -1,11 +1,18 @@
 import {useStoreClientV2} from "@/components/hooks/use-store-client";
-import {$myAccountInfo, $myConnectedWallet} from "@/stores/profile-store";
+import {
+    $connectionStatusChanged,
+    $myAccountInfo,
+    $myConnectedWallet,
+    $tgConnectionStatus,
+    $tgId
+} from "@/stores/profile-store";
 import {fromNano} from "@ton/core";
 import Link from "next/link";
 import {tonConnectUI} from "@/stores/ton-connect";
 import CreateAccount from "@/components/v2/create-account";
 import {$myAssignedQuestions, $mySubmittedQuestions} from "@/stores/questions-store";
 import copyTextHandler from "@/utils/copy-util";
+import {subscribe} from "@/services/api";
 
 export default function MyProfile() {
     const myConnectedWallet = useStoreClientV2($myConnectedWallet)
@@ -13,6 +20,9 @@ export default function MyProfile() {
 
     const myQuestionsAssigned = useStoreClientV2($myAssignedQuestions)
     const myQuestionsSubmitted = useStoreClientV2($mySubmittedQuestions)
+
+    const tgConnectionStatus = useStoreClientV2($tgConnectionStatus)
+    const tgId = useStoreClientV2($tgId)
 
     const onDisconnectClick = () => {
         tonConnectUI?.disconnect()
@@ -50,6 +60,22 @@ export default function MyProfile() {
             <Link href={"/about"} className={"btn btn-outline btn-success btn-lg btn-block mt-5"}>About</Link>
         </div>
     }
+    const onTgConnectClick = () => {
+        if(tgId == null || myConnectedWallet == null) {
+            return
+        }
+        subscribe(tgId, myConnectedWallet.toString())
+            .then(() => $connectionStatusChanged.set(true))
+    }
+
+    let tgConnectionBadge = null;
+    if (tgConnectionStatus != null) {
+        if (tgConnectionStatus === 'subscribed') {
+            tgConnectionBadge = <div className={"badge badge-outline badge-success"}>Telegram Connected</div>
+        } else {
+            tgConnectionBadge = <div className={"badge badge-outline badge-error"} onClick={onTgConnectClick}>Not Connected</div>
+        }
+    }
 
     const newQuestionsToMe = myQuestionsAssigned?.data?.filter(x => !x.isClosed)?.length
     const myQuestionsNotReplied = myQuestionsSubmitted?.data?.filter(x => !x.isClosed)?.length
@@ -67,6 +93,7 @@ export default function MyProfile() {
                         onClick={onShareClick}>Share
                 </button>
             </div>
+            {tgConnectionBadge != null && <div className={"mt-5"}>{tgConnectionBadge}</div>}
             <div className={"mt-10 w-full"}>
                 <Link href={"/inbox"} className="btn btn-block">
                     <span className={"text-2xl"}>Inbox</span>
@@ -86,12 +113,6 @@ export default function MyProfile() {
                 <Link href={"/find"} className={"btn btn-primary btn-outline btn-lg mt-4 btn-block"}>Find User</Link>
                 <button className={"btn btn-error btn-outline btn-block btn-lg mt-4"}
                         onClick={onDisconnectClick}>Disconnect
-                </button>
-                <button className={"btn btn-secondary btn-block btn-lg mt-4"}
-                        onClick={() => {
-                            // @ts-expect-error todo
-                            window.Telegram.WebApp.sendData(myConnectedWallet)
-                        }}>Connect My Telegram
                 </button>
             </div>
             <div className={"mt-20"}>

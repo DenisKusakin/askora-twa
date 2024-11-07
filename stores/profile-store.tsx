@@ -6,6 +6,7 @@ import {tonConnectUI} from "@/stores/ton-connect";
 import {QuestionData} from "@/stores/questions-store";
 import {getAsignedQuestions, getSubmittedQuestions} from "@/wrappers/wrappers-utils";
 import {Root} from "@/wrappers/Root";
+import {fetchSubscriptions} from "@/services/api";
 
 export const $myConnectedWallet = atom<Address | null | undefined>(undefined)
 
@@ -67,6 +68,30 @@ export const $myAccountInfo = computed([$myAccount, $myAccountRefresh], (myAccou
         } else {
             return null
         }
+    }
+}))
+
+export const $tgId = atom<undefined | null | string>(undefined)
+export const $connectionStatusChanged = atom(false)
+export const $tgConnectionStatus = computed([$myConnectedWallet, $tgId, $connectionStatusChanged], (myConnectedWallet, tgId) => task(async () => {
+    if (myConnectedWallet === undefined || tgId === undefined) {
+        return undefined
+    } else if (myConnectedWallet === null || tgId === null) {
+        return null
+    } else {
+        const mySubscriptions = await fetchSubscriptions(tgId)
+        for(let i = 0; i < mySubscriptions.length; i++) {
+            let parsedAddr = null;
+            try{
+                parsedAddr = Address.parse(mySubscriptions[i])
+            } catch {
+
+            }
+            if(parsedAddr !== null && parsedAddr.equals(myConnectedWallet)){
+                return 'subscribed'
+            }
+        }
+        return 'not-subscribed'
     }
 }))
 
