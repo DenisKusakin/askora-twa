@@ -15,7 +15,8 @@ export async function subscribe(tgId: string, walletAddr: string): Promise<void>
         method: 'POST',
         body: JSON.stringify({tgId: tgId, walletAddr}),
         headers: {
-            'skip_zrok_interstitial': 'true'
+            'skip_zrok_interstitial': 'true',
+            "Content-Type": 'application/json'
         }
     })
 }
