@@ -11,7 +11,8 @@ export async function fetchSubscriptions(tgId: string): Promise<string[]> {
 }
 
 export async function fetchTgInfo(initData: string, hash: string): Promise<unknown> {
-    const response = await fetch(`${basePath}/info?init_data=${initData}&hash=${hash}`, {
+    console.log(hash)
+    const response = await fetch(`${basePath}/info?${initData}`, {
         headers: {
             'skip_zrok_interstitial': 'true'
         }
