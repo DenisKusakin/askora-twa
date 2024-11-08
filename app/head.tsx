@@ -20,6 +20,7 @@ export default function MyHead() {
                 // @ts-expect-error todo
                 $tgInitData.set(window.Telegram.WebApp.initData)
             } else {
+                // @ts-expect-error todo
                 $tgInitData.set('test init data')
             }
             // @ts-expect-error todo
