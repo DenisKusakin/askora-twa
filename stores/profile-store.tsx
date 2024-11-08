@@ -6,7 +6,7 @@ import {tonConnectUI} from "@/stores/ton-connect";
 import {QuestionData} from "@/stores/questions-store";
 import {getAsignedQuestions, getSubmittedQuestions} from "@/wrappers/wrappers-utils";
 import {Root} from "@/wrappers/Root";
-import {fetchSubscriptions} from "@/services/api";
+import {fetchSubscriptions, fetchTgInfo} from "@/services/api";
 
 export const $myConnectedWallet = atom<Address | null | undefined>(undefined)
 
@@ -71,6 +71,12 @@ export const $myAccountInfo = computed([$myAccount, $myAccountRefresh], (myAccou
     }
 }))
 
+export const $tgInitData = atom<undefined | null | string>(undefined)
+$tgInitData.listen(initData => {
+    if(initData != null) {
+        fetchTgInfo(initData).then(x => console.log("Received!", x))
+    }
+})
 export const $tgId = atom<undefined | null | string>(undefined)
 export const $connectionStatusChanged = atom(false)
 export const $tgConnectionStatus = computed([$myConnectedWallet, $tgId, $connectionStatusChanged], (myConnectedWallet, tgId) => task(async () => {

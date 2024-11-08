@@ -1,4 +1,4 @@
-const basePath = "https://sc7b1v7bywdj.share.zrok.io"
+const basePath = "https://r2xeltz6rcrz.share.zrok.io"
 // const basePath = "http://localhost:3002"
 
 export async function fetchSubscriptions(tgId: string): Promise<string[]> {
@@ -8,6 +8,15 @@ export async function fetchSubscriptions(tgId: string): Promise<string[]> {
         }
     })
     return response.json().then(x => x.members)
+}
+
+export async function fetchTgInfo(initData: string): Promise<unknown> {
+    const response = await fetch(`${basePath}/info?init_data=${initData}`, {
+        headers: {
+            'skip_zrok_interstitial': 'true'
+        }
+    })
+    return response.json()
 }
 
 export async function subscribe(tgId: string, walletAddr: string): Promise<void> {

@@ -4,8 +4,6 @@ import {APP_CONTRACT_ADDR} from "@/components/utils/constants";
 export const createAccountTransaction = (price: bigint) => {
     const createAccountMsg = beginCell()
         .storeUint(BigInt("0x5f0ec1a3"), 32)
-        // .storeUint(BigInt("0x74385f77"), 32)
-        .storeUint(123, 64)
         .storeCoins(price)
         .endCell()
 
