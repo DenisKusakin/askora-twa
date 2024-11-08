@@ -10,8 +10,8 @@ export async function fetchSubscriptions(tgId: string): Promise<string[]> {
     return response.json().then(x => x.members)
 }
 
-export async function fetchTgInfo(initData: string): Promise<unknown> {
-    const response = await fetch(`${basePath}/info?init_data=${initData}`, {
+export async function fetchTgInfo(initData: string, hash: string): Promise<unknown> {
+    const response = await fetch(`${basePath}/info?init_data=${initData}&hash=${hash}`, {
         headers: {
             'skip_zrok_interstitial': 'true'
         }

@@ -71,10 +71,10 @@ export const $myAccountInfo = computed([$myAccount, $myAccountRefresh], (myAccou
     }
 }))
 
-export const $tgInitData = atom<undefined | null | string>(undefined)
-$tgInitData.listen(initData => {
-    if(initData != null) {
-        fetchTgInfo(initData).then(x => console.log("Received!", x))
+export const $tgInitData = atom<undefined | null | {hash: string, initData: string}>(undefined)
+$tgInitData.listen(data => {
+    if(data != null) {
+        fetchTgInfo(data.initData, data.hash).then(x => console.log("Received!", x))
     }
 })
 export const $tgId = atom<undefined | null | string>(undefined)
