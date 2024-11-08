@@ -4,7 +4,7 @@ import {
     $myAccountInfo,
     $myConnectedWallet,
     $tgConnectionStatus,
-    $tgId
+    $tgId, $tgInitData
 } from "@/stores/profile-store";
 import {fromNano} from "@ton/core";
 import Link from "next/link";
@@ -23,6 +23,7 @@ export default function MyProfile() {
 
     const tgConnectionStatus = useStoreClientV2($tgConnectionStatus)
     const tgId = useStoreClientV2($tgId)
+    const tgInitData = useStoreClientV2($tgInitData)
 
     const onDisconnectClick = () => {
         tonConnectUI?.disconnect()
@@ -61,10 +62,10 @@ export default function MyProfile() {
         </div>
     }
     const onTgConnectClick = () => {
-        if(tgId == null || myConnectedWallet == null) {
+        if(tgInitData == null || myConnectedWallet == null) {
             return
         }
-        subscribe(tgId, myConnectedWallet.toString())
+        subscribe(tgInitData, myConnectedWallet.toString())
             .then(() => $connectionStatusChanged.set(true))
     }
 

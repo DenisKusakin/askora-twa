@@ -10,8 +10,16 @@ export async function fetchSubscriptions(tgId: string): Promise<string[]> {
     return response.json().then(x => x.members)
 }
 
-export async function fetchTgInfo(initData: string, hash: string): Promise<unknown> {
-    console.log(hash)
+export async function fetchIsSubscribed(tgId: string, walletAddr: string): Promise<boolean> {
+    const response = await fetch(`${basePath}/subscribed?tg_id=${tgId}&wallet_addr=${walletAddr}`, {
+        headers: {
+            'skip_zrok_interstitial': 'true'
+        }
+    })
+    return response.json().then(x => x.subscribed)
+}
+
+export async function fetchTgInfo(initData: string): Promise<unknown> {
     const response = await fetch(`${basePath}/info?${initData}`, {
         headers: {
             'skip_zrok_interstitial': 'true'
@@ -20,10 +28,10 @@ export async function fetchTgInfo(initData: string, hash: string): Promise<unkno
     return response.json()
 }
 
-export async function subscribe(tgId: string, walletAddr: string): Promise<void> {
+export async function subscribe(initData: string, walletAddr: string): Promise<void> {
     await fetch(`${basePath}/subscribe`, {
         method: 'POST',
-        body: JSON.stringify({tgId: tgId, walletAddr}),
+        body: JSON.stringify({initData, walletAddr}),
         headers: {
             'skip_zrok_interstitial': 'true',
             "Content-Type": 'application/json'
