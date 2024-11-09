@@ -1,9 +1,9 @@
 import {QuestionData} from "@/stores/questions-store";
 import {Address, fromNano} from "@ton/core";
-import {useState} from "react";
+import {useEffect, useState} from "react";
 import {rejectQuestion, replyToQuestion} from "@/stores/transactions";
 import {useStoreClientV2} from "@/components/hooks/use-store-client";
-import {$myConnectedWallet} from "@/stores/profile-store";
+import {$myConnectedWallet, $tgInitData} from "@/stores/profile-store";
 import Link from "next/link";
 import TransactionSucceedDialog from "@/components/v2/transaction-suceed-dialog";
 import copyTextHandler from "@/utils/copy-util";
@@ -13,6 +13,7 @@ export default function QuestionDetails({question}: { question: QuestionData }) 
     const [replyShown, setReplyShown] = useState(false)
     const [myReply, setMyReply] = useState<string>('')
     const [isSuccessDialogVisible, setSuccessDialogVisible] = useState(false)
+    const tgInitData = useStoreClientV2($tgInitData)
 
     let additional_class = ""
     if (question.isRejected) {
@@ -41,6 +42,31 @@ export default function QuestionDetails({question}: { question: QuestionData }) 
                                       setReplyShown(false);
                                   }}>Close</button>
 
+    const isInTelegram = !(tgInitData === null || tgInitData === '')
+
+    useEffect(() => {
+        if (isInTelegram) {
+            if (replyShown && !question.isClosed && isMyQuestion) {
+                // @ts-expect-error todo
+                window.Telegram.WebApp.MainButton.setText('Send Reply');
+                // @ts-expect-error todo
+                window.Telegram.WebApp.MainButton.show();
+                // @ts-expect-error todo
+                window.Telegram.WebApp.MainButton.onClick(onReplyClick)
+                if (myReply.trim() === '') {
+                    // @ts-expect-error todo
+                    window.Telegram.WebApp.MainButton.disable();
+                } else {
+                    // @ts-expect-error todo
+                    window.Telegram.WebApp.MainButton.enable();
+                }
+            } else {
+                // @ts-expect-error todo
+                window.Telegram.WebApp.MainButton.hide();
+            }
+        }
+    }, [replyShown, question, isMyQuestion, myReply, isInTelegram]);
+
     return <>
         {isSuccessDialogVisible && <TransactionSucceedDialog content={dialogContent}/>}
         <div className={"pt-10"}>
@@ -52,8 +78,10 @@ export default function QuestionDetails({question}: { question: QuestionData }) 
                         className={`${!replyShown ? 'text-xl' : 'text-base'} text-3xl ml-2 ${additional_class}`}>TON</span>
                 </div>
                 <div className={"w-4/12 content-center"}>
-                    {question.isClosed && !question.isRejected && <span className={"badge badge-outline badge-success"}>Replied</span>}
-                    {question.isClosed && question.isRejected && <span className={"badge badge-outline badge-error"}>Rejected</span>}
+                    {question.isClosed && !question.isRejected &&
+                        <span className={"badge badge-outline badge-success"}>Replied</span>}
+                    {question.isClosed && question.isRejected &&
+                        <span className={"badge badge-outline badge-error"}>Rejected</span>}
                 </div>
             </div>
             {!replyShown && <div className={"flex flex-col"}>
@@ -118,10 +146,10 @@ export default function QuestionDetails({question}: { question: QuestionData }) 
                         className="textarea mt-2 textarea-bordered textarea-lg w-full h-[200px]"></textarea>
                 </div>
                 <div className={"mt-4"}>
-                    <button className={"btn btn-block btn-lg btn-primary"}
-                            onClick={onReplyClick}
-                            disabled={myReply.trim() === ''}>Send Reply
-                    </button>
+                    {!isInTelegram && <button className={"btn btn-block btn-lg btn-primary"}
+                                              onClick={onReplyClick}
+                                              disabled={myReply.trim() === ''}>Send Reply
+                    </button>}
                     <button className={"btn btn-outline btn-block btn-lg btn-error mt-2"}
                             onClick={() => setReplyShown(false)}>Cancel
                     </button>
