@@ -12,7 +12,8 @@ export default function Home() {
 
     useEffect(() => {
         if (tgStartParam !== undefined && !tgStartParam.isLoading && tgStartParam.startParam != null) {
-            router.push(`/account?id=${tgStartParam.startParam}`)
+            const decodedUrl = atob(tgStartParam.startParam)
+            router.push(decodedUrl)
         }
     }, [router, tgStartParam]);
 

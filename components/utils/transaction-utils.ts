@@ -44,7 +44,7 @@ export const rejectQuestionTransaction = (questionAddr: Address) => {
         validUntil: Math.floor(Date.now() / 1000) + 60,
         messages: [{
             address: questionAddr.toRawString(),
-            amount: toNano("0.01").toString(),
+            amount: toNano("0.1").toString(),
             payload: msg.toBoc().toString('base64')
         }]
     }
