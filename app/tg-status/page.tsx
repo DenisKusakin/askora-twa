@@ -29,7 +29,7 @@ export default function TgStatusPage() {
         unsubscribe(tgInitData, myConnectedWallet.toString())
             .then(() => $connectionStatusChanged.set(true))
     }
-    const isInTelegram = tgInitData === null || tgInitData === ''
+    const isInTelegram = !(tgInitData === null || tgInitData === '')
 
     return <div className={"pt-10"}>
         <p className={"text text-sm font-light text-center mt-2"}>Connecting your Telegram account is optional, but it
