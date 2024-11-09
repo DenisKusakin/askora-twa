@@ -1,5 +1,5 @@
 import {Address, beginCell, toNano} from "@ton/core";
-import {APP_CONTRACT_ADDR} from "@/components/utils/constants";
+import {APP_CONTRACT_ADDR} from "@/conf";
 
 export const createAccountTransaction = (price: bigint) => {
     const createAccountMsg = beginCell()

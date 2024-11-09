@@ -1,10 +1,9 @@
 import {useStoreClientV2} from "@/components/hooks/use-store-client";
 import {
-    $connectionStatusChanged,
     $myAccountInfo,
     $myConnectedWallet,
     $tgConnectionStatus,
-    $tgId, $tgInitData
+    $tgId
 } from "@/stores/profile-store";
 import {fromNano} from "@ton/core";
 import Link from "next/link";
@@ -12,7 +11,6 @@ import {tonConnectUI} from "@/stores/ton-connect";
 import CreateAccount from "@/components/v2/create-account";
 import {$myAssignedQuestions, $mySubmittedQuestions} from "@/stores/questions-store";
 import copyTextHandler from "@/utils/copy-util";
-import {subscribe} from "@/services/api";
 
 export default function MyProfile() {
     const myConnectedWallet = useStoreClientV2($myConnectedWallet)
@@ -23,7 +21,6 @@ export default function MyProfile() {
 
     const tgConnectionStatus = useStoreClientV2($tgConnectionStatus)
     const tgId = useStoreClientV2($tgId)
-    const tgInitData = useStoreClientV2($tgInitData)
 
     const onDisconnectClick = () => {
         tonConnectUI?.disconnect()
@@ -53,7 +50,7 @@ export default function MyProfile() {
                 <h2 className={"text text-xl mt-2"}>Connect TON Wallet</h2>
                 <h2 className={"text text-xl mt-2"}>Create an account and set a price</h2>
                 <h2 className={"text text-xl mt-2"}>Share link with your audience</h2>
-                <h2 className={"text text-xl mt-2"}>💰 Reply and earn reward</h2>
+                <h2 className={"text text-xl mt-2"}>💰Reply and earn reward</h2>
             </div>
             <button className={"btn btn-block btn-primary btn-lg mt-4"} onClick={onConnectClick}>Connect
             </button>
@@ -61,24 +58,15 @@ export default function MyProfile() {
             <Link href={"/about"} className={"btn btn-outline btn-success btn-lg btn-block mt-5"}>About</Link>
         </div>
     }
-    const onTgConnectClick = () => {
-        if(tgInitData == null || myConnectedWallet == null) {
-            return
-        }
-        subscribe(tgInitData, myConnectedWallet.toString())
-            .then(() => $connectionStatusChanged.set(true))
-    }
 
     let tgConnectionBadge = null;
-    if (tgConnectionStatus != null) {
+    if (tgConnectionStatus != null && tgId != null) {
         if (tgConnectionStatus === 'subscribed') {
-            tgConnectionBadge = <div className={"badge badge-outline badge-success"}>Telegram Connected</div>
+            tgConnectionBadge = <Link href={"/tg-status"} className={"badge badge-outline badge-success"}>Telegram Connected</Link>
         } else {
-            tgConnectionBadge = <div className={"badge badge-outline badge-error"} onClick={onTgConnectClick}>Not Connected</div>
+            tgConnectionBadge = <Link href={"/tg-status"} className={"badge badge-outline badge-error"}>Telegram Not Connected</Link>
         }
     }
-    const tgIdBadge = <div className={"text-sm font-light mt-2"}>Tg: {tgId}</div>
-
     const newQuestionsToMe = myQuestionsAssigned?.data?.filter(x => !x.isClosed)?.length
     const myQuestionsNotReplied = myQuestionsSubmitted?.data?.filter(x => !x.isClosed)?.length
 
@@ -95,9 +83,8 @@ export default function MyProfile() {
                         onClick={onShareClick}>Share
                 </button>
             </div>
-            {tgIdBadge}
             {tgConnectionBadge != null && <div className={"mt-5"}>{tgConnectionBadge}</div>}
-            <div className={"mt-10 w-full"}>
+            <div className={"mt-5 w-full"}>
                 <Link href={"/inbox"} className="btn btn-block">
                     <span className={"text-2xl"}>Inbox</span>
                     {myQuestionsAssigned !== undefined && !myQuestionsAssigned.isLoading && newQuestionsToMe != null && newQuestionsToMe !== 0 &&

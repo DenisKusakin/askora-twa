@@ -1,12 +1,12 @@
 import {atom, computed, task} from "nanostores";
 import {Address} from "@ton/core";
-import {APP_CONTRACT_ADDR} from "@/components/utils/constants";
 import {tonClient} from "@/wrappers/ton-client";
 import {tonConnectUI} from "@/stores/ton-connect";
 import {QuestionData} from "@/stores/questions-store";
 import {getAsignedQuestions, getSubmittedQuestions} from "@/wrappers/wrappers-utils";
 import {Root} from "@/wrappers/Root";
-import {fetchIsSubscribed, fetchSubscriptions, fetchTgInfo} from "@/services/api";
+import {fetchIsSubscribed} from "@/services/api";
+import {APP_CONTRACT_ADDR} from "@/conf";
 
 export const $myConnectedWallet = atom<Address | null | undefined>(undefined)
 
@@ -72,11 +72,6 @@ export const $myAccountInfo = computed([$myAccount, $myAccountRefresh], (myAccou
 }))
 
 export const $tgInitData = atom<undefined | null | string>(undefined)
-// $tgInitData.listen(data => {
-//     if(data != null) {
-//         fetchTgInfo(data).then(x => console.log("Received!", x))
-//     }
-// })
 export const $tgId = atom<undefined | null | string>(undefined)
 export const $connectionStatusChanged = atom(false)
 export const $tgConnectionStatus = computed([$myConnectedWallet, $tgId, $connectionStatusChanged], (myConnectedWallet, tgId) => task(async () => {
@@ -87,19 +82,6 @@ export const $tgConnectionStatus = computed([$myConnectedWallet, $tgId, $connect
     } else {
         const isSubscribed = await fetchIsSubscribed(tgId, myConnectedWallet.toString())
         return isSubscribed ? 'subscribed' : 'not-subscribed';
-        // const mySubscriptions = await fetchSubscriptions(tgId)
-        // for(let i = 0; i < mySubscriptions.length; i++) {
-        //     let parsedAddr = null;
-        //     try{
-        //         parsedAddr = Address.parse(mySubscriptions[i])
-        //     } catch {
-        //
-        //     }
-        //     if(parsedAddr !== null && parsedAddr.equals(myConnectedWallet)){
-        //         return 'subscribed'
-        //     }
-        // }
-        // return 'not-subscribed'
     }
 }))
 

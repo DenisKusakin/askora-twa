@@ -1,10 +1,10 @@
 import {batched, computed, task} from "nanostores";
 import {Address} from "@ton/core";
 import {$myAccount, $myAccountInfo} from "@/stores/profile-store";
-import {APP_CONTRACT_ADDR} from "@/components/utils/constants";
 import {tonClient} from "@/wrappers/ton-client";
 import {getAsignedQuestions, getSubmittedQuestions} from "@/wrappers/wrappers-utils";
 import {Root} from "@/wrappers/Root";
+import {APP_CONTRACT_ADDR} from "@/conf";
 
 export type QuestionData = {
     content: string,

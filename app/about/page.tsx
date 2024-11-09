@@ -1,5 +1,5 @@
-import {APP_CONTRACT_ADDR} from "@/components/utils/constants";
 import Link from "next/link";
+import {APP_CONTRACT_ADDR} from "@/conf";
 
 export default function AboutPage() {
     return <div className={"pt-10"}>

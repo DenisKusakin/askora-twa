@@ -1,17 +1,7 @@
-const basePath = "https://r2xeltz6rcrz.share.zrok.io"
-// const basePath = "http://localhost:3002"
-
-export async function fetchSubscriptions(tgId: string): Promise<string[]> {
-    const response = await fetch(`${basePath}/subscriptions?tg_id=${tgId}`, {
-        headers: {
-            'skip_zrok_interstitial': 'true'
-        }
-    })
-    return response.json().then(x => x.members)
-}
+import {API_BASE_PATH} from "@/conf";
 
 export async function fetchIsSubscribed(tgId: string, walletAddr: string): Promise<boolean> {
-    const response = await fetch(`${basePath}/subscribed?tg_id=${tgId}&wallet_addr=${walletAddr}`, {
+    const response = await fetch(`${API_BASE_PATH}/subscribed?tg_id=${tgId}&wallet_addr=${walletAddr}`, {
         headers: {
             'skip_zrok_interstitial': 'true'
         }
@@ -19,17 +9,19 @@ export async function fetchIsSubscribed(tgId: string, walletAddr: string): Promi
     return response.json().then(x => x.subscribed)
 }
 
-export async function fetchTgInfo(initData: string): Promise<unknown> {
-    const response = await fetch(`${basePath}/info?${initData}`, {
+export async function subscribe(initData: string, walletAddr: string): Promise<void> {
+    await fetch(`${API_BASE_PATH}/subscribe`, {
+        method: 'POST',
+        body: JSON.stringify({initData, walletAddr}),
         headers: {
-            'skip_zrok_interstitial': 'true'
+            'skip_zrok_interstitial': 'true',
+            "Content-Type": 'application/json'
         }
     })
-    return response.json()
 }
 
-export async function subscribe(initData: string, walletAddr: string): Promise<void> {
-    await fetch(`${basePath}/subscribe`, {
+export async function unsubscribe(initData: string, walletAddr: string): Promise<void> {
+    await fetch(`${API_BASE_PATH}/unsubscribe`, {
         method: 'POST',
         body: JSON.stringify({initData, walletAddr}),
         headers: {

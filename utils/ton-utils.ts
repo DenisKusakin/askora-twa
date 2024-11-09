@@ -1,8 +1,8 @@
 import {Address} from "@ton/core";
 import {tonClient} from "@/wrappers/ton-client";
 import {Root} from "@/wrappers/Root";
-import {APP_CONTRACT_ADDR} from "@/components/utils/constants";
 import {$myAccountRefresh} from "@/stores/profile-store";
+import {APP_CONTRACT_ADDR} from "@/conf";
 
 export async function waitUntilAccountCreated(ownerAddr: Address) {
     const rootContract = tonClient.open(Root.createFromAddress(APP_CONTRACT_ADDR))

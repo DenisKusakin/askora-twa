@@ -21,9 +21,9 @@ export default function Home() {
                 decodedUrl = `/my-question?id=${qId}`
             } else if (tgStartParam.startParam.startsWith("2_")) {
                 console.log(tgStartParam.startParam)
-                const secondDelimeterIdx = tgStartParam.startParam.lastIndexOf(":")
-                const qId = tgStartParam.startParam.substring(2, secondDelimeterIdx)
-                const accountId = tgStartParam.startParam.substring(secondDelimeterIdx + 1)
+                const secondDelIdx = tgStartParam.startParam.lastIndexOf("_")
+                const qId = tgStartParam.startParam.substring(2, secondDelIdx)
+                const accountId = tgStartParam.startParam.substring(secondDelIdx + 1)
                 decodedUrl = `/q-details?q_id=${qId}&owner_id=${accountId}`
             }
             if(decodedUrl != null) {
