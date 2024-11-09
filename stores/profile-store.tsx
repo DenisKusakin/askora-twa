@@ -73,6 +73,7 @@ export const $myAccountInfo = computed([$myAccount, $myAccountRefresh], (myAccou
 
 export const $tgInitData = atom<undefined | null | string>(undefined)
 export const $tgId = atom<undefined | null | string>(undefined)
+//TODO: this should be done in other way
 export const $connectionStatusChanged = atom(0)
 
 export function refreshTgConnectionStatus() {

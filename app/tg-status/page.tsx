@@ -14,7 +14,8 @@ export default function TgStatusPage() {
     const myConnectedWallet = useStoreClientV2($myConnectedWallet)
     const tgConnectionStatus = useStoreClientV2($tgConnectionStatus)
     const tgInitData = useStoreClientV2($tgInitData)
-    const [isStatusLoading, setStatusLoading] = useState(true)//useState(tgConnectionStatus === undefined)
+    const [isStatusLoading, setStatusLoading] = useState(tgConnectionStatus === undefined)
+
     useEffect(() => {
         if (tgConnectionStatus != undefined) {
             setStatusLoading(false)

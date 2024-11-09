@@ -15,7 +15,9 @@ export default function QuestionDetailsPage({ownerAddress, id}: { ownerAddress: 
             .then(x => setData({isLoading: false, data: x}))
     }, [ownerAddress, id]);
     if (data.isLoading || data.data == null) {
-        return <div className={"pt-10 loading loading-dots loading-lg"}></div>
+        return <div className={"w-full mt-[50%] flex justify-center"}>
+            <div className={"loading loading-ring w-[125px] h-[125px]"}></div>
+        </div>
     }
     // const qData = data?.data.find(x => x.id === id)
     // if (qData == null) {
