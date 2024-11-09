@@ -1,6 +1,6 @@
 import {Address} from "@ton/core";
 
-export const API_BASE_PATH = "https://r2xeltz6rcrz.share.zrok.io"
+export const API_BASE_PATH = "https://askora-backend-bffb2.ondigitalocean.app"
 export const APP_CONTRACT_ADDR = Address.parse("EQDdmpqGY1WO63W4LYjSn0xDd1bpnHAm9eWZ84qG0gYxV7pn")
 
 export const TON_API_ENDPOINT = 'https://testnet.toncenter.com/api/v2/jsonRPC'
