@@ -35,7 +35,7 @@ export default function MyProfile() {
         if (myConnectedWallet == null) {
             return
         }
-        navigator.share({url: `https://t.me/AskoraBot/app?startapp=0:${myConnectedWallet}`})
+        navigator.share({url: `https://t.me/AskoraBot/app?startapp=0_${myConnectedWallet}`})
     }
     if (myConnectedWallet === undefined || myAccountInfo === undefined) {
         return <div className={"w-full mt-[50%] flex justify-center"}>

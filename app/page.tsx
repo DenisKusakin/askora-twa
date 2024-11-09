@@ -13,13 +13,13 @@ export default function Home() {
     useEffect(() => {
         if (tgStartParam !== undefined && !tgStartParam.isLoading && tgStartParam.startParam != null) {
             let decodedUrl = null;
-            if (tgStartParam.startParam.startsWith("0:")) {
+            if (tgStartParam.startParam.startsWith("0_")) {
                 const accountId = tgStartParam.startParam.substring(2)
                 decodedUrl = `/account?id=${accountId}`
-            } else if (tgStartParam.startParam.startsWith("1:")) {
+            } else if (tgStartParam.startParam.startsWith("1_")) {
                 const qId = tgStartParam.startParam.substring(2)
                 decodedUrl = `/my-question?id=${qId}`
-            } else if (tgStartParam.startParam.startsWith("2:")) {
+            } else if (tgStartParam.startParam.startsWith("2_")) {
                 console.log(tgStartParam.startParam)
                 const secondDelimeterIdx = tgStartParam.startParam.lastIndexOf(":")
                 const qId = tgStartParam.startParam.substring(2, secondDelimeterIdx)
