@@ -8,13 +8,19 @@ export async function fetchIsSubscribed(tgId: string, walletAddr: string): Promi
 export async function subscribe(initData: string, walletAddr: string): Promise<void> {
     await fetch(`${API_BASE_PATH}/subscribe`, {
         method: 'POST',
-        body: JSON.stringify({initData, walletAddr})
+        body: JSON.stringify({initData, walletAddr}),
+        headers: {
+            "Content-Type": 'application/json'
+        }
     })
 }
 
 export async function unsubscribe(initData: string, walletAddr: string): Promise<void> {
     await fetch(`${API_BASE_PATH}/unsubscribe`, {
         method: 'POST',
-        body: JSON.stringify({initData, walletAddr})
+        body: JSON.stringify({initData, walletAddr}),
+        headers: {
+            "Content-Type": 'application/json'
+        }
     })
 }
