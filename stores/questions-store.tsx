@@ -1,4 +1,4 @@
-import {batched, computed, task} from "nanostores";
+import {batched, task} from "nanostores";
 import {Address} from "@ton/core";
 import {$myAccount, $myAccountInfo} from "@/stores/profile-store";
 import {tonClient} from "@/wrappers/ton-client";

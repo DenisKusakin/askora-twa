@@ -19,6 +19,8 @@ export default function MyHead() {
             if (window.Telegram.WebApp?.initData != null) {
                 // @ts-expect-error todo
                 $tgInitData.set(window.Telegram.WebApp.initData)
+            } else {
+                $tgInitData.set(null)
             }
             // @ts-expect-error todo
             if (window.Telegram.WebApp?.initDataUnsafe?.user?.id != null){
