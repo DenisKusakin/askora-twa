@@ -73,7 +73,12 @@ export const $myAccountInfo = computed([$myAccount, $myAccountRefresh], (myAccou
 
 export const $tgInitData = atom<undefined | null | string>(undefined)
 export const $tgId = atom<undefined | null | string>(undefined)
-export const $connectionStatusChanged = atom(false)
+export const $connectionStatusChanged = atom(0)
+
+export function refreshTgConnectionStatus() {
+    $connectionStatusChanged.set($connectionStatusChanged.get() + 1)
+}
+
 export const $tgConnectionStatus = computed([$myConnectedWallet, $tgId, $connectionStatusChanged], (myConnectedWallet, tgId) => task(async () => {
     if (myConnectedWallet === undefined || tgId === undefined) {
         return undefined
