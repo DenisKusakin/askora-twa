@@ -1,3 +1,5 @@
+'use client';
+
 import {useStoreClientV2} from "@/components/hooks/use-store-client";
 import {
     $connectionStatusChanged,
