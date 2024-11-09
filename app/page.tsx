@@ -24,7 +24,7 @@ export default function Home() {
                 const secondDelimeterIdx = tgStartParam.startParam.lastIndexOf(":")
                 const qId = tgStartParam.startParam.substring(2, secondDelimeterIdx)
                 const accountId = tgStartParam.startParam.substring(secondDelimeterIdx + 1)
-                decodedUrl = `/account?q_id=${qId}&owner_id=${accountId}`
+                decodedUrl = `/q-details?q_id=${qId}&owner_id=${accountId}`
             }
             if(decodedUrl != null) {
                 router.push(decodedUrl)
