@@ -15,6 +15,7 @@ export default function MyHead() {
             })
             // @ts-expect-error todo
             $tgStartParam.set({isLoading: false, startParam: window.Telegram.WebApp.initDataUnsafe.start_param})
+            // $tgStartParam.set({isLoading: false, startParam: '2:0:EQDmfkqHjo0oKBTASCZS2-CSEBt0NTdJz5kFyCsbPH5IgFdL'})
             // @ts-expect-error todo
             if (window.Telegram.WebApp?.initData != null) {
                 // @ts-expect-error todo

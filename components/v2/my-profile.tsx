@@ -35,9 +35,7 @@ export default function MyProfile() {
         if (myConnectedWallet == null) {
             return
         }
-        const profileUrl = `/account?id=${myConnectedWallet.toString()}`
-        const profileUrlEncoded = btoa(profileUrl)
-        navigator.share({url: `https://t.me/AskoraBot/app?startapp=${profileUrlEncoded}`})
+        navigator.share({url: `https://t.me/AskoraBot/app?startapp=0:${myConnectedWallet}`})
     }
     if (myConnectedWallet === undefined || myAccountInfo === undefined) {
         return <div className={"w-full mt-[50%] flex justify-center"}>
