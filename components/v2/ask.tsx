@@ -1,17 +1,20 @@
 import {Address, fromNano, toNano} from "@ton/core";
 import {useEffect, useState} from "react";
-import {$myConnectedWallet, AccountInfo, fetchAccountInfo} from "@/stores/profile-store";
+import {$myConnectedWallet, $tgInitData, AccountInfo, fetchAccountInfo} from "@/stores/profile-store";
 import {userFriendlyStr} from "@/components/utils/addr-utils";
 import {submitQuestion} from "@/stores/transactions";
 import {useStoreClientV2} from "@/components/hooks/use-store-client";
 import Link from "next/link";
 import TransactionSucceedDialog from "@/components/v2/transaction-suceed-dialog";
 import {tonConnectUI} from "@/stores/ton-connect";
+import TgMainButton from "@/components/v2/TgMainButon";
 
 export default function Ask({addr}: { addr: Address }) {
     const [text, setText] = useState("")
     const myConnectedWallet = useStoreClientV2($myConnectedWallet)
     const [accountInfo, setAccountInfo] = useState<{ isLoading: boolean, data?: AccountInfo }>({isLoading: true})
+    const tgInitData = useStoreClientV2($tgInitData)
+
     useEffect(() => {
         setAccountInfo({isLoading: true})
         fetchAccountInfo(addr)
@@ -54,6 +57,7 @@ export default function Ask({addr}: { addr: Address }) {
     const onConnectClick = () => {
         tonConnectUI?.modal?.open()
     }
+    const isInTelegram = !(tgInitData === null || tgInitData === '')
 
     return <>
         {isSuccessDialogVisible && <TransactionSucceedDialog content={transactionSuccessLinks}/>}
@@ -69,9 +73,11 @@ export default function Ask({addr}: { addr: Address }) {
             </div>
             <textarea className={"textarea textarea-bordered textarea-lg mt-4 w-full h-[200px]"} value={text}
                       onChange={e => setText(e.target.value)}/>
-            {myConnectedWallet != null && <button disabled={isDisabled} onClick={onSubmit}
-                                                  className={"btn btn-primary btn-block btn-lg mt-4"}>Submit
+            {myConnectedWallet != null && !isInTelegram && <button disabled={isDisabled} onClick={onSubmit}
+                                                                   className={"btn btn-primary btn-block btn-lg mt-4"}>Submit
             </button>}
+            {myConnectedWallet != null && isInTelegram &&
+                <TgMainButton enabled={!isDisabled} onClick={onSubmit} title={"Submit"}/>}
             {myConnectedWallet === null &&
                 <button className={"btn btn-block btn-primary btn-lg mt-4"} onClick={onConnectClick}>Connect
                 </button>}
