@@ -14,28 +14,28 @@ export default function TgMainButton({title, onClick, enabled}: {
     useEffect(() => {
         //if (isInTelegram) {
         // @ts-expect-error todo
-        if (window.Telegram.WebApp.MainButton.text !== title) {
-            // @ts-expect-error todo
-            window.Telegram.WebApp.MainButton.setText(title);
-        }
-        // @ts-expect-error todo
-        if (!window.Telegram.WebApp.MainButton.isVisible) {
+        window.Telegram.WebApp.MainButton.setText(title);
+        // if (window.Telegram.WebApp.MainButton.text !== title) {
+        //     // @ts-expect-error todo
+        // }
+        // if (!window.Telegram.WebApp.MainButton.isVisible) {
             // @ts-expect-error todo
             window.Telegram.WebApp.MainButton.show();
-        }
+        // }
         // @ts-expect-error todo
         window.Telegram.WebApp.MainButton.onClick(onClick)
-        // @ts-expect-error todo
-        if (enabled && !window.Telegram.WebApp.MainButton.isActive) {
+        // if (enabled && !window.Telegram.WebApp.MainButton.isActive) {
+        if(enabled){
             // @ts-expect-error todo
             window.Telegram.WebApp.MainButton.enable();
-        } else {
-            // @ts-expect-error todo
-            window.Telegram.WebApp.MainButton.disable();
         }
+        // } else {
+        //     // @ts-expect-error todo
+        //     window.Telegram.WebApp.MainButton.disable();
+        // }
         return () => {
-            // @ts-expect-error todo
-            window.Telegram.WebApp.MainButton.offClick(onClick)
+            // // @ts-expect-error todo
+            // window.Telegram.WebApp.MainButton.offClick(onClick)
             // @ts-expect-error todo
             window.Telegram.WebApp.MainButton.hide()
         }
