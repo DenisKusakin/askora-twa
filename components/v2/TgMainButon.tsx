@@ -13,9 +13,15 @@ export default function TgMainButton({title, onClick, enabled}: {
     useEffect(() => {
         if (isInTelegram) {
             // @ts-expect-error todo
-            window.Telegram.WebApp.MainButton.setText(title);
+            if(window.Telegram.WebApp.MainButton !== title){
+                // @ts-expect-error todo
+                window.Telegram.WebApp.MainButton.setText(title);
+            }
             // @ts-expect-error todo
-            window.Telegram.WebApp.MainButton.show();
+            if(!window.Telegram.WebApp.MainButton.isVisible){
+                // @ts-expect-error todo
+                window.Telegram.WebApp.MainButton.show();
+            }
             // @ts-expect-error todo
             window.Telegram.WebApp.MainButton.onClick(onClick)
             if (enabled) {
