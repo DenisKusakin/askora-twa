@@ -44,7 +44,7 @@ export default function TgMainButton({title, onClick, enabled, shown}: {
 
         return () => {
         }
-    }, [title, onClick, enabled]);
+    }, []);
 
     return null;
 }
