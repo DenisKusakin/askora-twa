@@ -1,5 +1,6 @@
 import "./globals.css";
 import MyHead from "@/app/head";
+import MyAppWrapper from "@/app/my-app-wrapper";
 
 export const metadata = {
     title: 'Askora',
@@ -17,7 +18,7 @@ export default function RootLayout({
             <MyHead/>
         </head>
         <body>
-        {children}
+        <MyAppWrapper>{children}</MyAppWrapper>
         </body>
         </html>
     )

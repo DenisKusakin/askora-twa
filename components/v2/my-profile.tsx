@@ -9,18 +9,47 @@ import {fromNano} from "@ton/core";
 import Link from "next/link";
 import {tonConnectUI} from "@/stores/ton-connect";
 import CreateAccount from "@/components/v2/create-account";
-import {$myAssignedQuestions, $mySubmittedQuestions} from "@/stores/questions-store";
+import {$mySubmittedQuestions} from "@/stores/questions-store";
 import copyTextHandler from "@/utils/copy-util";
+import {useContext, useEffect} from "react";
+import {MyAssignedQuestionsContext} from "@/app/context/my-questions-context";
 
 export default function MyProfile() {
     const myConnectedWallet = useStoreClientV2($myConnectedWallet)
     const myAccountInfo = useStoreClientV2($myAccountInfo)
 
-    const myQuestionsAssigned = useStoreClientV2($myAssignedQuestions)
     const myQuestionsSubmitted = useStoreClientV2($mySubmittedQuestions)
 
     const tgConnectionStatus = useStoreClientV2($tgConnectionStatus)
     const tgId = useStoreClientV2($tgId)
+
+    const myAssignedQuestionsContext = useContext(MyAssignedQuestionsContext)
+    useEffect(() => {
+        if (myAccountInfo != null) {
+            for (let i = 0; i < myAccountInfo.assignedCount; i++) {
+                //TODO get rid of setTimeout
+                setTimeout(() => myAssignedQuestionsContext.fetch(i), 1000 * i)
+            }
+        }
+    }, [myAccountInfo, myAssignedQuestionsContext.fetch]);
+    let isAssignedLoading = true;
+    if (myAccountInfo != null) {
+        let oneLoading = false;
+        for (let i = 0; i < myAccountInfo.assignedCount; i++) {
+            const found = myAssignedQuestionsContext.items.find(x => x.id === i);
+            if (found == null || found.isLoading || found.data === null) {
+                oneLoading = true;
+                break;
+            }
+        }
+        isAssignedLoading = oneLoading
+    }
+
+    const myQuestionsAssigned = {
+        isLoading: isAssignedLoading,
+        data: myAssignedQuestionsContext.items.map(x => x.data).filter(x => x !== null)
+    }
+
 
     const onDisconnectClick = () => {
         tonConnectUI?.disconnect()
@@ -62,9 +91,11 @@ export default function MyProfile() {
     let tgConnectionBadge = null;
     if (tgConnectionStatus != null && tgId != null) {
         if (tgConnectionStatus === 'subscribed') {
-            tgConnectionBadge = <Link href={"/tg-status"} className={"badge badge-outline badge-success"}>Telegram Connected</Link>
+            tgConnectionBadge =
+                <Link href={"/tg-status"} className={"badge badge-outline badge-success"}>Telegram Connected</Link>
         } else {
-            tgConnectionBadge = <Link href={"/tg-status"} className={"badge badge-outline badge-error"}>Telegram Not Connected</Link>
+            tgConnectionBadge =
+                <Link href={"/tg-status"} className={"badge badge-outline badge-error"}>Telegram Not Connected</Link>
         }
     }
     const newQuestionsToMe = myQuestionsAssigned?.data?.filter(x => !x.isClosed)?.length
