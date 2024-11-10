@@ -151,7 +151,7 @@ export default function QuestionDetails({question}: { question: QuestionData }) 
                                               onClick={onReplyClick}
                                               disabled={myReply.trim() === ''}>Send Reply
                     </button>}
-                    <TgMainButton title={"Send Reply"} onClick={onReplyClick} enabled={myReply.trim() !== ''}/>
+                    <TgMainButton shown={true} title={"Send Reply"} onClick={onReplyClick} enabled={myReply.trim() !== ''}/>
                     <button className={"btn btn-outline btn-block btn-lg btn-error mt-2"}
                             onClick={() => setReplyShown(false)}>Cancel
                     </button>

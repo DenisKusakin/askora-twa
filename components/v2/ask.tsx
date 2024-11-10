@@ -76,8 +76,7 @@ export default function Ask({addr}: { addr: Address }) {
             {myConnectedWallet != null && !isInTelegram && <button disabled={isDisabled} onClick={onSubmit}
                                                                    className={"btn btn-primary btn-block btn-lg mt-4"}>Submit
             </button>}
-            {myConnectedWallet != null && isInTelegram &&
-                <TgMainButton enabled={!isDisabled} onClick={onSubmit} title={"Submit"}/>}
+            {<TgMainButton shown={myConnectedWallet != null} enabled={!isDisabled} onClick={onSubmit} title={"Submit"}/>}
             {myConnectedWallet === null &&
                 <button className={"btn btn-block btn-primary btn-lg mt-4"} onClick={onConnectClick}>Connect
                 </button>}
