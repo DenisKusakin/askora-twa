@@ -1,8 +1,5 @@
-import {batched, task} from "nanostores";
 import {Address} from "@ton/core";
-import {$myAccount, $myAccountInfo} from "@/stores/profile-store";
 import {tonClient} from "@/wrappers/ton-client";
-import {getSubmittedQuestions} from "@/wrappers/wrappers-utils";
 import {Root} from "@/wrappers/Root";
 import {APP_CONTRACT_ADDR} from "@/conf";
 
@@ -18,20 +15,6 @@ export type QuestionData = {
     id: number,
     createdAt: number
 }
-
-export const $mySubmittedQuestions = batched([$myAccount, $myAccountInfo], (myAccount, myAccountInfo) => task(async () => {
-    if (myAccount === undefined || myAccountInfo === undefined) {
-        return {isLoading: true, data: []}
-    } else if (myAccount !== null && myAccountInfo !== null) {
-        return getSubmittedQuestions(myAccount, {from: 0, limit: myAccountInfo.submittedCount})
-            .then(data => ({isLoading: false, data}))
-    } else {
-        return {
-            isLoading: false,
-            data: []
-        }
-    }
-}))
 
 export async function fetchQuestionData(ownerAddress: Address, qId: number) {
     const rootContract = tonClient.open(Root.createFromAddress(APP_CONTRACT_ADDR))

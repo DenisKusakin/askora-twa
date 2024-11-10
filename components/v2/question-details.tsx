@@ -1,12 +1,13 @@
 import {QuestionData} from "@/stores/questions-store";
 import {Address, fromNano} from "@ton/core";
-import {useEffect, useState} from "react";
+import {useState} from "react";
 import {rejectQuestion, replyToQuestion} from "@/stores/transactions";
 import {useStoreClientV2} from "@/components/hooks/use-store-client";
 import {$myConnectedWallet, $tgInitData} from "@/stores/profile-store";
 import Link from "next/link";
 import TransactionSucceedDialog from "@/components/v2/transaction-suceed-dialog";
 import copyTextHandler from "@/utils/copy-util";
+import TgMainButton from "@/components/v2/TgMainButon";
 
 export default function QuestionDetails({question}: { question: QuestionData }) {
     const myConnectedWallet = useStoreClientV2($myConnectedWallet)
@@ -44,28 +45,28 @@ export default function QuestionDetails({question}: { question: QuestionData }) 
 
     const isInTelegram = !(tgInitData === null || tgInitData === '')
 
-    useEffect(() => {
-        if (isInTelegram) {
-            if (replyShown && !question.isClosed && isMyQuestion) {
-                // @ts-expect-error todo
-                window.Telegram.WebApp.MainButton.setText('Send Reply');
-                // @ts-expect-error todo
-                window.Telegram.WebApp.MainButton.show();
-                // @ts-expect-error todo
-                window.Telegram.WebApp.MainButton.onClick(onReplyClick)
-                if (myReply.trim() === '') {
-                    // @ts-expect-error todo
-                    window.Telegram.WebApp.MainButton.disable();
-                } else {
-                    // @ts-expect-error todo
-                    window.Telegram.WebApp.MainButton.enable();
-                }
-            } else {
-                // @ts-expect-error todo
-                window.Telegram.WebApp.MainButton.hide();
-            }
-        }
-    }, [replyShown, question, isMyQuestion, myReply, isInTelegram]);
+    // useEffect(() => {
+    //     if (isInTelegram) {
+    //         if (replyShown && !question.isClosed && isMyQuestion) {
+    //             // @ts-expect-error todo
+    //             window.Telegram.WebApp.MainButton.setText('Send Reply');
+    //             // @ts-expect-error todo
+    //             window.Telegram.WebApp.MainButton.show();
+    //             // @ts-expect-error todo
+    //             window.Telegram.WebApp.MainButton.onClick(onReplyClick)
+    //             if (myReply.trim() === '') {
+    //                 // @ts-expect-error todo
+    //                 window.Telegram.WebApp.MainButton.disable();
+    //             } else {
+    //                 // @ts-expect-error todo
+    //                 window.Telegram.WebApp.MainButton.enable();
+    //             }
+    //         } else {
+    //             // @ts-expect-error todo
+    //             window.Telegram.WebApp.MainButton.hide();
+    //         }
+    //     }
+    // }, [replyShown, question, isMyQuestion, myReply, isInTelegram]);
 
     return <>
         {isSuccessDialogVisible && <TransactionSucceedDialog content={dialogContent}/>}
@@ -150,6 +151,7 @@ export default function QuestionDetails({question}: { question: QuestionData }) 
                                               onClick={onReplyClick}
                                               disabled={myReply.trim() === ''}>Send Reply
                     </button>}
+                    <TgMainButton title={"Send Reply"} onClick={onReplyClick} enabled={myReply.trim() !== ''}/>
                     <button className={"btn btn-outline btn-block btn-lg btn-error mt-2"}
                             onClick={() => setReplyShown(false)}>Cancel
                     </button>

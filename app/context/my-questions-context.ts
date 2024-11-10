@@ -9,3 +9,12 @@ export const MyAssignedQuestionsContext = createContext<{
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     fetch: (id: number) => {}
 })
+
+export const MySubmittedQuestionsContext = createContext<{
+    items: { isLoading: boolean, id: number, data: QuestionData | null }[],
+    fetch: (id: number) => void
+}>({
+    items: [],
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    fetch: (id: number) => {}
+})

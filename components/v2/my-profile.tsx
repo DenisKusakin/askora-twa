@@ -9,29 +9,33 @@ import {fromNano} from "@ton/core";
 import Link from "next/link";
 import {tonConnectUI} from "@/stores/ton-connect";
 import CreateAccount from "@/components/v2/create-account";
-import {$mySubmittedQuestions} from "@/stores/questions-store";
 import copyTextHandler from "@/utils/copy-util";
 import {useContext, useEffect} from "react";
-import {MyAssignedQuestionsContext} from "@/app/context/my-questions-context";
+import {MyAssignedQuestionsContext, MySubmittedQuestionsContext} from "@/app/context/my-questions-context";
 
 export default function MyProfile() {
     const myConnectedWallet = useStoreClientV2($myConnectedWallet)
     const myAccountInfo = useStoreClientV2($myAccountInfo)
 
-    const myQuestionsSubmitted = useStoreClientV2($mySubmittedQuestions)
-
     const tgConnectionStatus = useStoreClientV2($tgConnectionStatus)
     const tgId = useStoreClientV2($tgId)
 
     const myAssignedQuestionsContext = useContext(MyAssignedQuestionsContext)
+    const mySubmittedQuestionsContext = useContext(MySubmittedQuestionsContext)
+
     useEffect(() => {
         if (myAccountInfo != null) {
             for (let i = 0; i < myAccountInfo.assignedCount; i++) {
                 //TODO get rid of setTimeout
                 setTimeout(() => myAssignedQuestionsContext.fetch(i), 1000 * i)
             }
+            for (let i = 0; i < myAccountInfo.submittedCount; i++) {
+                //TODO get rid of setTimeout
+                setTimeout(() => mySubmittedQuestionsContext.fetch(i), 1000 * i)
+            }
         }
     }, [myAccountInfo, myAssignedQuestionsContext.fetch]);
+
     let isAssignedLoading = true;
     if (myAccountInfo != null) {
         let oneLoading = false;
@@ -44,10 +48,31 @@ export default function MyProfile() {
         }
         isAssignedLoading = oneLoading
     }
+    //
+    let isSubmittedLoading = true;
+    if (myAccountInfo != null) {
+        let oneLoading = false;
+        for (let i = 0; i < myAccountInfo.submittedCount; i++) {
+            const found = mySubmittedQuestionsContext.items.find(x => x.id === i);
+            if (found == null || found.isLoading || found.data === null) {
+                oneLoading = true;
+                break;
+            }
+        }
+        isSubmittedLoading = oneLoading
+    }
 
     const myQuestionsAssigned = {
         isLoading: isAssignedLoading,
-        data: myAssignedQuestionsContext.items.map(x => x.data).filter(x => x !== null)
+        data: myAssignedQuestionsContext.items
+            .map(x => x.data)
+            .filter(x => x !== null)
+    }
+    const myQuestionsSubmitted = {
+        isLoading: isSubmittedLoading,
+        data: mySubmittedQuestionsContext.items
+            .map(x => x.data)
+            .filter(x => x !== null)
     }
 
 
@@ -118,16 +143,16 @@ export default function MyProfile() {
             <div className={"mt-5 w-full"}>
                 <Link href={"/inbox"} className="btn btn-block">
                     <span className={"text-2xl"}>Inbox</span>
-                    {myQuestionsAssigned !== undefined && !myQuestionsAssigned.isLoading && newQuestionsToMe != null && newQuestionsToMe !== 0 &&
+                    {!myQuestionsAssigned.isLoading && newQuestionsToMe != null && newQuestionsToMe !== 0 &&
                         <div className="badge badge-secondary">+{newQuestionsToMe}</div>}
-                    {myQuestionsAssigned === undefined || myQuestionsAssigned.isLoading &&
+                    {myQuestionsAssigned.isLoading &&
                         <div className={"loading loading-xs loading-dots"}></div>}
                 </Link>
                 <Link href={"/sent"} className="btn btn-block mt-5">
                     <span className={"text-2xl"}>Sent</span>
-                    {myQuestionsSubmitted !== undefined && !myQuestionsSubmitted.isLoading && myQuestionsNotReplied !== 0 &&
+                    {!myQuestionsSubmitted.isLoading && myQuestionsNotReplied !== 0 &&
                         <div className="badge badge-secondary">{myQuestionsNotReplied}</div>}
-                    {myQuestionsSubmitted === undefined || myQuestionsSubmitted.isLoading &&
+                    {myQuestionsSubmitted.isLoading &&
                         <div className={"loading loading-xs loading-dots"}></div>}
                 </Link>
                 <Link href={"/about"} className={"btn btn-outline btn-info btn-lg btn-block mt-10"}>About</Link>

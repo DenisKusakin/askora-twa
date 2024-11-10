@@ -1,24 +1,39 @@
 import {useStoreClientV2} from "@/components/hooks/use-store-client";
-import {$mySubmittedQuestions} from "@/stores/questions-store";
 import MessageListItem from "@/components/v2/msg-list-item";
+import {useContext, useEffect} from "react";
+import {MySubmittedQuestionsContext} from "@/app/context/my-questions-context";
+import {$myAccountInfo} from "@/stores/profile-store";
+import {QuestionData} from "@/stores/questions-store";
 
 export default function MySent() {
-    const assigned = useStoreClientV2($mySubmittedQuestions)
+    const context = useContext(MySubmittedQuestionsContext)
+    const myAccountInfo = useStoreClientV2($myAccountInfo)
+    useEffect(() => {
+        if (myAccountInfo != null) {
+            for (let i = 0; i < myAccountInfo.submittedCount; i++) {
+                setTimeout(() => context.fetch(i), 1000 * i)
+            }
+        }
+    }, [myAccountInfo, context.fetch]);
+
+    const items: { isLoading: boolean; id: number; data: QuestionData }[] = context.items
+        .filter(x => x != null)
+        .filter(x => x.data != null)
+        .map(x => x as { isLoading: boolean, id: number, data: QuestionData })
+        .sort((a, b) => b.data.createdAt - a.data.createdAt)
 
     return <div className={"pt-10"}>
         <div className={"text-xl"}>Sent</div>
         <div className={"flex w-full mt-4 flex-col"}>
-            {(assigned === undefined || assigned?.isLoading) && <div className={"loading loading-dots loading-xl"}></div>}
-            {assigned !== undefined && !assigned?.isLoading && assigned?.data?.length === 0 &&
-                <h2 className={"text text-sm font-italic"}>No sent messages</h2>}
-            {assigned !== undefined && !assigned?.isLoading && assigned?.data?.toReversed()?.map(x => <MessageListItem key={x.addr.toString()}
-                                                                                             addr={x.to}
-                                                                                             link={`/q-details?owner_id=${x.to.toString()}&q_id=${x.id}`}
-                                                                                             isClosed={x.isClosed}
-                                                                                             isRejected={x.isRejected}
-                                                                                             className={"mt-1"}
-                                                                                             createdAt={x.createdAt * 1000}
-                                                                                             amount={x.minPrice}/>)}
+            {items.length === 0 && <h2 className={"text text-sm font-italic"}>No sent messages</h2>}
+            {items.map(({data}) => <MessageListItem key={data.addr.toString()}
+                                                    addr={data.to}
+                                                    link={`/q-details?owner_id=${data.to.toString()}&q_id=${data.id}`}
+                                                    isClosed={data.isClosed}
+                                                    isRejected={data.isRejected}
+                                                    className={"mt-1"}
+                                                    createdAt={data.createdAt * 1000}
+                                                    amount={data.minPrice}/>)}
         </div>
     </div>
 }
