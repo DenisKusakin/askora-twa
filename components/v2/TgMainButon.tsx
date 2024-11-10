@@ -12,6 +12,7 @@ export default function TgMainButton({title, onClick, enabled}: {
     //const isInTelegram = !(tgInitData === null || tgInitData === '')
 
     useEffect(() => {
+        const onClickCopy = onClick;
         //if (isInTelegram) {
         // @ts-expect-error todo
         window.Telegram.WebApp.MainButton.setText(title);
@@ -28,14 +29,17 @@ export default function TgMainButton({title, onClick, enabled}: {
         if(enabled){
             // @ts-expect-error todo
             window.Telegram.WebApp.MainButton.enable();
+        } else {
+            // @ts-expect-error todo
+            window.Telegram.WebApp.MainButton.disable();
         }
         // } else {
         //     // @ts-expect-error todo
         //     window.Telegram.WebApp.MainButton.disable();
         // }
         return () => {
-            // // @ts-expect-error todo
-            // window.Telegram.WebApp.MainButton.offClick(onClick)
+            // @ts-expect-error todo
+            window.Telegram.WebApp.MainButton.offClick(onClickCopy)
             // @ts-expect-error todo
             window.Telegram.WebApp.MainButton.hide()
         }
