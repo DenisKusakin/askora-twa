@@ -25,6 +25,8 @@ export default function TgMainButton({title, onClick, enabled}: {
         window.Telegram.WebApp.MainButton.show();
         // }
         // @ts-expect-error todo
+        window.Telegram.WebApp.MainButton.offClick(onClickCopy)
+        // @ts-expect-error todo
         window.Telegram.WebApp.MainButton.onClick(onClick)
         // if (enabled && !window.Telegram.WebApp.MainButton.isActive) {
         if (enabled) {
@@ -38,15 +40,18 @@ export default function TgMainButton({title, onClick, enabled}: {
         //     // @ts-expect-error todo
         //     window.Telegram.WebApp.MainButton.disable();
         // }
-        return () => {
-            console.log("Cleanup")
-            // @ts-expect-error todo
-            window.Telegram.WebApp.MainButton.offClick(onClickCopy)
-            // @ts-expect-error todo
-            window.Telegram.WebApp.MainButton.hide()
-        }
+        // return () => {
+        //     console.log("Cleanup")
+        //     // @ts-expect-error todo
+        //     // window.Telegram.WebApp.MainButton.offClick(onClickCopy)
+        //     // @ts-expect-error todo
+        //     window.Telegram.WebApp.MainButton.hide()
+        // }
         //}
     }, [title, enabled, onClick]);
-
+    useEffect(() => {
+        // @ts-expect-error todo
+        window.Telegram.WebApp.MainButton.hide()
+    }, []);
     return null;
 }
