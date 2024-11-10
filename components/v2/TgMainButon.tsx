@@ -51,7 +51,7 @@ export default function TgMainButton({title, onClick, enabled}: {
     }, [title, enabled, onClick]);
     useEffect(() => {
         // @ts-expect-error todo
-        window.Telegram.WebApp.MainButton.hide()
+        return () => window.Telegram.WebApp.MainButton.hide()
     }, []);
     return null;
 }
