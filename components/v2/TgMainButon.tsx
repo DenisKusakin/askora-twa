@@ -2,7 +2,7 @@
 // import {$tgInitData} from "@/stores/profile-store";
 import {useEffect} from "react";
 
-export default function TgMainButton({title, onClick, enabled, shown}: {
+export default function TgMainButton({title, onClick, enabled}: {
     title: string,
     onClick: () => void,
     enabled: boolean,
@@ -14,7 +14,7 @@ export default function TgMainButton({title, onClick, enabled, shown}: {
     useEffect(() => {
         //if (isInTelegram) {
             // @ts-expect-error todo
-            if(window.Telegram.WebApp.MainButton !== title){
+            if(window.Telegram.WebApp.MainButton.text !== title){
                 // @ts-expect-error todo
                 window.Telegram.WebApp.MainButton.setText(title);
             }
@@ -35,10 +35,8 @@ export default function TgMainButton({title, onClick, enabled, shown}: {
             return () => {
                 // @ts-expect-error todo
                 window.Telegram.WebApp.MainButton.offClick(onClick)
-                if(!shown){
-                    // @ts-expect-error todo
-                    window.Telegram.WebApp.MainButton.hide()
-                }
+                // @ts-expect-error todo
+                window.Telegram.WebApp.MainButton.hide()
             }
         //}
 
