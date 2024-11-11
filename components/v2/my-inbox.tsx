@@ -10,7 +10,7 @@ export default function MyInbox() {
     useEffect(() => {
         if (myAccountInfo != null) {
             for (let i = 0; i < myAccountInfo.assignedCount - 1; i++) {
-                setTimeout(() => context.fetch(myAccountInfo.assignedCount - 1 - i), 500 * i)
+                setTimeout(() => context.fetch(myAccountInfo.assignedCount - 1 - i), 1000 * i)
             }
         }
     }, [myAccountInfo, context.fetch]);
