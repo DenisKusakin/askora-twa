@@ -7,7 +7,7 @@ export default function MyQuestionDetails({id}: { id: number }) {
 
     useEffect(() => {
         d.fetch(id)
-    }, [d.fetch]);
+    }, [d.fetch, id]);
     const qData = d.items.find(x => x.id === id)
     if (qData === undefined || qData?.isLoading) {
         return <div className={"w-full mt-[50%] flex justify-center"}>

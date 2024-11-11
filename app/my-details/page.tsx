@@ -1,13 +1,15 @@
 'use client';
 
 import {useStoreClientV2} from "@/components/hooks/use-store-client";
-import {$myAccountInfo, $myConnectedWallet} from "@/stores/profile-store";
+import {$myConnectedWallet} from "@/stores/profile-store";
 import CreateAccount from "@/components/v2/create-account";
 import {tonConnectUI} from "@/stores/ton-connect";
 import copyTextHandler from "@/utils/copy-util";
+import {useContext} from "react";
+import {MyAccountInfoContext} from "@/app/context/my-account-context";
 
 export default function MyDetailsPage() {
-    const myAccountInfo = useStoreClientV2($myAccountInfo)
+    const myAccountInfo = useContext(MyAccountInfoContext).info
     const myConnectedWallet = useStoreClientV2($myConnectedWallet)
 
     if (myConnectedWallet === undefined || myAccountInfo === undefined) {

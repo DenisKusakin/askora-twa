@@ -3,16 +3,17 @@
 import {useStoreClientV2} from "@/components/hooks/use-store-client";
 import {
     $myConnectedWallet,
-    $tgConnectionStatus,
-    $tgInitData, refreshTgConnectionStatus
+    $tgInitData
 } from "@/stores/profile-store";
 import {subscribe, unsubscribe} from "@/services/api";
 import Link from "next/link";
-import {useEffect, useState} from "react";
+import {useContext, useEffect, useState} from "react";
+import {TgConnectionStatus} from "@/app/context/my-account-context";
 
 export default function TgStatusPage() {
     const myConnectedWallet = useStoreClientV2($myConnectedWallet)
-    const tgConnectionStatus = useStoreClientV2($tgConnectionStatus)
+    const tgConnectionStatusContext = useContext(TgConnectionStatus)
+    const tgConnectionStatus = tgConnectionStatusContext.info
     const tgInitData = useStoreClientV2($tgInitData)
     const [isStatusLoading, setStatusLoading] = useState(tgConnectionStatus === undefined)
 
@@ -28,7 +29,7 @@ export default function TgStatusPage() {
         }
         setStatusLoading(true)
         subscribe(tgInitData, myConnectedWallet.toString())
-            .then(() => refreshTgConnectionStatus())
+            .then(tgConnectionStatusContext.refresh)
             .then(() => setStatusLoading(false))
     }
     const onTgDisconnectClick = () => {
@@ -37,7 +38,7 @@ export default function TgStatusPage() {
         }
         setStatusLoading(true)
         unsubscribe(tgInitData, myConnectedWallet.toString())
-            .then(() => refreshTgConnectionStatus())
+            .then(tgConnectionStatusContext.refresh)
             .then(() => setStatusLoading(false))
     }
     const isInTelegram = !(tgInitData === null || tgInitData === '')

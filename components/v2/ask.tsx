@@ -1,6 +1,6 @@
 import {Address, fromNano, toNano} from "@ton/core";
 import {useEffect, useState} from "react";
-import {$myConnectedWallet, $tgInitData, AccountInfo, fetchAccountInfo} from "@/stores/profile-store";
+import {$myConnectedWallet, $tgInitData, fetchAccountInfo} from "@/stores/profile-store";
 import {userFriendlyStr} from "@/components/utils/addr-utils";
 import {submitQuestion} from "@/stores/transactions";
 import {useStoreClientV2} from "@/components/hooks/use-store-client";
@@ -8,6 +8,7 @@ import Link from "next/link";
 import TransactionSucceedDialog from "@/components/v2/transaction-suceed-dialog";
 import {tonConnectUI} from "@/stores/ton-connect";
 import TgMainButton from "@/components/v2/TgMainButon";
+import {AccountInfo} from "@/app/context/my-account-context";
 
 export default function Ask({addr}: { addr: Address }) {
     const [text, setText] = useState("")

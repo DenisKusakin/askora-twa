@@ -1,17 +1,16 @@
-import {useStoreClientV2} from "@/components/hooks/use-store-client";
 import MessageListItem from "@/components/v2/msg-list-item";
 import {useContext, useEffect} from "react";
 import {MyAssignedQuestionsContext} from "@/app/context/my-questions-context";
-import {$myAccountInfo} from "@/stores/profile-store";
 import {QuestionData} from "@/stores/questions-store";
+import {MyAccountInfoContext} from "@/app/context/my-account-context";
 
 export default function MyInbox() {
     const context = useContext(MyAssignedQuestionsContext)
-    const myAccountInfo = useStoreClientV2($myAccountInfo)
+    const myAccountInfo = useContext(MyAccountInfoContext).info
     useEffect(() => {
         if (myAccountInfo != null) {
-            for (let i = 0; i < myAccountInfo.assignedCount; i++) {
-                setTimeout(() => context.fetch(i), 1000 * i)
+            for (let i = 0; i < myAccountInfo.assignedCount - 1; i++) {
+                setTimeout(() => context.fetch(myAccountInfo.assignedCount - 1 - i), 500 * i)
             }
         }
     }, [myAccountInfo, context.fetch]);

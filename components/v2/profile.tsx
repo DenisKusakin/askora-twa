@@ -1,8 +1,9 @@
-import {AccountInfo, fetchAccountInfo} from "@/stores/profile-store";
+import {fetchAccountInfo} from "@/stores/profile-store";
 import {Address, fromNano} from "@ton/core";
 import Link from "next/link";
 import {useEffect, useState} from "react";
 import copyTextHandler from "@/utils/copy-util";
+import {AccountInfo} from "@/app/context/my-account-context";
 
 export default function Profile({owner}: { owner: Address }) {
     const [data, setData] = useState<{ isLoading: boolean, data: AccountInfo | null }>({isLoading: true, data: null})

@@ -1,13 +1,12 @@
-import {useStoreClientV2} from "@/components/hooks/use-store-client";
 import MessageListItem from "@/components/v2/msg-list-item";
 import {useContext, useEffect} from "react";
 import {MySubmittedQuestionsContext} from "@/app/context/my-questions-context";
-import {$myAccountInfo} from "@/stores/profile-store";
 import {QuestionData} from "@/stores/questions-store";
+import {MyAccountInfoContext} from "@/app/context/my-account-context";
 
 export default function MySent() {
     const context = useContext(MySubmittedQuestionsContext)
-    const myAccountInfo = useStoreClientV2($myAccountInfo)
+    const myAccountInfo = useContext(MyAccountInfoContext).info
     useEffect(() => {
         if (myAccountInfo != null) {
             for (let i = 0; i < myAccountInfo.submittedCount; i++) {

@@ -4,7 +4,67 @@ import {ReactNode, useCallback, useEffect, useState} from "react";
 import {MyAssignedQuestionsContext, MySubmittedQuestionsContext} from "@/app/context/my-questions-context";
 import {QuestionData} from "@/stores/questions-store";
 import {useStoreClientV2} from "@/components/hooks/use-store-client";
-import {$myAccount} from "@/stores/profile-store";
+import {$myAccount, $myConnectedWallet, $tgId} from "@/stores/profile-store";
+import {tonClient} from "@/wrappers/ton-client";
+import {AccountInfo, MyAccountInfoContext, TgConnectionStatus} from "@/app/context/my-account-context";
+import {fetchIsSubscribed} from "@/services/api";
+
+function TgConnectionStatusWrapper({children}: { children: ReactNode }) {
+    const myConnectedWallet = useStoreClientV2($myConnectedWallet)
+    const tgId = useStoreClientV2($tgId)
+    const [connectionStatus, setConnectionStatus] = useState<'subscribed' | 'not-subscribed' | undefined>(undefined)
+
+    const refresh = useCallback(() => {
+        if (myConnectedWallet == null || tgId == null) {
+            return
+        }
+        return fetchIsSubscribed(tgId, myConnectedWallet.toString())
+            .then(isSubscribed => isSubscribed ? 'subscribed' : 'not-subscribed')
+            .then(setConnectionStatus)
+    }, [tgId, myConnectedWallet])
+
+    useEffect(() => {
+        refresh()
+        return;
+    }, [myConnectedWallet, tgId, refresh]);
+
+    return <TgConnectionStatus.Provider value={{info: connectionStatus, refresh}}>
+        {children}
+    </TgConnectionStatus.Provider>
+}
+
+function MyAccountInfoWrapper({children}: { children: ReactNode }) {
+    const myAccount = useStoreClientV2($myAccount)
+    const [myAccountInfo, setMyAccountInfo] = useState<undefined | null | AccountInfo>(undefined)
+
+    const refresh = useCallback(() => {
+        if (myAccount === undefined) {
+            setMyAccountInfo(undefined)
+        } else if (myAccount === null) {
+            setMyAccountInfo(null)
+        } else {
+            const accountContract = myAccount
+            tonClient.getContractState(myAccount.address).then(async ({state}) => {
+                if (state === 'active') {
+                    const data = await accountContract.getAllData();
+                    setMyAccountInfo({
+                        price: data.minPrice,
+                        assignedCount: data.assignedQuestionsCount,
+                        submittedCount: data.submittedQuestionsCount,
+                        status: 'active',
+                        address: accountContract.address
+                    });
+                } else {
+                    setMyAccountInfo(null);
+                }
+            })
+        }
+    }, [myAccount])
+    useEffect(refresh, [myAccount, refresh]);
+
+    return <MyAccountInfoContext.Provider
+        value={{info: myAccountInfo, refresh}}>{children}</MyAccountInfoContext.Provider>
+}
 
 function SubmittedQuestions({children}: { children: ReactNode }) {
     const myAccount = useStoreClientV2($myAccount)
@@ -125,7 +185,7 @@ export default function MyAppWrapper({children}: { children: ReactNode }) {
                 .then(x => x.getAllData().then(xx => ({data: xx, addr: x.address})))
                 .then(({data, addr}) => ({...data, from: data.submitterAddr, to: data.ownerAddr, id, addr}))
                 .then((x: QuestionData) => {
-
+                    console.log(`Fetched ${x.id}`)
                     setMyAssignedQuestions(currentItems => {
                         const newItems: {
                             isLoading: boolean,
@@ -143,12 +203,16 @@ export default function MyAppWrapper({children}: { children: ReactNode }) {
         }
     }, [myAccount, myAssignedQuestions]);
 
-    return <MyAssignedQuestionsContext.Provider value={{
-        items: myAssignedQuestions,
-        fetch
-    }}>
-        <SubmittedQuestions>
-            {children}
-        </SubmittedQuestions>
-    </MyAssignedQuestionsContext.Provider>
+    return <TgConnectionStatusWrapper>
+        <MyAccountInfoWrapper>
+            <MyAssignedQuestionsContext.Provider value={{
+                items: myAssignedQuestions,
+                fetch
+            }}>
+                <SubmittedQuestions>
+                    {children}
+                </SubmittedQuestions>
+            </MyAssignedQuestionsContext.Provider>
+        </MyAccountInfoWrapper>
+    </TgConnectionStatusWrapper>
 }

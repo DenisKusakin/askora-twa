@@ -1,8 +1,6 @@
 import {useStoreClientV2} from "@/components/hooks/use-store-client";
 import {
-    $myAccountInfo,
     $myConnectedWallet,
-    $tgConnectionStatus,
     $tgId
 } from "@/stores/profile-store";
 import {fromNano} from "@ton/core";
@@ -10,71 +8,15 @@ import Link from "next/link";
 import {tonConnectUI} from "@/stores/ton-connect";
 import CreateAccount from "@/components/v2/create-account";
 import copyTextHandler from "@/utils/copy-util";
-import {useContext, useEffect} from "react";
-import {MyAssignedQuestionsContext, MySubmittedQuestionsContext} from "@/app/context/my-questions-context";
+import {useContext} from "react";
+import {MyAccountInfoContext, TgConnectionStatus} from "@/app/context/my-account-context";
 
 export default function MyProfile() {
     const myConnectedWallet = useStoreClientV2($myConnectedWallet)
-    const myAccountInfo = useStoreClientV2($myAccountInfo)
+    const myAccountInfo = useContext(MyAccountInfoContext).info
 
-    const tgConnectionStatus = useStoreClientV2($tgConnectionStatus)
+    const tgConnectionStatus = useContext(TgConnectionStatus).info
     const tgId = useStoreClientV2($tgId)
-
-    const myAssignedQuestionsContext = useContext(MyAssignedQuestionsContext)
-    const mySubmittedQuestionsContext = useContext(MySubmittedQuestionsContext)
-
-    useEffect(() => {
-        if (myAccountInfo != null) {
-            for (let i = 0; i < myAccountInfo.assignedCount; i++) {
-                //TODO get rid of setTimeout
-                setTimeout(() => myAssignedQuestionsContext.fetch(i), 1000 * i)
-            }
-            for (let i = 0; i < myAccountInfo.submittedCount; i++) {
-                //TODO get rid of setTimeout
-                setTimeout(() => mySubmittedQuestionsContext.fetch(i), 1000 * i)
-            }
-        }
-    }, [myAccountInfo, myAssignedQuestionsContext.fetch]);
-
-    let isAssignedLoading = true;
-    if (myAccountInfo != null) {
-        let oneLoading = false;
-        for (let i = 0; i < myAccountInfo.assignedCount; i++) {
-            const found = myAssignedQuestionsContext.items.find(x => x.id === i);
-            if (found == null || found.isLoading || found.data === null) {
-                oneLoading = true;
-                break;
-            }
-        }
-        isAssignedLoading = oneLoading
-    }
-    //
-    let isSubmittedLoading = true;
-    if (myAccountInfo != null) {
-        let oneLoading = false;
-        for (let i = 0; i < myAccountInfo.submittedCount; i++) {
-            const found = mySubmittedQuestionsContext.items.find(x => x.id === i);
-            if (found == null || found.isLoading || found.data === null) {
-                oneLoading = true;
-                break;
-            }
-        }
-        isSubmittedLoading = oneLoading
-    }
-
-    const myQuestionsAssigned = {
-        isLoading: isAssignedLoading,
-        data: myAssignedQuestionsContext.items
-            .map(x => x.data)
-            .filter(x => x !== null)
-    }
-    const myQuestionsSubmitted = {
-        isLoading: isSubmittedLoading,
-        data: mySubmittedQuestionsContext.items
-            .map(x => x.data)
-            .filter(x => x !== null)
-    }
-
 
     const onDisconnectClick = () => {
         tonConnectUI?.disconnect()
@@ -123,8 +65,6 @@ export default function MyProfile() {
                 <Link href={"/tg-status"} className={"badge badge-outline badge-error"}>Telegram Not Connected</Link>
         }
     }
-    const newQuestionsToMe = myQuestionsAssigned?.data?.filter(x => !x.isClosed)?.length
-    const myQuestionsNotReplied = myQuestionsSubmitted?.data?.filter(x => !x.isClosed)?.length
 
     return <div className={"pt-10"}>
         <div className={"flex flex-col items-center"}>
@@ -143,17 +83,9 @@ export default function MyProfile() {
             <div className={"mt-5 w-full"}>
                 <Link href={"/inbox"} className="btn btn-block">
                     <span className={"text-2xl"}>Inbox</span>
-                    {!myQuestionsAssigned.isLoading && newQuestionsToMe != null && newQuestionsToMe !== 0 &&
-                        <div className="badge badge-secondary">+{newQuestionsToMe}</div>}
-                    {myQuestionsAssigned.isLoading &&
-                        <div className={"loading loading-xs loading-dots"}></div>}
                 </Link>
                 <Link href={"/sent"} className="btn btn-block mt-5">
                     <span className={"text-2xl"}>Sent</span>
-                    {!myQuestionsSubmitted.isLoading && myQuestionsNotReplied !== 0 &&
-                        <div className="badge badge-secondary">{myQuestionsNotReplied}</div>}
-                    {myQuestionsSubmitted.isLoading &&
-                        <div className={"loading loading-xs loading-dots"}></div>}
                 </Link>
                 <Link href={"/about"} className={"btn btn-outline btn-info btn-lg btn-block mt-10"}>About</Link>
                 <Link href={"/find"} className={"btn btn-primary btn-outline btn-lg mt-4 btn-block"}>Find User</Link>

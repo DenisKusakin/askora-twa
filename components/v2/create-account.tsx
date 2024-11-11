@@ -1,24 +1,34 @@
 import {useStoreClientV2} from "@/components/hooks/use-store-client";
 import {$myConnectedWallet} from "@/stores/profile-store";
-import {useState} from "react";
-import {Address, toNano} from "@ton/core";
+import {useContext, useEffect, useState} from "react";
+import {toNano} from "@ton/core";
 import {createAccount} from "@/stores/transactions";
 import {tonConnectUI} from "@/stores/ton-connect";
-import {waitUntilAccountCreated} from "@/utils/ton-utils";
 import AccountCreationStatusDialog from "@/components/v2/account-creation-status-dialog";
+import {MyAccountInfoContext} from "@/app/context/my-account-context";
 
 export default function CreateAccount() {
     const myConnectedWallet = useStoreClientV2($myConnectedWallet)
     const [price, setPrice] = useState(0)
+    const {info, refresh} = useContext(MyAccountInfoContext)
     const [isInProgress, setIsInProgress] = useState(false)
+
+    useEffect(() => {
+        if(isInProgress){
+            if(info?.status === 'active'){
+                setIsInProgress(false)
+            } else {
+                const id = setInterval(refresh, 1000)
+                return () => clearInterval(id)
+            }
+        }
+    }, [isInProgress, info, refresh]);
 
     const onClick = () => {
         if (myConnectedWallet !== null) {
             createAccount(toNano(price))
                 .then(() => {
                     setIsInProgress(true)
-                    return waitUntilAccountCreated(myConnectedWallet as Address)
-                        .then(() => setIsInProgress(false))
                 })
         }
     }
