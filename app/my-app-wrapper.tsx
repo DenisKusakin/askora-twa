@@ -43,7 +43,7 @@ function TgMainButtonWrapper({children}: { children: ReactNode }) {
         }
         if(currentProps?.text !== newProps.text) {
             // @ts-expect-error todo
-            window.Telegram.WebApp.MainButton.setText(title);
+            window.Telegram.WebApp.MainButton.setText(newProps.text);
         }
         if(currentProps?.onClick != newProps.onClick) {
             if (currentProps?.onClick != null) {
