@@ -16,7 +16,7 @@ export default function MyProfile() {
     const myAccountInfo = useContext(MyAccountInfoContext).info
 
     const tgConnectionStatus = useContext(TgConnectionStatus).info
-    const tgId = useContext(MyTgContext).tgId
+    const tgId = useContext(MyTgContext).info?.tgId
 
     const onDisconnectClick = () => {
         tonConnectUI?.disconnect()

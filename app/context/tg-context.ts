@@ -1,6 +1,9 @@
 import {createContext} from "react";
 
 export const MyTgContext = createContext<{
-    tgId: undefined | null | string,
-    setTgId: (id: null | string) => void
-}>({tgId: undefined, setTgId: () => {}})
+    info: {
+        tgId: string,
+        tgInitData: string
+    } | undefined | null
+    setTgInfo: (info: {tgId: string, tgInitData: string} | null) => void
+}>({info: undefined, setTgInfo: () => {}})

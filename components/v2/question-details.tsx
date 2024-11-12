@@ -1,20 +1,21 @@
 import {QuestionData} from "@/stores/questions-store";
 import {Address, fromNano} from "@ton/core";
-import {useState} from "react";
+import {useContext, useState} from "react";
 import {rejectQuestion, replyToQuestion} from "@/stores/transactions";
 import {useStoreClientV2} from "@/components/hooks/use-store-client";
-import {$myConnectedWallet, $tgInitData} from "@/stores/profile-store";
+import {$myConnectedWallet} from "@/stores/profile-store";
 import Link from "next/link";
 import TransactionSucceedDialog from "@/components/v2/transaction-suceed-dialog";
 import copyTextHandler from "@/utils/copy-util";
 import TgMainButton from "@/components/v2/TgMainButon";
+import {MyTgContext} from "@/app/context/tg-context";
 
 export default function QuestionDetails({question}: { question: QuestionData }) {
     const myConnectedWallet = useStoreClientV2($myConnectedWallet)
     const [replyShown, setReplyShown] = useState(false)
     const [myReply, setMyReply] = useState<string>('')
     const [isSuccessDialogVisible, setSuccessDialogVisible] = useState(false)
-    const tgInitData = useStoreClientV2($tgInitData)
+    const tgInitData = useContext(MyTgContext).info?.tgInitData
 
     let additional_class = ""
     if (question.isRejected) {

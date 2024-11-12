@@ -2,7 +2,6 @@
 
 import Script from "next/script";
 import {$tgStartParam} from "@/stores/tg-store";
-import {$tgInitData} from "@/stores/profile-store";
 import {useContext} from "react";
 import {MyTgContext} from "@/app/context/tg-context";
 
@@ -20,16 +19,15 @@ export default function MyHead() {
             // @ts-expect-error todo
             $tgStartParam.set({isLoading: false, startParam: window.Telegram.WebApp.initDataUnsafe.start_param})
             // @ts-expect-error todo
-            if (window.Telegram.WebApp?.initData != null) {
-                // @ts-expect-error todo
-                $tgInitData.set(window.Telegram.WebApp.initData)
+            if (window.Telegram.WebApp?.initData != null && window.Telegram.WebApp?.initData != '') {
+                tgContext.setTgInfo({
+                    // @ts-expect-error todo
+                    tgId: window.Telegram.WebApp.initDataUnsafe.user.id.toString(),
+                    // @ts-expect-error todo
+                    tgInitData: window.Telegram.WebApp?.initData
+                })
             } else {
-                $tgInitData.set(null)
-            }
-            // @ts-expect-error todo
-            if (window.Telegram.WebApp?.initDataUnsafe?.user?.id != null){
-                // @ts-expect-error todo
-                tgContext.setTgId(window.Telegram.WebApp.initDataUnsafe.user.id.toString())
+                tgContext.setTgInfo(null)
             }
         }
     }}/>

@@ -44,8 +44,6 @@ export const $myAccount = computed($myConnectedWallet, walletAddr => task(async 
     return await rootContract.getAccount(walletAddr)
 }))
 
-export const $tgInitData = atom<undefined | null | string>(undefined)
-
 export async function fetchAccountInfo(ownerAddr: Address): Promise<AccountInfo> {
     const rootContract = tonClient.open(Root.createFromAddress(APP_CONTRACT_ADDR))
     const accountContract = await rootContract.getAccount(ownerAddr)

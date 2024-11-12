@@ -12,7 +12,7 @@ import {MyTgContext} from "@/app/context/tg-context";
 //TODO: Simplify and make sure it is correct
 function TgConnectionStatusWrapper({children}: { children: ReactNode }) {
     const myConnectedWallet = useStoreClientV2($myConnectedWallet)
-    const tgId = useContext(MyTgContext).tgId
+    const tgId = useContext(MyTgContext).info?.tgId
     const [connectionStatus, setConnectionStatus] = useState<'subscribed' | 'not-subscribed' | undefined>(undefined)
 
     const refresh = useCallback(() => {
