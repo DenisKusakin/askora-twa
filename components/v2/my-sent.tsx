@@ -10,11 +10,10 @@ export default function MySent() {
     useEffect(() => {
         if (myAccountInfo != null) {
             for (let i = 0; i < myAccountInfo.submittedCount; i++) {
-                setTimeout(() => context.fetch(i), 1000 * i)
+                setTimeout(() => context.fetch(myAccountInfo.submittedCount - 1 - i), 1000 * i)
             }
         }
     }, [myAccountInfo, context.fetch]);
-
     const items: { isLoading: boolean; id: number; data: QuestionData }[] = context.items
         .filter(x => x != null)
         .filter(x => x.data != null)

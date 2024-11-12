@@ -8,7 +8,6 @@ export default function QuestionDetailsPage({ownerAddress, id}: { ownerAddress: 
         isLoading: boolean,
         data?: QuestionData// & { from: Address, to: Address }
     }>({isLoading: true})
-
     useEffect(() => {
         setData({isLoading: true})
         fetchQuestionData(ownerAddress, id)

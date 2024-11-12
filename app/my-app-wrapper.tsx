@@ -8,7 +8,7 @@ import {$myAccount, $myConnectedWallet, $tgId} from "@/stores/profile-store";
 import {tonClient} from "@/wrappers/ton-client";
 import {AccountInfo, MyAccountInfoContext, TgConnectionStatus} from "@/app/context/my-account-context";
 import {fetchIsSubscribed} from "@/services/api";
-
+//TODO: Simplify and make sure it is correct
 function TgConnectionStatusWrapper({children}: { children: ReactNode }) {
     const myConnectedWallet = useStoreClientV2($myConnectedWallet)
     const tgId = useStoreClientV2($tgId)
@@ -111,9 +111,8 @@ function SubmittedQuestions({children}: { children: ReactNode }) {
             myAccount.getQuestionRef(id)
                 .then(x => x.getQuestion())
                 .then(x => x.getAllData().then(xx => ({data: xx, addr: x.address})))
-                .then(({data, addr}) => ({...data, from: data.submitterAddr, to: data.ownerAddr, id, addr}))
+                .then(({data, addr}) => ({...data, from: data.submitterAddr, to: data.ownerAddr, id: data.id, addr}))
                 .then((x: QuestionData) => {
-
                     setMySubmittedQuestions(currentItems => {
                         const newItems: {
                             isLoading: boolean,
@@ -183,9 +182,8 @@ export default function MyAppWrapper({children}: { children: ReactNode }) {
             const id = myAssignedQuestions[i].id;
             myAccount.getQuestion(id)
                 .then(x => x.getAllData().then(xx => ({data: xx, addr: x.address})))
-                .then(({data, addr}) => ({...data, from: data.submitterAddr, to: data.ownerAddr, id, addr}))
+                .then(({data, addr}) => ({...data, from: data.submitterAddr, to: data.ownerAddr, id: data.id, addr}))
                 .then((x: QuestionData) => {
-                    console.log(`Fetched ${x.id}`)
                     setMyAssignedQuestions(currentItems => {
                         const newItems: {
                             isLoading: boolean,

@@ -45,29 +45,6 @@ export default function QuestionDetails({question}: { question: QuestionData }) 
 
     const isInTelegram = !(tgInitData === null || tgInitData === '')
 
-    // useEffect(() => {
-    //     if (isInTelegram) {
-    //         if (replyShown && !question.isClosed && isMyQuestion) {
-    //             // @ts-expect-error todo
-    //             window.Telegram.WebApp.MainButton.setText('Send Reply');
-    //             // @ts-expect-error todo
-    //             window.Telegram.WebApp.MainButton.show();
-    //             // @ts-expect-error todo
-    //             window.Telegram.WebApp.MainButton.onClick(onReplyClick)
-    //             if (myReply.trim() === '') {
-    //                 // @ts-expect-error todo
-    //                 window.Telegram.WebApp.MainButton.disable();
-    //             } else {
-    //                 // @ts-expect-error todo
-    //                 window.Telegram.WebApp.MainButton.enable();
-    //             }
-    //         } else {
-    //             // @ts-expect-error todo
-    //             window.Telegram.WebApp.MainButton.hide();
-    //         }
-    //     }
-    // }, [replyShown, question, isMyQuestion, myReply, isInTelegram]);
-
     return <>
         {isSuccessDialogVisible && <TransactionSucceedDialog content={dialogContent}/>}
         <div className={"pt-10"}>

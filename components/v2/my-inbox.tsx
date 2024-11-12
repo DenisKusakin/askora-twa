@@ -9,7 +9,7 @@ export default function MyInbox() {
     const myAccountInfo = useContext(MyAccountInfoContext).info
     useEffect(() => {
         if (myAccountInfo != null) {
-            for (let i = 0; i < myAccountInfo.assignedCount - 1; i++) {
+            for (let i = 0; i < myAccountInfo.assignedCount; i++) {
                 setTimeout(() => context.fetch(myAccountInfo.assignedCount - 1 - i), 1000 * i)
             }
         }
@@ -20,7 +20,6 @@ export default function MyInbox() {
         .filter(x => x.data != null)
         .map(x => x as { isLoading: boolean, id: number, data: QuestionData })
         .sort((a, b) => b.data.createdAt - a.data.createdAt)
-
     return <div className={"pt-10"}>
         <div className={"text-xl"}>Inbox</div>
         <div className={"flex w-full mt-4 flex-col"}>
