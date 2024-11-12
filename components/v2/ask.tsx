@@ -4,7 +4,6 @@ import {fetchAccountInfo} from "@/stores/profile-store";
 import {userFriendlyStr} from "@/components/utils/addr-utils";
 import Link from "next/link";
 import TransactionSucceedDialog from "@/components/v2/transaction-suceed-dialog";
-import TgMainButton from "@/components/v2/TgMainButon";
 import {AccountInfo} from "@/app/context/my-account-context";
 import {MyTgContext} from "@/app/context/tg-context";
 import {useTonConnectUI} from "@tonconnect/ui-react";
