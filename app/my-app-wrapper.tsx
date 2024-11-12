@@ -1,17 +1,18 @@
 'use client';
 
-import {ReactNode, useCallback, useEffect, useState} from "react";
+import {ReactNode, useCallback, useContext, useEffect, useState} from "react";
 import {MyAssignedQuestionsContext, MySubmittedQuestionsContext} from "@/app/context/my-questions-context";
 import {QuestionData} from "@/stores/questions-store";
 import {useStoreClientV2} from "@/components/hooks/use-store-client";
-import {$myAccount, $myConnectedWallet, $tgId} from "@/stores/profile-store";
+import {$myAccount, $myConnectedWallet} from "@/stores/profile-store";
 import {tonClient} from "@/wrappers/ton-client";
 import {AccountInfo, MyAccountInfoContext, TgConnectionStatus} from "@/app/context/my-account-context";
 import {fetchIsSubscribed} from "@/services/api";
+import {MyTgContext} from "@/app/context/tg-context";
 //TODO: Simplify and make sure it is correct
 function TgConnectionStatusWrapper({children}: { children: ReactNode }) {
     const myConnectedWallet = useStoreClientV2($myConnectedWallet)
-    const tgId = useStoreClientV2($tgId)
+    const tgId = useContext(MyTgContext).tgId
     const [connectionStatus, setConnectionStatus] = useState<'subscribed' | 'not-subscribed' | undefined>(undefined)
 
     const refresh = useCallback(() => {

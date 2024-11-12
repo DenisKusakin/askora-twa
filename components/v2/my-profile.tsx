@@ -1,7 +1,6 @@
 import {useStoreClientV2} from "@/components/hooks/use-store-client";
 import {
     $myConnectedWallet,
-    $tgId
 } from "@/stores/profile-store";
 import {fromNano} from "@ton/core";
 import Link from "next/link";
@@ -10,13 +9,14 @@ import CreateAccount from "@/components/v2/create-account";
 import copyTextHandler from "@/utils/copy-util";
 import {useContext} from "react";
 import {MyAccountInfoContext, TgConnectionStatus} from "@/app/context/my-account-context";
+import {MyTgContext} from "@/app/context/tg-context";
 
 export default function MyProfile() {
     const myConnectedWallet = useStoreClientV2($myConnectedWallet)
     const myAccountInfo = useContext(MyAccountInfoContext).info
 
     const tgConnectionStatus = useContext(TgConnectionStatus).info
-    const tgId = useStoreClientV2($tgId)
+    const tgId = useContext(MyTgContext).tgId
 
     const onDisconnectClick = () => {
         tonConnectUI?.disconnect()

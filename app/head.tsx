@@ -2,9 +2,13 @@
 
 import Script from "next/script";
 import {$tgStartParam} from "@/stores/tg-store";
-import {$tgId, $tgInitData} from "@/stores/profile-store";
+import {$tgInitData} from "@/stores/profile-store";
+import {useContext} from "react";
+import {MyTgContext} from "@/app/context/tg-context";
 
 export default function MyHead() {
+    const tgContext = useContext(MyTgContext)
+
     return <Script src="https://telegram.org/js/telegram-web-app.js" onReady={() => {
         if (typeof window !== 'undefined') {
             // @ts-expect-error todo
@@ -25,7 +29,7 @@ export default function MyHead() {
             // @ts-expect-error todo
             if (window.Telegram.WebApp?.initDataUnsafe?.user?.id != null){
                 // @ts-expect-error todo
-                $tgId.set(window.Telegram.WebApp.initDataUnsafe.user.id.toString())
+                tgContext.setTgId(window.Telegram.WebApp.initDataUnsafe.user.id.toString())
             }
         }
     }}/>

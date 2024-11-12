@@ -1,6 +1,7 @@
 import "./globals.css";
 import MyHead from "@/app/head";
 import MyAppWrapper from "@/app/my-app-wrapper";
+import MyTgContextWrapper from "@/app/MyTgContextWrapper";
 
 export const metadata = {
     title: 'Askora',
@@ -14,12 +15,14 @@ export default function RootLayout({
 }) {
     return (
         <html lang="en" className={"bg-base-100 p-4"}>
-        <head>
-            <MyHead/>
-        </head>
-        <body>
-        <MyAppWrapper>{children}</MyAppWrapper>
-        </body>
+        <MyTgContextWrapper>
+            <head>
+                <MyHead/>
+            </head>
+            <body>
+            <MyAppWrapper>{children}</MyAppWrapper>
+            </body>
+        </MyTgContextWrapper>
         </html>
     )
 }
