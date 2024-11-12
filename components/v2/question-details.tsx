@@ -1,14 +1,14 @@
 import {QuestionData} from "@/stores/questions-store";
 import {Address, fromNano} from "@ton/core";
-import {useContext, useState} from "react";
+import {useContext, useEffect, useState} from "react";
 import Link from "next/link";
 import TransactionSucceedDialog from "@/components/v2/transaction-suceed-dialog";
 import copyTextHandler from "@/utils/copy-util";
-import TgMainButton from "@/components/v2/TgMainButon";
 import {MyTgContext} from "@/app/context/tg-context";
 import {rejectQuestionTransaction, replyTransaction} from "@/components/utils/transaction-utils";
 import {useTonConnectUI} from "@tonconnect/ui-react";
 import {useMyConnectedWallet} from "@/app/hooks/ton-hooks";
+import {TgMainButtonContext, TgMainButtonProps} from "@/app/context/tg-main-button-context";
 
 export default function QuestionDetails({question}: { question: QuestionData }) {
     const myConnectedWallet = useMyConnectedWallet()
@@ -17,6 +17,7 @@ export default function QuestionDetails({question}: { question: QuestionData }) 
     const [isSuccessDialogVisible, setSuccessDialogVisible] = useState(false)
     const tgInitData = useContext(MyTgContext).info?.tgInitData
     const [tonConnectUI] = useTonConnectUI();
+    const tgMainButton = useContext(TgMainButtonContext)
 
     let additional_class = ""
     if (question.isRejected) {
@@ -47,6 +48,18 @@ export default function QuestionDetails({question}: { question: QuestionData }) 
                                   }}>Close</button>
 
     const isInTelegram = !(tgInitData === null || tgInitData === '')
+    const tgMainButtonProps: TgMainButtonProps = {
+        text: "Send Reply",
+        onClick: onReplyClick,
+        enabled: myReply.trim() !== '',
+        visible: true
+    }
+    useEffect(() => {
+        tgMainButton.setProps(tgMainButtonProps)
+    }, [tgMainButtonProps]);
+    useEffect(() => {
+        tgMainButton.setProps({...tgMainButtonProps, enabled: false})
+    }, []);
 
     return <>
         {isSuccessDialogVisible && <TransactionSucceedDialog content={dialogContent}/>}
@@ -131,8 +144,6 @@ export default function QuestionDetails({question}: { question: QuestionData }) 
                                               onClick={onReplyClick}
                                               disabled={myReply.trim() === ''}>Send Reply
                     </button>}
-                    <TgMainButton shown={true} title={"Send Reply"} onClick={onReplyClick}
-                                  enabled={myReply.trim() !== ''}/>
                     <button className={"btn btn-outline btn-block btn-lg btn-error mt-2"}
                             onClick={() => setReplyShown(false)}>Cancel
                     </button>
