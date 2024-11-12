@@ -52,13 +52,13 @@ export default function QuestionDetails({question}: { question: QuestionData }) 
         text: "Send Reply",
         onClick: onReplyClick,
         enabled: myReply.trim() !== '',
-        visible: true
+        visible: replyShown
     }
     useEffect(() => {
         tgMainButton.setProps(tgMainButtonProps)
-    }, [tgMainButtonProps]);
+    }, [tgMainButtonProps, tgMainButton]);
     useEffect(() => {
-        tgMainButton.setProps({...tgMainButtonProps, enabled: false})
+        return () => tgMainButton.setProps({...tgMainButtonProps, enabled: false})
     }, []);
 
     return <>
