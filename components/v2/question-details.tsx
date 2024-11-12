@@ -47,7 +47,7 @@ export default function QuestionDetails({question}: { question: QuestionData }) 
                                       setReplyShown(false);
                                   }}>Close</button>
 
-    const isInTelegram = !(tgInitData === null || tgInitData === '')
+    const isInTelegram = !(tgInitData == null || tgInitData === '')
     const tgMainButtonProps: TgMainButtonProps = useMemo(() => ({
         text: "Send Reply",
         onClick: onReplyClick,

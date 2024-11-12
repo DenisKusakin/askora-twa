@@ -4,6 +4,7 @@ import {Account} from "@/wrappers/Account";
 
 export type AccountInfo = {
     price: bigint,
+    description: string,
     assignedCount: number,
     submittedCount: number,
     status: 'active' | 'non-active',

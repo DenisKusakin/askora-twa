@@ -1,10 +1,11 @@
 import {Address, beginCell, toNano} from "@ton/core";
 import {APP_CONTRACT_ADDR} from "@/conf";
 
-export const createAccountTransaction = (price: bigint) => {
+export const createAccountTransaction = (price: bigint, description: string) => {
     const createAccountMsg = beginCell()
         .storeUint(BigInt("0x5f0ec1a3"), 32)
         .storeCoins(price)
+        .storeRef(beginCell().storeStringTail(description).endCell())
         .endCell()
 
     return {
@@ -51,10 +52,25 @@ export const rejectQuestionTransaction = (questionAddr: Address) => {
 }
 
 export const updatePriceTransaction = (accountAddr: Address, price: bigint) => {
-    console.log("New price", price)
     const msg = beginCell()
         .storeUint(BigInt("0xaaacc05b"), 32)
         .storeCoins(price)
+        .endCell()
+
+    return {
+        validUntil: Math.floor(Date.now() / 1000) + 60,
+        messages: [{
+            address: accountAddr.toRawString(),
+            amount: toNano("0.01").toString(),
+            payload: msg.toBoc().toString('base64')
+        }]
+    }
+}
+
+export const updateDescriptionTransaction = (accountAddr: Address, description: string) => {
+    const msg = beginCell()
+        .storeUint(BigInt("0x901bca3e"), 32)
+        .storeStringRefTail(description)
         .endCell()
 
     return {

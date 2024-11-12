@@ -34,6 +34,9 @@ export default function Profile({owner}: { owner: Address }) {
                 <span className={"text-5xl font-bold"}>{priceUserFriendly}</span>
                 <span className={"text-3xl ml-2"}>TON</span>
             </div>
+            {data?.data?.description != null && data?.data?.description !== '' ? <div className={"text mt-2 text-base italic text-center"}>
+                &quot;{data?.data?.description}&quot;
+            </div> : null}
             <div className={"mt-10 w-full"}>
                 <Link href={`/account/inbox?id=${owner.toString()}`} className="btn btn-block">
                     <span className={"text-2xl"}>Inbox</span>

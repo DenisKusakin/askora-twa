@@ -66,17 +66,23 @@ export default function MyProfile() {
 
     return <div className={"pt-10"}>
         <div className={"flex flex-col items-center"}>
-            <div className={"text-neutral text-xl"}>Price</div>
-            {myAccountInfo !== null && <div>
-                <span className={"text-5xl font-bold"}>{parseFloat(fromNano(myAccountInfo.price))}</span>
-                <span className={"text-3xl ml-2"}>TON</span>
-            </div>}
-            <div className={"mt-10 flex flex-row"}>
-                <Link href={"/configure"} className={"btn btn-sm btn-primary btn-outline ml-4"}>Settings</Link>
-                <button className={"btn btn-sm btn-primary ml-4"}
-                        onClick={onShareClick}>Share
-                </button>
-            </div>
+            {/*<div className={"text-neutral text-xl"}>Price</div>*/}
+            {myAccountInfo !== null && <Link href={"/configure"}>
+                <span className={"text-3xl font-bold"}>{parseFloat(fromNano(myAccountInfo.price))}</span>
+                <span className={"text-xl ml-2"}>TON</span>
+            </Link>}
+            {(myAccountInfo?.description != null && myAccountInfo?.description !== '') ?
+                <Link href={"/configure/description"} className={"text mt-2 text-base italic text-center"}>
+                    &quot;{myAccountInfo?.description}&quot;
+                </Link> : <Link href={"/configure/description"} className={"text mt-2 text-base italic text-center font-extralight"}>Set
+                    description</Link>}
+            {/*<div className={"mt-5 flex flex-row"}>*/}
+            {/*    <Link href={"/configure"} className={"btn btn-sm btn-primary btn-outline ml-4"}>Change The*/}
+            {/*        Price</Link>*/}
+            {/*    <button className={"btn btn-sm btn-primary ml-4"}*/}
+            {/*            onClick={onShareClick}>Share*/}
+            {/*    </button>*/}
+            {/*</div>*/}
             {tgConnectionBadge != null && <div className={"mt-5"}>{tgConnectionBadge}</div>}
             <div className={"mt-5 w-full"}>
                 <Link href={"/inbox"} className="btn btn-block">
@@ -85,8 +91,12 @@ export default function MyProfile() {
                 <Link href={"/sent"} className="btn btn-block mt-5">
                     <span className={"text-2xl"}>Sent</span>
                 </Link>
-                <Link href={"/about"} className={"btn btn-outline btn-info btn-lg btn-block mt-10"}>About</Link>
-                <Link href={"/find"} className={"btn btn-primary btn-outline btn-lg mt-4 btn-block"}>Find User</Link>
+                <button className={"btn btn-block btn-primary btn-lg mt-10"}
+                        onClick={onShareClick}>Share
+                </button>
+                <Link href={"/about"} className={"btn btn-outline btn-info btn-lg btn-block mt-4"}>About</Link>
+                <Link href={"/find"} className={"btn btn-primary btn-outline btn-lg mt-4 btn-block"}>Find
+                    User</Link>
                 <button className={"btn btn-error btn-outline btn-block btn-lg mt-4"}
                         onClick={onDisconnectClick}>Disconnect
                 </button>

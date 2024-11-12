@@ -113,6 +113,7 @@ function MyAccountInfoWrapper({children}: { children: ReactNode }) {
                     const data = await accountContract.getAllData();
                     setMyAccountInfo({
                         price: data.minPrice,
+                        description: data.description,
                         assignedCount: data.assignedQuestionsCount,
                         submittedCount: data.submittedQuestionsCount,
                         status: 'active',
