@@ -1,6 +1,6 @@
 import {QuestionData} from "@/stores/questions-store";
 import {Address, fromNano} from "@ton/core";
-import {useContext, useEffect, useState} from "react";
+import {useCallback, useContext, useEffect, useMemo, useState} from "react";
 import Link from "next/link";
 import TransactionSucceedDialog from "@/components/v2/transaction-suceed-dialog";
 import copyTextHandler from "@/utils/copy-util";
@@ -35,11 +35,11 @@ export default function QuestionDetails({question}: { question: QuestionData }) 
         tonConnectUI.sendTransaction(rejectQuestionTransaction(question.addr))
             .then(() => setSuccessDialogVisible(true))
     }
-    const onReplyClick = () => {
+    const onReplyClick = useCallback(() => {
         const transaction = replyTransaction(question.addr, myReply)
-        tonConnectUI?.sendTransaction(transaction)
+        tonConnectUI.sendTransaction(transaction)
             .then(() => setSuccessDialogVisible(true))
-    }
+    }, [myReply])
 
     const dialogContent = <button className={"btn btn-block btn-primary"}
                                   onClick={() => {
@@ -48,17 +48,19 @@ export default function QuestionDetails({question}: { question: QuestionData }) 
                                   }}>Close</button>
 
     const isInTelegram = !(tgInitData === null || tgInitData === '')
-    const tgMainButtonProps: TgMainButtonProps = {
+    const tgMainButtonProps: TgMainButtonProps = useMemo(() => ({
         text: "Send Reply",
         onClick: onReplyClick,
         enabled: myReply.trim() !== '',
         visible: replyShown
-    }
+    }), [onReplyClick, myReply, replyShown])
     useEffect(() => {
         tgMainButton.setProps(tgMainButtonProps)
     }, [tgMainButtonProps, tgMainButton]);
     useEffect(() => {
-        return () => tgMainButton.setProps({...tgMainButtonProps, enabled: false})
+        return () => {
+            tgMainButton.setProps({...tgMainButtonProps, visible: false})
+        }
     }, []);
 
     return <>

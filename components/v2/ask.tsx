@@ -1,5 +1,5 @@
 import {Address, fromNano, toNano} from "@ton/core";
-import {useContext, useEffect, useState} from "react";
+import {useCallback, useContext, useEffect, useMemo, useState} from "react";
 import {fetchAccountInfo} from "@/stores/profile-store";
 import {userFriendlyStr} from "@/components/utils/addr-utils";
 import Link from "next/link";
@@ -20,28 +20,33 @@ export default function Ask({addr}: { addr: Address }) {
     const [tonConnectUI] = useTonConnectUI();
     const tgMainButton = useContext(TgMainButtonContext)
 
+    const transactionFee = toNano(0.1)
+    //@ts-expect-error todo
+    const serviceFee = accountInfo.data != null ? (accountInfo.data.price / 100n) * 5n : null
+    const totalFee = accountInfo.data != null && serviceFee != null ? accountInfo.data.price + transactionFee + serviceFee : null
+
     useEffect(() => {
         setAccountInfo({isLoading: true})
         fetchAccountInfo(addr)
             .then(data => setAccountInfo({isLoading: false, data}))
     }, [addr]);
 
-    const onSubmit = () => {
-        if (accountInfo.data == null) {
+    const onSubmit = useCallback(() => {
+        if (accountInfo.data == null || totalFee == null) {
             return;
         }
         const transaction = createQuestionTransaction(text, totalFee, accountInfo.data?.address)
         tonConnectUI.sendTransaction(transaction)
             .then(() => setSuccessDialogVisible(true))
-    }
+    }, [text, totalFee, accountInfo?.data])
     const isDisabled = text === ''
 
-    const tgMainButtonProps: TgMainButtonProps = {
+    const tgMainButtonProps: TgMainButtonProps = useMemo(() => ({
         text: `Submit ${text.length}`,
         visible: myConnectedWallet != null,
         enabled: !isDisabled,
         onClick: onSubmit
-    }
+    }), [myConnectedWallet, isDisabled, onSubmit, text])
     useEffect(() => {
         tgMainButton.setProps(tgMainButtonProps)
     }, [tgMainButtonProps, tgMainButton]);
@@ -61,13 +66,9 @@ export default function Ask({addr}: { addr: Address }) {
         </>
     }
 
-    const transactionFee = toNano(0.1)
-    //@ts-expect-error todo
-    const serviceFee = (accountInfo.data.price / 100n) * 5n
-    const totalFee = accountInfo.data.price + transactionFee + serviceFee
     const accountRewardFormatted = parseFloat(fromNano(accountInfo.data.price)).toFixed(3)
-    const totalFeeFormatted = parseFloat(fromNano(totalFee)).toFixed(3)
-    const serviceFeeFormatted = parseFloat(fromNano(serviceFee)).toFixed(3)
+    const totalFeeFormatted = totalFee != null ? parseFloat(fromNano(totalFee)).toFixed(3) : null
+    const serviceFeeFormatted = serviceFee != null ? parseFloat(fromNano(serviceFee)).toFixed(3) : null
     const transactionFeeFormatted = parseFloat(fromNano(transactionFee)).toFixed(3)
 
     const transactionSuccessLinks = <>
