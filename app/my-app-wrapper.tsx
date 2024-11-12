@@ -18,6 +18,47 @@ import {Root} from "@/wrappers/Root";
 import {APP_CONTRACT_ADDR} from "@/conf";
 import {TonConnectUIProvider} from "@tonconnect/ui-react";
 import {useMyConnectedWallet} from "@/app/hooks/ton-hooks";
+import {TgMainButtonContext, TgMainButtonProps} from "@/app/context/tg-main-button-context";
+
+function TgMainButtonWrapper({children}: { children: ReactNode }) {
+    const [currentProps, setCurrentProps] = useState<TgMainButtonProps | null>(null)
+    const setProps = (newProps: TgMainButtonProps) => {
+        if (newProps.visible != !currentProps?.visible){
+           if(newProps.visible){
+               // @ts-expect-error todo
+               window.Telegram.WebApp.MainButton.show();
+           } else {
+               // @ts-expect-error todo
+               window.Telegram.WebApp.MainButton.hide();
+           }
+        }
+        if(newProps.enabled !== !currentProps?.enabled) {
+            if(newProps.enabled){
+                // @ts-expect-error todo
+                window.Telegram.WebApp.MainButton.enable();
+            } else {
+                // @ts-expect-error todo
+                window.Telegram.WebApp.MainButton.disable();
+            }
+        }
+        if(currentProps?.text !== newProps.text) {
+            // @ts-expect-error todo
+            window.Telegram.WebApp.MainButton.setText(title);
+        }
+        if(currentProps?.onClick != newProps.onClick) {
+            if (currentProps?.onClick != null) {
+                // @ts-expect-error todo
+                window.Telegram.WebApp.MainButton.offClick(currentProps?.onClick)
+            }
+            // @ts-expect-error todo
+            window.Telegram.WebApp.MainButton.onClick(newProps.onClick)
+        }
+        setCurrentProps(newProps)
+    }
+    return <TgMainButtonContext.Provider value={{setProps}}>
+        {children}
+    </TgMainButtonContext.Provider>
+}
 
 //TODO: Simplify and make sure it is correct
 function TgConnectionStatusWrapper({children}: { children: ReactNode }) {
@@ -240,13 +281,15 @@ export default function MyAppWrapper({children}: { children: ReactNode }) {
 
     return <TonConnectUIProvider manifestUrl={'https://askora-twa.vercel.app/tonconnect-manifest.json'}>
         <TgConnectionStatusWrapper>
-            <MyAccountInfoWrapper>
-                <MyAssignedQuestionsWrapper>
-                    <SubmittedQuestions>
-                        {children}
-                    </SubmittedQuestions>
-                </MyAssignedQuestionsWrapper>
-            </MyAccountInfoWrapper>
+            <TgMainButtonWrapper>
+                <MyAccountInfoWrapper>
+                    <MyAssignedQuestionsWrapper>
+                        <SubmittedQuestions>
+                            {children}
+                        </SubmittedQuestions>
+                    </MyAssignedQuestionsWrapper>
+                </MyAccountInfoWrapper>
+            </TgMainButtonWrapper>
         </TgConnectionStatusWrapper>
     </TonConnectUIProvider>
 }

@@ -1,4 +1,4 @@
-import {useEffect} from "react";
+import {useEffect, useState} from "react";
 
 export default function TgMainButton({title, onClick, enabled}: {
     title: string,
@@ -6,6 +6,20 @@ export default function TgMainButton({title, onClick, enabled}: {
     enabled: boolean,
     shown: boolean
 }) {
+    const [lastKnownProps, setLastKnownProps] = useState<{
+        title: string,
+        onClick: () => void,
+        enabled: boolean
+    } | null>()
+    useEffect(() => {
+        if (lastKnownProps !== null) {
+
+        } else {
+
+        }
+
+    }, [title, enabled, onClick]);
+
     useEffect(() => {
         const onClickCopy = onClick;
         // @ts-expect-error todo

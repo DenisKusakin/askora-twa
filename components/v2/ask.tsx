@@ -10,6 +10,7 @@ import {MyTgContext} from "@/app/context/tg-context";
 import {useTonConnectUI} from "@tonconnect/ui-react";
 import {createQuestionTransaction} from "@/components/utils/transaction-utils";
 import {useMyConnectedWallet} from "@/app/hooks/ton-hooks";
+import {TgMainButtonContext, TgMainButtonProps} from "@/app/context/tg-main-button-context";
 
 export default function Ask({addr}: { addr: Address }) {
     const [text, setText] = useState("")
@@ -18,12 +19,37 @@ export default function Ask({addr}: { addr: Address }) {
     const [accountInfo, setAccountInfo] = useState<{ isLoading: boolean, data?: AccountInfo }>({isLoading: true})
     const tgInitData = useContext(MyTgContext).info?.tgInitData
     const [tonConnectUI] = useTonConnectUI();
+    const tgMainButton = useContext(TgMainButtonContext)
 
     useEffect(() => {
         setAccountInfo({isLoading: true})
         fetchAccountInfo(addr)
             .then(data => setAccountInfo({isLoading: false, data}))
     }, [addr]);
+
+    const onSubmit = () => {
+        if (accountInfo.data == null) {
+            return;
+        }
+        const transaction = createQuestionTransaction(text, totalFee, accountInfo.data?.address)
+        tonConnectUI.sendTransaction(transaction)
+            .then(() => setSuccessDialogVisible(true))
+    }
+    const isDisabled = text === ''
+
+    const tgMainButtonProps: TgMainButtonProps = {
+        text: `Submit ${text.length}`,
+        visible: myConnectedWallet != null,
+        enabled: !isDisabled,
+        onClick: onSubmit
+    }
+    useEffect(() => {
+        tgMainButton.setProps(tgMainButtonProps)
+    }, [tgMainButtonProps, tgMainButton]);
+    useEffect(() => {
+        return () => tgMainButton.setProps({...tgMainButtonProps, visible: false})
+    }, []);
+
     const [isSuccessDialogVisible, setSuccessDialogVisible] = useState(false)
 
     if (accountInfo.isLoading || accountInfo.data == null || myConnectedWallet === undefined) {
@@ -36,7 +62,6 @@ export default function Ask({addr}: { addr: Address }) {
         </>
     }
 
-    const isDisabled = text === ''
     const transactionFee = toNano(0.1)
     //@ts-expect-error todo
     const serviceFee = (accountInfo.data.price / 100n) * 5n
@@ -46,14 +71,6 @@ export default function Ask({addr}: { addr: Address }) {
     const serviceFeeFormatted = parseFloat(fromNano(serviceFee)).toFixed(3)
     const transactionFeeFormatted = parseFloat(fromNano(transactionFee)).toFixed(3)
 
-    const onSubmit = () => {
-        if (accountInfo.data == null) {
-            return;
-        }
-        const transaction = createQuestionTransaction(text, totalFee, accountInfo.data?.address)
-        tonConnectUI.sendTransaction(transaction)
-            .then(() => setSuccessDialogVisible(true))
-    }
     const transactionSuccessLinks = <>
         <Link href={`/account?id=${addr}`}
               className={"btn btn-block btn-primary"}>Close</Link>
@@ -63,7 +80,7 @@ export default function Ask({addr}: { addr: Address }) {
         tonConnectUI.openModal()
     }
     const isInTelegram = !(tgInitData == null || tgInitData === '')
-    console.log("IsInTg", tgInitData)
+
     return <>
         {isSuccessDialogVisible && <TransactionSucceedDialog content={transactionSuccessLinks}/>}
         <div className={"pt-10"}>
@@ -81,8 +98,8 @@ export default function Ask({addr}: { addr: Address }) {
             {myConnectedWallet != null && !isInTelegram && <button disabled={isDisabled} onClick={onSubmit}
                                                                    className={"btn btn-primary btn-block btn-lg mt-4"}>Submit
             </button>}
-            {<TgMainButton shown={myConnectedWallet != null} enabled={!isDisabled} onClick={onSubmit}
-                           title={"Submit"}/>}
+            {/*{<TgMainButton shown={myConnectedWallet != null} enabled={!isDisabled} onClick={onSubmit}*/}
+            {/*               title={"Submit"}/>}*/}
             {myConnectedWallet === null &&
                 <button className={"btn btn-block btn-primary btn-lg mt-4"} onClick={onConnectClick}>Connect
                 </button>}
