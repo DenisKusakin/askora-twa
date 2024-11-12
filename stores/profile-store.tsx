@@ -1,38 +1,36 @@
-import {atom} from "nanostores";
 import {Address} from "@ton/core";
 import {tonClient} from "@/wrappers/ton-client";
-import {tonConnectUI} from "@/stores/ton-connect";
 import {QuestionData} from "@/stores/questions-store";
 import {getAsignedQuestions, getSubmittedQuestions} from "@/wrappers/wrappers-utils";
 import {Root} from "@/wrappers/Root";
 import {APP_CONTRACT_ADDR} from "@/conf";
 import {AccountInfo} from "@/app/context/my-account-context";
 
-export const $myConnectedWallet = atom<Address | null | undefined>(undefined)
+// export const $myConnectedWallet = atom<Address | null | undefined>(undefined)
 
-if (tonConnectUI != null) {
-    if (tonConnectUI.connected && tonConnectUI.wallet !== null) {
-        $myConnectedWallet.set(Address.parse(tonConnectUI.wallet.account.address))
-    } else {
-        tonConnectUI.connectionRestored.then(isConnected => {
-            if (isConnected && tonConnectUI !== null && tonConnectUI.wallet !== null) {
-                $myConnectedWallet.set(Address.parse(tonConnectUI.wallet.account.address))
-            } else {
-                $myConnectedWallet.set(null)
-            }
-        })
-    }
-}
-
-if (tonConnectUI != null) {
-    tonConnectUI.onStatusChange(wallet => {
-        if (wallet === null) {
-            $myConnectedWallet.set(null)
-        } else {
-            $myConnectedWallet.set(Address.parse(wallet.account.address))
-        }
-    })
-}
+// if (tonConnectUI != null) {
+//     if (tonConnectUI.connected && tonConnectUI.wallet !== null) {
+//         $myConnectedWallet.set(Address.parse(tonConnectUI.wallet.account.address))
+//     } else {
+//         tonConnectUI.connectionRestored.then(isConnected => {
+//             if (isConnected && tonConnectUI !== null && tonConnectUI.wallet !== null) {
+//                 $myConnectedWallet.set(Address.parse(tonConnectUI.wallet.account.address))
+//             } else {
+//                 $myConnectedWallet.set(null)
+//             }
+//         })
+//     }
+// }
+//
+// if (tonConnectUI != null) {
+//     tonConnectUI.onStatusChange(wallet => {
+//         if (wallet === null) {
+//             $myConnectedWallet.set(null)
+//         } else {
+//             $myConnectedWallet.set(Address.parse(wallet.account.address))
+//         }
+//     })
+// }
 
 export async function fetchAccountInfo(ownerAddr: Address): Promise<AccountInfo> {
     const rootContract = tonClient.open(Root.createFromAddress(APP_CONTRACT_ADDR))

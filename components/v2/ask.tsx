@@ -1,21 +1,23 @@
 import {Address, fromNano, toNano} from "@ton/core";
 import {useContext, useEffect, useState} from "react";
-import {$myConnectedWallet, fetchAccountInfo} from "@/stores/profile-store";
+import {fetchAccountInfo} from "@/stores/profile-store";
 import {userFriendlyStr} from "@/components/utils/addr-utils";
-import {submitQuestion} from "@/stores/transactions";
-import {useStoreClientV2} from "@/components/hooks/use-store-client";
 import Link from "next/link";
 import TransactionSucceedDialog from "@/components/v2/transaction-suceed-dialog";
-import {tonConnectUI} from "@/stores/ton-connect";
 import TgMainButton from "@/components/v2/TgMainButon";
 import {AccountInfo} from "@/app/context/my-account-context";
 import {MyTgContext} from "@/app/context/tg-context";
+import {useTonConnectUI} from "@tonconnect/ui-react";
+import {createQuestionTransaction} from "@/components/utils/transaction-utils";
+import {useMyConnectedWallet} from "@/app/hooks/ton-hooks";
 
 export default function Ask({addr}: { addr: Address }) {
     const [text, setText] = useState("")
-    const myConnectedWallet = useStoreClientV2($myConnectedWallet)
+    const myConnectedWallet = useMyConnectedWallet()
+    console.log("My Connected wallet", myConnectedWallet?.toString())
     const [accountInfo, setAccountInfo] = useState<{ isLoading: boolean, data?: AccountInfo }>({isLoading: true})
     const tgInitData = useContext(MyTgContext).info?.tgInitData
+    const [tonConnectUI] = useTonConnectUI();
 
     useEffect(() => {
         setAccountInfo({isLoading: true})
@@ -48,7 +50,8 @@ export default function Ask({addr}: { addr: Address }) {
         if (accountInfo.data == null) {
             return;
         }
-        submitQuestion(accountInfo.data?.address, text, totalFee)
+        const transaction = createQuestionTransaction(text, totalFee, accountInfo.data?.address)
+        tonConnectUI.sendTransaction(transaction)
             .then(() => setSuccessDialogVisible(true))
     }
     const transactionSuccessLinks = <>
@@ -57,10 +60,10 @@ export default function Ask({addr}: { addr: Address }) {
         <Link href={`/`} className={"btn btn-block btn-outline btn-primary mt-5"}>My Account Page</Link>
     </>
     const onConnectClick = () => {
-        tonConnectUI?.modal?.open()
+        tonConnectUI.openModal()
     }
-    const isInTelegram = !(tgInitData === null || tgInitData === '')
-
+    const isInTelegram = !(tgInitData == null || tgInitData === '')
+    console.log("IsInTg", tgInitData)
     return <>
         {isSuccessDialogVisible && <TransactionSucceedDialog content={transactionSuccessLinks}/>}
         <div className={"pt-10"}>
@@ -78,7 +81,8 @@ export default function Ask({addr}: { addr: Address }) {
             {myConnectedWallet != null && !isInTelegram && <button disabled={isDisabled} onClick={onSubmit}
                                                                    className={"btn btn-primary btn-block btn-lg mt-4"}>Submit
             </button>}
-            {<TgMainButton shown={myConnectedWallet != null} enabled={!isDisabled} onClick={onSubmit} title={"Submit"}/>}
+            {<TgMainButton shown={myConnectedWallet != null} enabled={!isDisabled} onClick={onSubmit}
+                           title={"Submit"}/>}
             {myConnectedWallet === null &&
                 <button className={"btn btn-block btn-primary btn-lg mt-4"} onClick={onConnectClick}>Connect
                 </button>}

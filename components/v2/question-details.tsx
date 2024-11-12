@@ -1,21 +1,22 @@
 import {QuestionData} from "@/stores/questions-store";
 import {Address, fromNano} from "@ton/core";
 import {useContext, useState} from "react";
-import {rejectQuestion, replyToQuestion} from "@/stores/transactions";
-import {useStoreClientV2} from "@/components/hooks/use-store-client";
-import {$myConnectedWallet} from "@/stores/profile-store";
 import Link from "next/link";
 import TransactionSucceedDialog from "@/components/v2/transaction-suceed-dialog";
 import copyTextHandler from "@/utils/copy-util";
 import TgMainButton from "@/components/v2/TgMainButon";
 import {MyTgContext} from "@/app/context/tg-context";
+import {rejectQuestionTransaction, replyTransaction} from "@/components/utils/transaction-utils";
+import {useTonConnectUI} from "@tonconnect/ui-react";
+import {useMyConnectedWallet} from "@/app/hooks/ton-hooks";
 
 export default function QuestionDetails({question}: { question: QuestionData }) {
-    const myConnectedWallet = useStoreClientV2($myConnectedWallet)
+    const myConnectedWallet = useMyConnectedWallet()
     const [replyShown, setReplyShown] = useState(false)
     const [myReply, setMyReply] = useState<string>('')
     const [isSuccessDialogVisible, setSuccessDialogVisible] = useState(false)
     const tgInitData = useContext(MyTgContext).info?.tgInitData
+    const [tonConnectUI] = useTonConnectUI();
 
     let additional_class = ""
     if (question.isRejected) {
@@ -30,11 +31,12 @@ export default function QuestionDetails({question}: { question: QuestionData }) 
     }
 
     const onRejectClick = () => {
-        rejectQuestion(question.addr)
+        tonConnectUI.sendTransaction(rejectQuestionTransaction(question.addr))
             .then(() => setSuccessDialogVisible(true))
     }
     const onReplyClick = () => {
-        replyToQuestion(question.addr, myReply)
+        const transaction = replyTransaction(question.addr, myReply)
+        tonConnectUI?.sendTransaction(transaction)
             .then(() => setSuccessDialogVisible(true))
     }
 
@@ -129,7 +131,8 @@ export default function QuestionDetails({question}: { question: QuestionData }) 
                                               onClick={onReplyClick}
                                               disabled={myReply.trim() === ''}>Send Reply
                     </button>}
-                    <TgMainButton shown={true} title={"Send Reply"} onClick={onReplyClick} enabled={myReply.trim() !== ''}/>
+                    <TgMainButton shown={true} title={"Send Reply"} onClick={onReplyClick}
+                                  enabled={myReply.trim() !== ''}/>
                     <button className={"btn btn-outline btn-block btn-lg btn-error mt-2"}
                             onClick={() => setReplyShown(false)}>Cancel
                     </button>

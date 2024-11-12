@@ -1,13 +1,12 @@
 'use client';
 
 import MyProfile from "@/components/v2/my-profile";
-import {useStoreClientV2} from "@/components/hooks/use-store-client";
-import {$tgStartParam} from "@/stores/tg-store";
-import {useEffect} from "react";
+import {useContext, useEffect} from "react";
 import {useRouter} from "next/navigation";
+import {MyTgContext} from "@/app/context/tg-context";
 
 export default function Home() {
-    const tgStartParam = useStoreClientV2($tgStartParam)
+    const tgStartParam = useContext(MyTgContext).startParam
     const router = useRouter()
 
     useEffect(() => {

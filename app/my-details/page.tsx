@@ -1,22 +1,22 @@
 'use client';
 
-import {useStoreClientV2} from "@/components/hooks/use-store-client";
-import {$myConnectedWallet} from "@/stores/profile-store";
 import CreateAccount from "@/components/v2/create-account";
-import {tonConnectUI} from "@/stores/ton-connect";
 import copyTextHandler from "@/utils/copy-util";
 import {useContext} from "react";
 import {MyAccountInfoContext} from "@/app/context/my-account-context";
+import {useTonConnectUI} from "@tonconnect/ui-react";
+import {useMyConnectedWallet} from "@/app/hooks/ton-hooks";
 
 export default function MyDetailsPage() {
     const myAccountInfo = useContext(MyAccountInfoContext).info
-    const myConnectedWallet = useStoreClientV2($myConnectedWallet)
+    const myConnectedWallet = useMyConnectedWallet()
+    const [tonConnectUI] = useTonConnectUI()
 
     if (myConnectedWallet === undefined || myAccountInfo === undefined) {
         return <div className={"pt-10 loading loading-dots loading-lg"}></div>
     }
     const onConnectClick = () => {
-        tonConnectUI?.modal?.open()
+        tonConnectUI.openModal()
     }
     if (myConnectedWallet === null) {
         return <div className={"pt-10"}>

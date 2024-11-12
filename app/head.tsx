@@ -1,7 +1,6 @@
 'use client';
 
 import Script from "next/script";
-import {$tgStartParam} from "@/stores/tg-store";
 import {useContext} from "react";
 import {MyTgContext} from "@/app/context/tg-context";
 
@@ -17,7 +16,7 @@ export default function MyHead() {
                 window.history.back()
             })
             // @ts-expect-error todo
-            $tgStartParam.set({isLoading: false, startParam: window.Telegram.WebApp.initDataUnsafe.start_param})
+            tgContext.setTgStartParam(window.Telegram.WebApp.initDataUnsafe.start_param || null)
             // @ts-expect-error todo
             if (window.Telegram.WebApp?.initData != null && window.Telegram.WebApp?.initData != '') {
                 tgContext.setTgInfo({

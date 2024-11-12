@@ -3,8 +3,6 @@
 import {ReactElement, ReactNode, useCallback, useContext, useEffect, useState} from "react";
 import {MyAssignedQuestionsContext, MySubmittedQuestionsContext} from "@/app/context/my-questions-context";
 import {QuestionData} from "@/stores/questions-store";
-import {useStoreClientV2} from "@/components/hooks/use-store-client";
-import {$myConnectedWallet} from "@/stores/profile-store";
 import {tonClient} from "@/wrappers/ton-client";
 import {
     AccountInfo,
@@ -18,10 +16,12 @@ import {OpenedContract} from "@ton/core";
 import {Account} from "@/wrappers/Account";
 import {Root} from "@/wrappers/Root";
 import {APP_CONTRACT_ADDR} from "@/conf";
+import {TonConnectUIProvider} from "@tonconnect/ui-react";
+import {useMyConnectedWallet} from "@/app/hooks/ton-hooks";
 
 //TODO: Simplify and make sure it is correct
 function TgConnectionStatusWrapper({children}: { children: ReactNode }) {
-    const myConnectedWallet = useStoreClientV2($myConnectedWallet)
+    const myConnectedWallet = useMyConnectedWallet()
     const tgId = useContext(MyTgContext).info?.tgId
     const [connectionStatus, setConnectionStatus] = useState<'subscribed' | 'not-subscribed' | undefined>(undefined)
 
@@ -45,7 +45,7 @@ function TgConnectionStatusWrapper({children}: { children: ReactNode }) {
 }
 
 function MyAccountInfoWrapper({children}: { children: ReactNode }) {
-    const myConnectedWallet = useStoreClientV2($myConnectedWallet)
+    const myConnectedWallet = useMyConnectedWallet()//useTonAddress()//useStoreClientV2($myConnectedWallet)
     const [myAccount, setMyAccount] = useState<undefined | null | OpenedContract<Account>>(undefined)
 
     useEffect(() => {
@@ -60,7 +60,6 @@ function MyAccountInfoWrapper({children}: { children: ReactNode }) {
         }
     }, [myConnectedWallet]);
     const [myAccountInfo, setMyAccountInfo] = useState<undefined | null | AccountInfo>(undefined)
-    console.log(myAccount)
     const refresh = useCallback(() => {
         if (myAccount === undefined) {
             setMyAccountInfo(undefined)
@@ -239,13 +238,15 @@ function MyAssignedQuestionsWrapper({children}: { children: ReactElement }) {
 
 export default function MyAppWrapper({children}: { children: ReactNode }) {
 
-    return <TgConnectionStatusWrapper>
-        <MyAccountInfoWrapper>
-            <MyAssignedQuestionsWrapper>
-                <SubmittedQuestions>
-                    {children}
-                </SubmittedQuestions>
-            </MyAssignedQuestionsWrapper>
-        </MyAccountInfoWrapper>
-    </TgConnectionStatusWrapper>
+    return <TonConnectUIProvider manifestUrl={'https://askora-twa.vercel.app/tonconnect-manifest.json'}>
+        <TgConnectionStatusWrapper>
+            <MyAccountInfoWrapper>
+                <MyAssignedQuestionsWrapper>
+                    <SubmittedQuestions>
+                        {children}
+                    </SubmittedQuestions>
+                </MyAssignedQuestionsWrapper>
+            </MyAccountInfoWrapper>
+        </TgConnectionStatusWrapper>
+    </TonConnectUIProvider>
 }

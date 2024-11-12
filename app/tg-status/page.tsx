@@ -1,17 +1,14 @@
 'use client';
 
-import {useStoreClientV2} from "@/components/hooks/use-store-client";
-import {
-    $myConnectedWallet,
-} from "@/stores/profile-store";
 import {subscribe, unsubscribe} from "@/services/api";
 import Link from "next/link";
 import {useContext, useEffect, useState} from "react";
 import {TgConnectionStatus} from "@/app/context/my-account-context";
 import {MyTgContext} from "@/app/context/tg-context";
+import {useMyConnectedWallet} from "@/app/hooks/ton-hooks";
 
 export default function TgStatusPage() {
-    const myConnectedWallet = useStoreClientV2($myConnectedWallet)
+    const myConnectedWallet = useMyConnectedWallet()
     const tgConnectionStatusContext = useContext(TgConnectionStatus)
     const tgConnectionStatus = tgConnectionStatusContext.info
     const tgInitData = useContext(MyTgContext).info?.tgInitData
