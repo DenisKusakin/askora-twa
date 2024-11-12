@@ -1,5 +1,6 @@
 import {createContext} from "react";
-import {Address} from "@ton/core";
+import {Address, OpenedContract} from "@ton/core";
+import {Account} from "@/wrappers/Account";
 
 export type AccountInfo = {
     price: bigint,
@@ -16,6 +17,8 @@ export const MyAccountInfoContext = createContext<{
     info: undefined, refresh: () => {
     }
 })
+
+export const MyAccountContext = createContext<undefined | null | OpenedContract<Account>>(undefined)
 
 export const TgConnectionStatus = createContext<{
     info: undefined | null | 'subscribed' | 'not-subscribed',

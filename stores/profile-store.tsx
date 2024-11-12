@@ -1,4 +1,4 @@
-import {atom, computed, task} from "nanostores";
+import {atom} from "nanostores";
 import {Address} from "@ton/core";
 import {tonClient} from "@/wrappers/ton-client";
 import {tonConnectUI} from "@/stores/ton-connect";
@@ -33,16 +33,6 @@ if (tonConnectUI != null) {
         }
     })
 }
-
-export const $myAccount = computed($myConnectedWallet, walletAddr => task(async () => {
-    if (walletAddr === undefined) {
-        return undefined
-    } else if (walletAddr === null) {
-        return null
-    }
-    const rootContract = tonClient.open(Root.createFromAddress(APP_CONTRACT_ADDR))
-    return await rootContract.getAccount(walletAddr)
-}))
 
 export async function fetchAccountInfo(ownerAddr: Address): Promise<AccountInfo> {
     const rootContract = tonClient.open(Root.createFromAddress(APP_CONTRACT_ADDR))

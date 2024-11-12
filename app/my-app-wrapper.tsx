@@ -1,14 +1,24 @@
 'use client';
 
-import {ReactNode, useCallback, useContext, useEffect, useState} from "react";
+import {ReactElement, ReactNode, useCallback, useContext, useEffect, useState} from "react";
 import {MyAssignedQuestionsContext, MySubmittedQuestionsContext} from "@/app/context/my-questions-context";
 import {QuestionData} from "@/stores/questions-store";
 import {useStoreClientV2} from "@/components/hooks/use-store-client";
-import {$myAccount, $myConnectedWallet} from "@/stores/profile-store";
+import {$myConnectedWallet} from "@/stores/profile-store";
 import {tonClient} from "@/wrappers/ton-client";
-import {AccountInfo, MyAccountInfoContext, TgConnectionStatus} from "@/app/context/my-account-context";
+import {
+    AccountInfo,
+    MyAccountContext,
+    MyAccountInfoContext,
+    TgConnectionStatus
+} from "@/app/context/my-account-context";
 import {fetchIsSubscribed} from "@/services/api";
 import {MyTgContext} from "@/app/context/tg-context";
+import {OpenedContract} from "@ton/core";
+import {Account} from "@/wrappers/Account";
+import {Root} from "@/wrappers/Root";
+import {APP_CONTRACT_ADDR} from "@/conf";
+
 //TODO: Simplify and make sure it is correct
 function TgConnectionStatusWrapper({children}: { children: ReactNode }) {
     const myConnectedWallet = useStoreClientV2($myConnectedWallet)
@@ -35,9 +45,22 @@ function TgConnectionStatusWrapper({children}: { children: ReactNode }) {
 }
 
 function MyAccountInfoWrapper({children}: { children: ReactNode }) {
-    const myAccount = useStoreClientV2($myAccount)
-    const [myAccountInfo, setMyAccountInfo] = useState<undefined | null | AccountInfo>(undefined)
+    const myConnectedWallet = useStoreClientV2($myConnectedWallet)
+    const [myAccount, setMyAccount] = useState<undefined | null | OpenedContract<Account>>(undefined)
 
+    useEffect(() => {
+        if (myConnectedWallet === undefined) {
+            setMyAccount(undefined)
+        } else if (myConnectedWallet === null) {
+            setMyAccount(null)
+        } else {
+            const rootContract = tonClient.open(Root.createFromAddress(APP_CONTRACT_ADDR))
+            rootContract.getAccount(myConnectedWallet)
+                .then(acc => setMyAccount(acc))
+        }
+    }, [myConnectedWallet]);
+    const [myAccountInfo, setMyAccountInfo] = useState<undefined | null | AccountInfo>(undefined)
+    console.log(myAccount)
     const refresh = useCallback(() => {
         if (myAccount === undefined) {
             setMyAccountInfo(undefined)
@@ -64,11 +87,15 @@ function MyAccountInfoWrapper({children}: { children: ReactNode }) {
     useEffect(refresh, [myAccount, refresh]);
 
     return <MyAccountInfoContext.Provider
-        value={{info: myAccountInfo, refresh}}>{children}</MyAccountInfoContext.Provider>
+        value={{info: myAccountInfo, refresh}}>
+        <MyAccountContext.Provider value={myAccount}>
+            {children}
+        </MyAccountContext.Provider>
+    </MyAccountInfoContext.Provider>
 }
 
 function SubmittedQuestions({children}: { children: ReactNode }) {
-    const myAccount = useStoreClientV2($myAccount)
+    const myAccount = useContext(MyAccountContext)//useStoreClientV2($myAccount)
     const [mySubmittedQuestions, setMySubmittedQuestions] = useState<{
         isLoading: boolean,
         startLoading: boolean,
@@ -139,8 +166,8 @@ function SubmittedQuestions({children}: { children: ReactNode }) {
     </MySubmittedQuestionsContext.Provider>
 }
 
-export default function MyAppWrapper({children}: { children: ReactNode }) {
-    const myAccount = useStoreClientV2($myAccount)
+function MyAssignedQuestionsWrapper({children}: { children: ReactElement }) {
+    const myAccount = useContext(MyAccountContext)//useStoreClientV2($myAccount)
     const [myAssignedQuestions, setMyAssignedQuestions] = useState<{
         isLoading: boolean,
         startLoading: boolean,
@@ -202,16 +229,23 @@ export default function MyAppWrapper({children}: { children: ReactNode }) {
         }
     }, [myAccount, myAssignedQuestions]);
 
+    return <MyAssignedQuestionsContext.Provider value={{
+        items: myAssignedQuestions,
+        fetch
+    }}>
+        {children}
+    </MyAssignedQuestionsContext.Provider>
+}
+
+export default function MyAppWrapper({children}: { children: ReactNode }) {
+
     return <TgConnectionStatusWrapper>
         <MyAccountInfoWrapper>
-            <MyAssignedQuestionsContext.Provider value={{
-                items: myAssignedQuestions,
-                fetch
-            }}>
+            <MyAssignedQuestionsWrapper>
                 <SubmittedQuestions>
                     {children}
                 </SubmittedQuestions>
-            </MyAssignedQuestionsContext.Provider>
+            </MyAssignedQuestionsWrapper>
         </MyAccountInfoWrapper>
     </TgConnectionStatusWrapper>
 }
