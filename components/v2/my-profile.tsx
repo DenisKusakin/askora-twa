@@ -33,6 +33,8 @@ export default function MyProfile() {
             <div className={"loading loading-ring w-[125px] h-[125px]"}></div>
         </div>
     }
+    //TODO: Right after connecting a wallet, it is possible that this condition would be true even though account could exist
+    //need to fix
     if (myConnectedWallet !== null && myAccountInfo === null) {
         return <CreateAccount/>
     }
@@ -74,7 +76,8 @@ export default function MyProfile() {
             {(myAccountInfo?.description != null && myAccountInfo?.description !== '') ?
                 <Link href={"/configure/description"} className={"text mt-2 text-base italic text-center"}>
                     &quot;{myAccountInfo?.description}&quot;
-                </Link> : <Link href={"/configure/description"} className={"text mt-2 text-base italic text-center font-extralight"}>Set
+                </Link> : <Link href={"/configure/description"}
+                                className={"text mt-2 text-base italic text-center font-extralight"}>Set
                     description</Link>}
             {/*<div className={"mt-5 flex flex-row"}>*/}
             {/*    <Link href={"/configure"} className={"btn btn-sm btn-primary btn-outline ml-4"}>Change The*/}

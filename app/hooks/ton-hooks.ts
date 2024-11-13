@@ -8,8 +8,8 @@ export function useMyConnectedWallet(): Address | null | undefined {
     const [tonConnectUI] = useTonConnectUI()
 
     useEffect(() => {
-        tonConnectUI.connectionRestored.then(restored => {
-            if (!restored || myConnectedWallet === '') {
+        tonConnectUI.connectionRestored.then(() => {
+            if (myConnectedWallet === '') {
                 setRes(null)
             } else {
                 setRes(Address.parse(myConnectedWallet))
