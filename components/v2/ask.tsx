@@ -19,7 +19,7 @@ export default function Ask({addr}: { addr: Address }) {
     // const tgInitData = useContext(MyTgContext).info?.tgInitData
     const [tonConnectUI] = useTonConnectUI();
     // const tgMainButton = useContext(TgMainButtonContext)
-
+    const [test, setTest] = useState('')
     const transactionFee = toNano(0.1)
     //@ts-expect-error todo
     const serviceFee = accountInfo.data != null ? (accountInfo.data.price / 100n) * 5n : null
@@ -35,6 +35,7 @@ export default function Ask({addr}: { addr: Address }) {
         if (accountInfo.data == null || totalFee == null) {
             return;
         }
+        setTest(`text=${text}, fee=${totalFee}, addr=${accountInfo.data.address}`)
         const transaction = createQuestionTransaction(text, totalFee, accountInfo.data.address)
         tonConnectUI.sendTransaction(transaction)
             .then(() => setSuccessDialogVisible(true))
@@ -98,6 +99,7 @@ export default function Ask({addr}: { addr: Address }) {
             {myConnectedWallet != null && <button disabled={isDisabled} onClick={onSubmit}
                                                                    className={"btn btn-primary btn-block btn-lg mt-4"}>Submit
             </button>}
+            <div className={"font-light text-sm text-error"}>Test: {test}</div>
             {/*{<TgMainButton shown={myConnectedWallet != null} enabled={!isDisabled} onClick={onSubmit}*/}
             {/*               title={"Submit"}/>}*/}
             {myConnectedWallet === null &&
