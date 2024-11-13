@@ -42,11 +42,11 @@ export default function Ask({addr}: { addr: Address }) {
     const isDisabled = text === ''
 
     const tgMainButtonProps: TgMainButtonProps = useMemo(() => ({
-        text: `Submit`,
+        text: `Submit ${text.length}`,
         visible: myConnectedWallet != null,
         enabled: !isDisabled,
         onClick: onSubmit
-    }), [myConnectedWallet, isDisabled, onSubmit])
+    }), [myConnectedWallet, isDisabled, onSubmit, text])
     useEffect(() => {
         tgMainButton.setProps(tgMainButtonProps)
     }, [tgMainButtonProps, tgMainButton]);
