@@ -49,7 +49,8 @@ export default function QuestionDetails({question}: { question: QuestionData }) 
                 const buffer = cell.hash();
                 const hashHex = buffer.toString('hex');
                 tgMainButton.setProps({
-                    text: '', visible: false, enabled: false, onClick: () => {
+                    //TODO: text can't be empty so using 'x' as a placeholder
+                    text: 'x', visible: false, enabled: false, onClick: () => {
                     }
                 })
                 setTransactionHash(hashHex)

@@ -44,12 +44,13 @@ export default function Ask({addr}: { addr: Address }) {
                 const hashHex = buffer.toString('hex');
 
                 tgMainButton.setProps({
-                    text: '', visible: false, enabled: false, onClick: () => {
+                    //TODO: text can't be empty so using 'x' as a placeholder
+                    text: 'x', visible: false, enabled: false, onClick: () => {
                     }
                 })
                 setTransactionHash(hashHex)
             })
-    }, [text, totalFee, accountInfo?.data, tonConnectUI, tgMainButton])
+    }, [text, totalFee, accountInfo?.data, tonConnectUI])
     const isDisabled = text === ''
 
     const tgMainButtonProps: TgMainButtonProps = useMemo(() => ({
