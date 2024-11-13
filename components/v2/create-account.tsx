@@ -32,7 +32,7 @@ export default function CreateAccount() {
     }, [isInProgress, info, refresh]);
 
     const onClick = () => {
-        if (myConnectedWallet !== null) {
+        if (myConnectedWallet != null) {
             tonConnectUI.sendTransaction(createAccountTransaction(toNano(price), description))
                 .then(() => {
                     if (isInTelegram && tgInitData != null) {
