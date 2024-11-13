@@ -22,6 +22,7 @@ import {TgMainButtonContext, TgMainButtonProps} from "@/app/context/tg-main-butt
 
 function TgMainButtonWrapper({children}: { children: ReactNode }) {
     const [currentProps, setCurrentProps] = useState<TgMainButtonProps | null>(null)
+    //TODO: What if TG Api is not yet available?
     const setProps = (newProps: TgMainButtonProps) => {
         if (newProps.visible != !currentProps?.visible){
            if(newProps.visible){
@@ -105,6 +106,7 @@ function MyAccountInfoWrapper({children}: { children: ReactNode }) {
         if (myAccount === undefined) {
             setMyAccountInfo(undefined)
         } else if (myAccount === null) {
+            console.log("NUll from here 1")
             setMyAccountInfo(null)
         } else {
             const accountContract = myAccount
@@ -120,6 +122,7 @@ function MyAccountInfoWrapper({children}: { children: ReactNode }) {
                         address: accountContract.address
                     });
                 } else {
+                    console.log("NUll from here 2")
                     setMyAccountInfo(null);
                 }
             })
@@ -280,7 +283,7 @@ function MyAssignedQuestionsWrapper({children}: { children: ReactElement }) {
 
 export default function MyAppWrapper({children}: { children: ReactNode }) {
 
-    return <TonConnectUIProvider manifestUrl={'https://askora-twa.vercel.app/tonconnect-manifest.json'} actionsConfiguration={{twaReturnUrl: `https://t.me/AskoraBot/app`}}>
+    return <TonConnectUIProvider manifestUrl={'https://askora-twa.vercel.app/tonconnect-manifest.json'} actionsConfiguration={{twaReturnUrl: `https://t.me/AskoraBot/app`, returnStrategy: 'back'}}>
         <TgConnectionStatusWrapper>
             <TgMainButtonWrapper>
                 <MyAccountInfoWrapper>
