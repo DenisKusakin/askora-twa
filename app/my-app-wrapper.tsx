@@ -280,7 +280,7 @@ function MyAssignedQuestionsWrapper({children}: { children: ReactElement }) {
 
 export default function MyAppWrapper({children}: { children: ReactNode }) {
 
-    return <TonConnectUIProvider manifestUrl={'https://askora-twa.vercel.app/tonconnect-manifest.json'}>
+    return <TonConnectUIProvider manifestUrl={'https://askora-twa.vercel.app/tonconnect-manifest.json'} actionsConfiguration={{twaReturnUrl: `https://t.me/AskoraBot/app`}}>
         <TgConnectionStatusWrapper>
             <TgMainButtonWrapper>
                 <MyAccountInfoWrapper>

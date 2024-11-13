@@ -35,14 +35,14 @@ export default function Ask({addr}: { addr: Address }) {
         if (accountInfo.data == null || totalFee == null) {
             return;
         }
-        const transaction = createQuestionTransaction(text, totalFee, accountInfo.data?.address)
+        const transaction = createQuestionTransaction(text, totalFee, accountInfo.data.address)
         tonConnectUI.sendTransaction(transaction)
             .then(() => setSuccessDialogVisible(true))
     }, [text, totalFee, accountInfo?.data, tonConnectUI])
     const isDisabled = text === ''
 
     const tgMainButtonProps: TgMainButtonProps = useMemo(() => ({
-        text: `Submit ${text.length}`,
+        text: `Submit`,
         visible: myConnectedWallet != null,
         enabled: !isDisabled,
         onClick: onSubmit
