@@ -50,7 +50,7 @@ export default function Ask({addr}: { addr: Address }) {
 
     const tgMainButtonProps: TgMainButtonProps = useMemo(() => ({
         text: `Submit`,
-        visible: myConnectedWallet != null && transactionHash != null,
+        visible: myConnectedWallet != null && transactionHash === null,
         enabled: !isDisabled,
         onClick: onSubmit
     }), [myConnectedWallet, isDisabled, onSubmit, transactionHash])
