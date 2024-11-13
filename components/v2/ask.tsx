@@ -43,11 +43,6 @@ export default function Ask({addr}: { addr: Address }) {
                 const buffer = cell.hash();
                 const hashHex = buffer.toString('hex');
 
-                tgMainButton.setProps({
-                    //TODO: text can't be empty so using 'x' as a placeholder
-                    text: 'x', visible: false, enabled: false, onClick: () => {
-                    }
-                })
                 setTransactionHash(hashHex)
             })
     }, [text, totalFee, accountInfo?.data, tonConnectUI])
@@ -55,10 +50,10 @@ export default function Ask({addr}: { addr: Address }) {
 
     const tgMainButtonProps: TgMainButtonProps = useMemo(() => ({
         text: `Submit`,
-        visible: myConnectedWallet != null,
+        visible: myConnectedWallet != null && transactionHash != null,
         enabled: !isDisabled,
         onClick: onSubmit
-    }), [myConnectedWallet, isDisabled, onSubmit, text])
+    }), [myConnectedWallet, isDisabled, onSubmit, transactionHash])
     useEffect(() => {
         tgMainButton.setProps(tgMainButtonProps)
     }, [tgMainButtonProps, tgMainButton]);
