@@ -48,11 +48,6 @@ export default function QuestionDetails({question}: { question: QuestionData }) 
                 const cell = Cell.fromBase64(resp.boc)
                 const buffer = cell.hash();
                 const hashHex = buffer.toString('hex');
-                tgMainButton.setProps({
-                    //TODO: text can't be empty so using 'x' as a placeholder
-                    text: 'x', visible: false, enabled: false, onClick: () => {
-                    }
-                })
                 setTransactionHash(hashHex)
             })
     }, [myReply])
@@ -71,8 +66,8 @@ export default function QuestionDetails({question}: { question: QuestionData }) 
         text: "Send Reply",
         onClick: onReplyClick,
         enabled: myReply.trim() !== '',
-        visible: replyShown
-    }), [onReplyClick, myReply, replyShown])
+        visible: replyShown && transactionHash === null
+    }), [onReplyClick, myReply, replyShown, transactionHash])
     useEffect(() => {
         tgMainButton.setProps(tgMainButtonProps)
     }, [tgMainButtonProps, tgMainButton]);
