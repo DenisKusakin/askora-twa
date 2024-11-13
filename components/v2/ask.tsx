@@ -47,12 +47,12 @@ export default function Ask({addr}: { addr: Address }) {
         enabled: !isDisabled,
         onClick: onSubmit
     }), [myConnectedWallet, isDisabled, onSubmit, text])
-    useEffect(() => {
-        tgMainButton.setProps(tgMainButtonProps)
-    }, [tgMainButtonProps, tgMainButton]);
-    useEffect(() => {
-        return () => tgMainButton.setProps({...tgMainButtonProps, visible: false})
-    }, []);
+    // useEffect(() => {
+    //     tgMainButton.setProps(tgMainButtonProps)
+    // }, [tgMainButtonProps, tgMainButton]);
+    // useEffect(() => {
+    //     return () => tgMainButton.setProps({...tgMainButtonProps, visible: false})
+    // }, []);
 
     const [isSuccessDialogVisible, setSuccessDialogVisible] = useState(false)
 
@@ -95,7 +95,7 @@ export default function Ask({addr}: { addr: Address }) {
             </div>
             <textarea className={"textarea textarea-bordered textarea-lg mt-4 w-full h-[200px]"} value={text}
                       onChange={e => setText(e.target.value)}/>
-            {myConnectedWallet != null && !isInTelegram && <button disabled={isDisabled} onClick={onSubmit}
+            {myConnectedWallet != null && <button disabled={isDisabled} onClick={onSubmit}
                                                                    className={"btn btn-primary btn-block btn-lg mt-4"}>Submit
             </button>}
             {/*{<TgMainButton shown={myConnectedWallet != null} enabled={!isDisabled} onClick={onSubmit}*/}
