@@ -38,7 +38,7 @@ export default function Ask({addr}: { addr: Address }) {
         const transaction = createQuestionTransaction(text, totalFee, accountInfo.data?.address)
         tonConnectUI.sendTransaction(transaction)
             .then(() => setSuccessDialogVisible(true))
-    }, [text, totalFee, accountInfo?.data])
+    }, [text, totalFee, accountInfo?.data, tonConnectUI])
     const isDisabled = text === ''
 
     const tgMainButtonProps: TgMainButtonProps = useMemo(() => ({
@@ -52,7 +52,7 @@ export default function Ask({addr}: { addr: Address }) {
     }, [tgMainButtonProps, tgMainButton]);
     useEffect(() => {
         return () => tgMainButton.setProps({...tgMainButtonProps, visible: false})
-    });
+    }, []);
 
     const [isSuccessDialogVisible, setSuccessDialogVisible] = useState(false)
 
