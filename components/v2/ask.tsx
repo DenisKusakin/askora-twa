@@ -1,24 +1,24 @@
 import {Address, fromNano, toNano} from "@ton/core";
-import {useCallback, useContext, useEffect, useMemo, useState} from "react";
+import {useCallback, useEffect, useState} from "react";
 import {fetchAccountInfo} from "@/stores/profile-store";
 import {userFriendlyStr} from "@/components/utils/addr-utils";
 import Link from "next/link";
 import TransactionSucceedDialog from "@/components/v2/transaction-suceed-dialog";
 import {AccountInfo} from "@/app/context/my-account-context";
-import {MyTgContext} from "@/app/context/tg-context";
+// import {MyTgContext} from "@/app/context/tg-context";
 import {useTonConnectUI} from "@tonconnect/ui-react";
 import {createQuestionTransaction} from "@/components/utils/transaction-utils";
 import {useMyConnectedWallet} from "@/app/hooks/ton-hooks";
-import {TgMainButtonContext, TgMainButtonProps} from "@/app/context/tg-main-button-context";
+// import {TgMainButtonContext, TgMainButtonProps} from "@/app/context/tg-main-button-context";
 
 export default function Ask({addr}: { addr: Address }) {
     const [text, setText] = useState("")
     const myConnectedWallet = useMyConnectedWallet()
     console.log("My Connected wallet", myConnectedWallet?.toString())
     const [accountInfo, setAccountInfo] = useState<{ isLoading: boolean, data?: AccountInfo }>({isLoading: true})
-    const tgInitData = useContext(MyTgContext).info?.tgInitData
+    // const tgInitData = useContext(MyTgContext).info?.tgInitData
     const [tonConnectUI] = useTonConnectUI();
-    const tgMainButton = useContext(TgMainButtonContext)
+    // const tgMainButton = useContext(TgMainButtonContext)
 
     const transactionFee = toNano(0.1)
     //@ts-expect-error todo
@@ -41,12 +41,12 @@ export default function Ask({addr}: { addr: Address }) {
     }, [text, totalFee, accountInfo?.data, tonConnectUI])
     const isDisabled = text === ''
 
-    const tgMainButtonProps: TgMainButtonProps = useMemo(() => ({
-        text: `Submit`,
-        visible: myConnectedWallet != null,
-        enabled: !isDisabled,
-        onClick: onSubmit
-    }), [myConnectedWallet, isDisabled, onSubmit, text])
+    // const tgMainButtonProps: TgMainButtonProps = useMemo(() => ({
+    //     text: `Submit`,
+    //     visible: myConnectedWallet != null,
+    //     enabled: !isDisabled,
+    //     onClick: onSubmit
+    // }), [myConnectedWallet, isDisabled, onSubmit, text])
     // useEffect(() => {
     //     tgMainButton.setProps(tgMainButtonProps)
     // }, [tgMainButtonProps, tgMainButton]);
@@ -79,7 +79,7 @@ export default function Ask({addr}: { addr: Address }) {
     const onConnectClick = () => {
         tonConnectUI.openModal()
     }
-    const isInTelegram = !(tgInitData == null || tgInitData === '')
+    // const isInTelegram = !(tgInitData == null || tgInitData === '')
 
     return <>
         {isSuccessDialogVisible && <TransactionSucceedDialog content={transactionSuccessLinks}/>}
