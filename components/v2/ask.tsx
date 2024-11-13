@@ -1,4 +1,4 @@
-import {Address, fromNano, toNano} from "@ton/core";
+import {Address, Cell, fromNano, toNano} from "@ton/core";
 import {useCallback, useContext, useEffect, useMemo, useState} from "react";
 import {fetchAccountInfo} from "@/stores/profile-store";
 import {userFriendlyStr} from "@/components/utils/addr-utils";
@@ -10,6 +10,7 @@ import {createQuestionTransaction} from "@/components/utils/transaction-utils";
 import {useMyConnectedWallet} from "@/app/hooks/ton-hooks";
 import {TgMainButtonContext, TgMainButtonProps} from "@/app/context/tg-main-button-context";
 import {MyTgContext} from "@/app/context/tg-context";
+import copyTextHandler from "@/utils/copy-util";
 
 export default function Ask({addr}: { addr: Address }) {
     const [text, setText] = useState("")
@@ -22,6 +23,8 @@ export default function Ask({addr}: { addr: Address }) {
     //@ts-expect-error todo
     const serviceFee = accountInfo.data != null ? (accountInfo.data.price / 100n) * 5n : null
     const totalFee = accountInfo.data != null && serviceFee != null ? accountInfo.data.price + transactionFee + serviceFee : null
+    // const [isSuccessDialogVisible, setSuccessDialogVisible] = useState(false)
+    const [transactionHash, setTransactionHash] = useState<null | string>(null)
 
     useEffect(() => {
         setAccountInfo({isLoading: true})
@@ -35,7 +38,13 @@ export default function Ask({addr}: { addr: Address }) {
         }
         const transaction = createQuestionTransaction(text, totalFee, accountInfo.data.address)
         tonConnectUI.sendTransaction(transaction)
-            .then(() => setSuccessDialogVisible(true))
+            .then(resp => {
+                const cell = Cell.fromBase64(resp.boc)
+                const buffer = cell.hash();
+                const hashHex = buffer.toString('hex');
+
+                setTransactionHash(hashHex)
+            })
     }, [text, totalFee, accountInfo?.data, tonConnectUI])
     const isDisabled = text === ''
 
@@ -49,10 +58,11 @@ export default function Ask({addr}: { addr: Address }) {
         tgMainButton.setProps(tgMainButtonProps)
     }, [tgMainButtonProps, tgMainButton]);
     useEffect(() => {
-        return () => tgMainButton.setProps({...tgMainButtonProps, visible: false})
+        return () => {
+            tgMainButton.setProps({...tgMainButtonProps, visible: false})
+            setTransactionHash(null)
+        }
     }, []);
-
-    const [isSuccessDialogVisible, setSuccessDialogVisible] = useState(false)
 
     if (accountInfo.isLoading || accountInfo.data == null || myConnectedWallet === undefined) {
         return <div className={"pt-10 loading loading-lg loading-dots"}/>
@@ -69,18 +79,19 @@ export default function Ask({addr}: { addr: Address }) {
     const serviceFeeFormatted = serviceFee != null ? parseFloat(fromNano(serviceFee)).toFixed(3) : null
     const transactionFeeFormatted = parseFloat(fromNano(transactionFee)).toFixed(3)
 
-    const transactionSuccessLinks = <>
+    const transactionSuccessLinks = <div>
+        <div className={"text text-xs break-all"} onClick={copyTextHandler(transactionHash || '')}><b>Hash</b>: {transactionHash}</div>
+        <Link className={"link link-primary"} href={`https://testnet.tonviewer.com/transaction/${transactionHash}`} target={"_blank"}>Tonviewer</Link>
         <Link href={`/account?id=${addr}`}
-              className={"btn btn-block btn-primary"}>Close</Link>
-        <Link href={`/`} className={"btn btn-block btn-outline btn-primary mt-5"}>My Account Page</Link>
-    </>
+              className={"btn btn-block btn-primary mt-6"}>Close</Link>
+    </div>
     const onConnectClick = () => {
         tonConnectUI.openModal()
     }
     const isInTelegram = !(tgInitData == null || tgInitData === '')
 
     return <>
-        {isSuccessDialogVisible && <TransactionSucceedDialog content={transactionSuccessLinks}/>}
+        {(transactionHash !== null) && <TransactionSucceedDialog content={transactionSuccessLinks}/>}
         <div className={"pt-10"}>
             <div>
                 <div className={"text font-light"}>Question for</div>

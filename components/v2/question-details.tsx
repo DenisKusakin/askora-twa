@@ -1,5 +1,5 @@
 import {QuestionData} from "@/stores/questions-store";
-import {Address, fromNano} from "@ton/core";
+import {Address, Cell, fromNano} from "@ton/core";
 import {useCallback, useContext, useEffect, useMemo, useState} from "react";
 import Link from "next/link";
 import TransactionSucceedDialog from "@/components/v2/transaction-suceed-dialog";
@@ -14,10 +14,10 @@ export default function QuestionDetails({question}: { question: QuestionData }) 
     const myConnectedWallet = useMyConnectedWallet()
     const [replyShown, setReplyShown] = useState(false)
     const [myReply, setMyReply] = useState<string>('')
-    const [isSuccessDialogVisible, setSuccessDialogVisible] = useState(false)
     const tgInitData = useContext(MyTgContext).info?.tgInitData
     const [tonConnectUI] = useTonConnectUI();
     const tgMainButton = useContext(TgMainButtonContext)
+    const [transactionHash, setTransactionHash] = useState<null | string>(null)
 
     let additional_class = ""
     if (question.isRejected) {
@@ -33,19 +33,34 @@ export default function QuestionDetails({question}: { question: QuestionData }) 
 
     const onRejectClick = () => {
         tonConnectUI.sendTransaction(rejectQuestionTransaction(question.addr))
-            .then(() => setSuccessDialogVisible(true))
+            .then(resp => {
+                const cell = Cell.fromBase64(resp.boc)
+                const buffer = cell.hash();
+                const hashHex = buffer.toString('hex');
+
+                setTransactionHash(hashHex)
+            })
     }
     const onReplyClick = useCallback(() => {
         const transaction = replyTransaction(question.addr, myReply)
         tonConnectUI.sendTransaction(transaction)
-            .then(() => setSuccessDialogVisible(true))
+            .then(resp => {
+                const cell = Cell.fromBase64(resp.boc)
+                const buffer = cell.hash();
+                const hashHex = buffer.toString('hex');
+
+                setTransactionHash(hashHex)
+            })
     }, [myReply])
 
-    const dialogContent = <button className={"btn btn-block btn-primary"}
-                                  onClick={() => {
-                                      setSuccessDialogVisible(false);
-                                      setReplyShown(false);
-                                  }}>Close</button>
+    const dialogContent = <div>
+        <div className={"text text-xs break-all"} onClick={copyTextHandler(transactionHash || '')}>
+            <b>Hash</b>: {transactionHash}</div>
+        <Link className={"link link-primary"} href={`https://testnet.tonviewer.com/transaction/${transactionHash}`}
+              target={"_blank"}>Tonviewer</Link>
+        <Link href={`/`}
+              className={"btn btn-block btn-primary mt-6"}>Close</Link>
+    </div>
 
     const isInTelegram = !(tgInitData == null || tgInitData === '')
     const tgMainButtonProps: TgMainButtonProps = useMemo(() => ({
@@ -60,11 +75,12 @@ export default function QuestionDetails({question}: { question: QuestionData }) 
     useEffect(() => {
         return () => {
             tgMainButton.setProps({...tgMainButtonProps, visible: false})
+            setTransactionHash(null);
         }
     }, []);
 
     return <>
-        {isSuccessDialogVisible && <TransactionSucceedDialog content={dialogContent}/>}
+        {transactionHash != null && <TransactionSucceedDialog content={dialogContent}/>}
         <div className={"pt-10"}>
             <div className={"flex flex-row mb-2"}>
                 <div className={"w-8/12"}>
