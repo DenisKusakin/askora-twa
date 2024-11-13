@@ -1,25 +1,22 @@
 import {Address, fromNano, toNano} from "@ton/core";
-import {useCallback, useEffect, useState} from "react";
+import {useCallback, useContext, useEffect, useMemo, useState} from "react";
 import {fetchAccountInfo} from "@/stores/profile-store";
 import {userFriendlyStr} from "@/components/utils/addr-utils";
 import Link from "next/link";
 import TransactionSucceedDialog from "@/components/v2/transaction-suceed-dialog";
 import {AccountInfo} from "@/app/context/my-account-context";
-// import {MyTgContext} from "@/app/context/tg-context";
 import {useTonConnectUI} from "@tonconnect/ui-react";
 import {createQuestionTransaction} from "@/components/utils/transaction-utils";
 import {useMyConnectedWallet} from "@/app/hooks/ton-hooks";
-// import {TgMainButtonContext, TgMainButtonProps} from "@/app/context/tg-main-button-context";
+import {TgMainButtonContext, TgMainButtonProps} from "@/app/context/tg-main-button-context";
 
 export default function Ask({addr}: { addr: Address }) {
     const [text, setText] = useState("")
     const myConnectedWallet = useMyConnectedWallet()
     console.log("My Connected wallet", myConnectedWallet?.toString())
     const [accountInfo, setAccountInfo] = useState<{ isLoading: boolean, data?: AccountInfo }>({isLoading: true})
-    // const tgInitData = useContext(MyTgContext).info?.tgInitData
     const [tonConnectUI] = useTonConnectUI();
-    // const tgMainButton = useContext(TgMainButtonContext)
-    const [test, setTest] = useState('')
+    const tgMainButton = useContext(TgMainButtonContext)
     const transactionFee = toNano(0.1)
     //@ts-expect-error todo
     const serviceFee = accountInfo.data != null ? (accountInfo.data.price / 100n) * 5n : null
@@ -35,25 +32,24 @@ export default function Ask({addr}: { addr: Address }) {
         if (accountInfo.data == null || totalFee == null) {
             return;
         }
-        setTest(`text=${text}, fee=${totalFee}, addr=${accountInfo.data.address}`)
         const transaction = createQuestionTransaction(text, totalFee, accountInfo.data.address)
         tonConnectUI.sendTransaction(transaction)
             .then(() => setSuccessDialogVisible(true))
     }, [text, totalFee, accountInfo?.data, tonConnectUI])
     const isDisabled = text === ''
 
-    // const tgMainButtonProps: TgMainButtonProps = useMemo(() => ({
-    //     text: `Submit`,
-    //     visible: myConnectedWallet != null,
-    //     enabled: !isDisabled,
-    //     onClick: onSubmit
-    // }), [myConnectedWallet, isDisabled, onSubmit, text])
-    // useEffect(() => {
-    //     tgMainButton.setProps(tgMainButtonProps)
-    // }, [tgMainButtonProps, tgMainButton]);
-    // useEffect(() => {
-    //     return () => tgMainButton.setProps({...tgMainButtonProps, visible: false})
-    // }, []);
+    const tgMainButtonProps: TgMainButtonProps = useMemo(() => ({
+        text: `Submit`,
+        visible: myConnectedWallet != null,
+        enabled: !isDisabled,
+        onClick: onSubmit
+    }), [myConnectedWallet, isDisabled, onSubmit, text])
+    useEffect(() => {
+        tgMainButton.setProps(tgMainButtonProps)
+    }, [tgMainButtonProps, tgMainButton]);
+    useEffect(() => {
+        return () => tgMainButton.setProps({...tgMainButtonProps, visible: false})
+    }, []);
 
     const [isSuccessDialogVisible, setSuccessDialogVisible] = useState(false)
 
@@ -80,7 +76,6 @@ export default function Ask({addr}: { addr: Address }) {
     const onConnectClick = () => {
         tonConnectUI.openModal()
     }
-    // const isInTelegram = !(tgInitData == null || tgInitData === '')
 
     return <>
         {isSuccessDialogVisible && <TransactionSucceedDialog content={transactionSuccessLinks}/>}
@@ -99,9 +94,6 @@ export default function Ask({addr}: { addr: Address }) {
             {myConnectedWallet != null && <button disabled={isDisabled} onClick={onSubmit}
                                                                    className={"btn btn-primary btn-block btn-lg mt-4"}>Submit
             </button>}
-            <div className={"font-light text-sm text-error"}>Test: {test}</div>
-            {/*{<TgMainButton shown={myConnectedWallet != null} enabled={!isDisabled} onClick={onSubmit}*/}
-            {/*               title={"Submit"}/>}*/}
             {myConnectedWallet === null &&
                 <button className={"btn btn-block btn-primary btn-lg mt-4"} onClick={onConnectClick}>Connect
                 </button>}
