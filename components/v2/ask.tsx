@@ -23,7 +23,6 @@ export default function Ask({addr}: { addr: Address }) {
     //@ts-expect-error todo
     const serviceFee = accountInfo.data != null ? (accountInfo.data.price / 100n) * 5n : null
     const totalFee = accountInfo.data != null && serviceFee != null ? accountInfo.data.price + transactionFee + serviceFee : null
-    // const [isSuccessDialogVisible, setSuccessDialogVisible] = useState(false)
     const [transactionHash, setTransactionHash] = useState<null | string>(null)
 
     useEffect(() => {

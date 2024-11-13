@@ -8,13 +8,15 @@ import TransactionSucceedDialog from "@/components/v2/transaction-suceed-dialog"
 import {MyAccountInfoContext} from "@/app/context/my-account-context";
 import {useTonConnectUI} from "@tonconnect/ui-react";
 import {useMyConnectedWallet} from "@/app/hooks/ton-hooks";
+import {Cell} from "@ton/core";
+import copyTextHandler from "@/utils/copy-util";
 
 export default function ConfigurePrice() {
     const myConnectedWallet = useMyConnectedWallet()
     const myProfileInfo = useContext(MyAccountInfoContext).info
     const [description, setDescription] = useState(myProfileInfo?.description || '')
-    const [isSuccessDialogVisible, setSuccessDialogVisible] = useState(false)
     const [tonConnectUI] = useTonConnectUI()
+    const [transactionHash, setTransactionHash] = useState<null | string>(null)
 
     useEffect(() => {
         setDescription(myProfileInfo?.description || '')
@@ -24,7 +26,13 @@ export default function ConfigurePrice() {
         if (myProfileInfo?.address != null) {
             tonConnectUI
                 .sendTransaction(updateDescriptionTransaction(myProfileInfo?.address, description))
-                .then(() => setSuccessDialogVisible(true))
+                .then(resp => {
+                    const cell = Cell.fromBase64(resp.boc)
+                    const buffer = cell.hash();
+                    const hashHex = buffer.toString('hex');
+
+                    setTransactionHash(hashHex)
+                })
         }
     }
 
@@ -45,10 +53,17 @@ export default function ConfigurePrice() {
         return <CreateAccount/>
     }
     const descriptionChanged = description !== (myProfileInfo.description || '')
-    const dialogContent = <Link href={"/"} className={"btn btn-outline btn-primary"}>My Account</Link>
+    const dialogContent = <div>
+        <div className={"text text-xs break-all"} onClick={copyTextHandler(transactionHash || '')}>
+            <b>Hash</b>: {transactionHash}</div>
+        <Link className={"link link-primary"} href={`https://testnet.tonviewer.com/transaction/${transactionHash}`}
+              target={"_blank"}>Tonviewer</Link>
+        <Link href={`/`}
+              className={"btn btn-block btn-primary mt-6"}>Close</Link>
+    </div>
 
     return <>
-        {isSuccessDialogVisible && <TransactionSucceedDialog content={dialogContent}/>}
+        {transactionHash !== null && <TransactionSucceedDialog content={dialogContent}/>}
         <div className={"pt-10"}>
             <div className={"w-full flex flex-col justify-center"}>
                 <textarea
