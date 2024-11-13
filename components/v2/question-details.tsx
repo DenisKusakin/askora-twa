@@ -48,7 +48,10 @@ export default function QuestionDetails({question}: { question: QuestionData }) 
                 const cell = Cell.fromBase64(resp.boc)
                 const buffer = cell.hash();
                 const hashHex = buffer.toString('hex');
-
+                tgMainButton.setProps({
+                    text: '', visible: false, enabled: false, onClick: () => {
+                    }
+                })
                 setTransactionHash(hashHex)
             })
     }, [myReply])

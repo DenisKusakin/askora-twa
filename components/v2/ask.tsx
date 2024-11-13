@@ -43,9 +43,13 @@ export default function Ask({addr}: { addr: Address }) {
                 const buffer = cell.hash();
                 const hashHex = buffer.toString('hex');
 
+                tgMainButton.setProps({
+                    text: '', visible: false, enabled: false, onClick: () => {
+                    }
+                })
                 setTransactionHash(hashHex)
             })
-    }, [text, totalFee, accountInfo?.data, tonConnectUI])
+    }, [text, totalFee, accountInfo?.data, tonConnectUI, tgMainButton])
     const isDisabled = text === ''
 
     const tgMainButtonProps: TgMainButtonProps = useMemo(() => ({
@@ -80,8 +84,10 @@ export default function Ask({addr}: { addr: Address }) {
     const transactionFeeFormatted = parseFloat(fromNano(transactionFee)).toFixed(3)
 
     const transactionSuccessLinks = <div>
-        <div className={"text text-xs break-all"} onClick={copyTextHandler(transactionHash || '')}><b>Hash</b>: {transactionHash}</div>
-        <Link className={"link link-primary"} href={`https://testnet.tonviewer.com/transaction/${transactionHash}`} target={"_blank"}>Tonviewer</Link>
+        <div className={"text text-xs break-all"} onClick={copyTextHandler(transactionHash || '')}>
+            <b>Hash</b>: {transactionHash}</div>
+        <Link className={"link link-primary"} href={`https://testnet.tonviewer.com/transaction/${transactionHash}`}
+              target={"_blank"}>Tonviewer</Link>
         <Link href={`/account?id=${addr}`}
               className={"btn btn-block btn-primary mt-6"}>Close</Link>
     </div>
