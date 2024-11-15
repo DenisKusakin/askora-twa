@@ -9,6 +9,9 @@ import {rejectQuestionTransaction, replyTransaction} from "@/components/utils/tr
 import {useTonConnectUI} from "@tonconnect/ui-react";
 import {useMyConnectedWallet} from "@/app/hooks/ton-hooks";
 import {TgMainButtonContext, TgMainButtonProps} from "@/app/context/tg-main-button-context";
+import {useAuth} from "@/app/hooks/auth-hook";
+import {rejectQuestion, replyQuestion} from "@/services/api";
+import TransactionErrorDialog from "@/components/v2/transaction-failed-dialog";
 
 export default function QuestionDetails({question}: { question: QuestionData }) {
     const myConnectedWallet = useMyConnectedWallet()
@@ -17,7 +20,15 @@ export default function QuestionDetails({question}: { question: QuestionData }) 
     const tgInitData = useContext(MyTgContext).info?.tgInitData
     const [tonConnectUI] = useTonConnectUI();
     const tgMainButton = useContext(TgMainButtonContext)
-    const [transactionHash, setTransactionHash] = useState<null | string>(null)
+    const [transaction, setTransaction] = useState<{
+        hash: string | null, isSponsored: boolean,
+        error?: string
+    } | null>(null)
+    const {sponsoredTransactionsEnabled, updateTonProof} = useAuth()
+
+    const renewSession = useCallback(() => {
+        updateTonProof().then(() => setTransaction(null))
+    }, [updateTonProof, setTransaction])
 
     let additional_class = ""
     if (question.isRejected) {
@@ -31,34 +42,67 @@ export default function QuestionDetails({question}: { question: QuestionData }) 
         return myConnectedWallet != null && addr.equals(myConnectedWallet)
     }
 
-    const onRejectClick = () => {
-        tonConnectUI.sendTransaction(rejectQuestionTransaction(question.addr))
+    const onRejectClick = useCallback(() => {
+        const transactionPromise = sponsoredTransactionsEnabled ? rejectQuestion(question.id) : tonConnectUI.sendTransaction(rejectQuestionTransaction(question.addr))
+        transactionPromise
             .then(resp => {
-                const cell = Cell.fromBase64(resp.boc)
-                const buffer = cell.hash();
-                const hashHex = buffer.toString('hex');
+                if (resp) {
+                    const cell = Cell.fromBase64(resp.boc)
+                    const buffer = cell.hash();
+                    const hash = buffer.toString('hex');
 
-                setTransactionHash(hashHex)
+                    setTransaction({hash, isSponsored: false})
+                } else {
+                    setTransaction({hash: null, isSponsored: true})
+                }
             })
-    }
+    }, [question.id, question.addr, sponsoredTransactionsEnabled, tonConnectUI])
+
     const onReplyClick = useCallback(() => {
-        const transaction = replyTransaction(question.addr, myReply)
-        tonConnectUI.sendTransaction(transaction)
+        const transactionPromise = sponsoredTransactionsEnabled ? replyQuestion(question.id, myReply) : tonConnectUI.sendTransaction(replyTransaction(question.addr, myReply))
+        transactionPromise
             .then(resp => {
-                const cell = Cell.fromBase64(resp.boc)
-                const buffer = cell.hash();
-                const hashHex = buffer.toString('hex');
-                setTransactionHash(hashHex)
+                if (resp) {
+                    const cell = Cell.fromBase64(resp.boc)
+                    const buffer = cell.hash();
+                    const hash = buffer.toString('hex');
+                    setTransaction({hash, isSponsored: false})
+                } else {
+                    setTransaction({hash: null, isSponsored: true})
+                }
             })
-    }, [myReply])
+            .catch(e => {
+                if (e instanceof Error) {
+                    setTransaction({hash: null, isSponsored: sponsoredTransactionsEnabled, error: e.message})
+                }
+                console.log("Err", e)
+            })
+    }, [myReply, sponsoredTransactionsEnabled, question.addr, question.id, tonConnectUI])
 
     const dialogContent = <div>
-        <div className={"text text-xs break-all"} onClick={copyTextHandler(transactionHash || '')}>
-            <b>Hash</b>: {transactionHash}</div>
-        <Link className={"link link-primary"} href={`https://testnet.tonviewer.com/transaction/${transactionHash}`}
-              target={"_blank"}>Tonviewer</Link>
+        {transaction?.hash != null && <>
+            <div className={"text text-xs break-all"} onClick={copyTextHandler(transaction.hash)}>
+                <b>Hash</b>: {transaction.hash}</div>
+            <Link className={"link link-primary"} href={`https://testnet.tonviewer.com/transaction/${transaction}`}
+                  target={"_blank"}>Tonviewer</Link></>}
         <Link href={`/`}
               className={"btn btn-block btn-primary mt-6"}>Close</Link>
+    </div>
+
+    const sessionExpiredDialogContent = <>
+        <div className={"text text-lg text-center w-full"}>Session has expired</div>
+        <button className={"btn btn-block btn-primary mt-6"}
+                onClick={renewSession}>Renew Session
+        </button>
+        <button className={"btn btn-block btn-primary btn-outline mt-6"}
+                onClick={() => setTransaction(null)}>Close
+        </button>
+    </>
+    const unknownErrorDialogContent = <div>
+        <span className={"text text-error"}>Something went wrong...</span>
+        <button className={"btn btn-block btn-primary mt-6"}
+                onClick={() => setTransaction(null)}>Close
+        </button>
     </div>
 
     const isInTelegram = !(tgInitData == null || tgInitData === '')
@@ -66,20 +110,23 @@ export default function QuestionDetails({question}: { question: QuestionData }) 
         text: "Send Reply",
         onClick: onReplyClick,
         enabled: myReply.trim() !== '',
-        visible: replyShown && transactionHash === null
-    }), [onReplyClick, myReply, replyShown, transactionHash])
+        visible: replyShown && transaction === null
+    }), [onReplyClick, myReply, replyShown, transaction])
     useEffect(() => {
         tgMainButton.setProps(tgMainButtonProps)
     }, [tgMainButtonProps, tgMainButton]);
     useEffect(() => {
         return () => {
             tgMainButton.setProps({...tgMainButtonProps, visible: false})
-            setTransactionHash(null);
+            setTransaction(null);
         }
     }, []);
 
     return <>
-        {transactionHash != null && <TransactionSucceedDialog content={dialogContent}/>}
+        {transaction != null && <TransactionSucceedDialog content={dialogContent}/>}
+        {transaction !== null && transaction.error != null &&
+            <TransactionErrorDialog
+                content={transaction.error === 'unauthorized' ? sessionExpiredDialogContent : unknownErrorDialogContent}/>}
         <div className={"pt-10"}>
             <div className={"flex flex-row mb-2"}>
                 <div className={"w-8/12"}>

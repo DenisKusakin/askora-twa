@@ -6,7 +6,8 @@ import {useTonConnectUI} from "@tonconnect/ui-react";
 import {createAccountTransaction} from "@/components/utils/transaction-utils";
 import {useMyConnectedWallet} from "@/app/hooks/ton-hooks";
 import {MyTgContext} from "@/app/context/tg-context";
-import {subscribe} from "@/services/api";
+import {createAccount, subscribe} from "@/services/api";
+import {useAuth} from "@/app/hooks/auth-hook";
 
 export default function CreateAccount() {
     const myConnectedWallet = useMyConnectedWallet()
@@ -19,6 +20,7 @@ export default function CreateAccount() {
     const tgInitData = useContext(MyTgContext).info?.tgInitData
     const isInTelegram = !(tgInitData == null || tgInitData === '')
     const [description, setDescription] = useState('')
+    const {sponsoredTransactionsEnabled} = useAuth()
 
     useEffect(() => {
         if (isInProgress) {
@@ -33,7 +35,8 @@ export default function CreateAccount() {
 
     const onClick = () => {
         if (myConnectedWallet != null) {
-            tonConnectUI.sendTransaction(createAccountTransaction(toNano(price), description))
+            const sendTransactionPromise = sponsoredTransactionsEnabled ? createAccount(toNano(price), description) : tonConnectUI.sendTransaction(createAccountTransaction(toNano(price), description))
+            sendTransactionPromise
                 .then(() => {
                     if (isInTelegram && tgInitData != null) {
                         subscribe(tgInitData, myConnectedWallet.toString())

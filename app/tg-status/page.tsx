@@ -39,7 +39,7 @@ export default function TgStatusPage() {
             .then(() => setStatusLoading(false))
     }
     const isInTelegram = !(tgInitData == null || tgInitData === '')
-
+    
     return <div className={"pt-10"}>
         <p className={"text text-sm font-light text-center mt-2"}>Linking your Telegram account is optional and allows
             you to receive notifications directly in Telegram. You can change this at any time.</p>

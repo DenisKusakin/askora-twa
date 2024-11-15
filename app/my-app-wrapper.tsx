@@ -106,7 +106,6 @@ function MyAccountInfoWrapper({children}: { children: ReactNode }) {
         if (myAccount === undefined) {
             setMyAccountInfo(undefined)
         } else if (myAccount === null) {
-            console.log("NUll from here 1")
             setMyAccountInfo(null)
         } else {
             const accountContract = myAccount
@@ -122,7 +121,6 @@ function MyAccountInfoWrapper({children}: { children: ReactNode }) {
                         address: accountContract.address
                     });
                 } else {
-                    console.log("NUll from here 2")
                     setMyAccountInfo(null);
                 }
             })

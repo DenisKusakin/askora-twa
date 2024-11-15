@@ -5,22 +5,25 @@ import copyTextHandler from "@/utils/copy-util";
 import {useContext} from "react";
 import {MyAccountInfoContext, TgConnectionStatus} from "@/app/context/my-account-context";
 import {MyTgContext} from "@/app/context/tg-context";
-import {useTonConnectUI} from "@tonconnect/ui-react";
 import {useMyConnectedWallet} from "@/app/hooks/ton-hooks";
+import {useAuth} from "@/app/hooks/auth-hook";
 
 export default function MyProfile() {
     const myConnectedWallet = useMyConnectedWallet()
     const myAccountInfo = useContext(MyAccountInfoContext).info
+    const auth = useAuth()
 
     const tgConnectionStatus = useContext(TgConnectionStatus).info
     const tgId = useContext(MyTgContext).info?.tgId
-    const [tonConnectUI] = useTonConnectUI();
+    // const [tonConnectUI] = useTonConnectUI();
 
     const onDisconnectClick = () => {
-        tonConnectUI?.disconnect()
+        //tonConnectUI?.disconnect()
+        auth.disconnect()
     }
     const onConnectClick = () => {
-        tonConnectUI?.modal?.open()
+        //tonConnectUI?.modal?.open()
+        auth.connect()
     }
     const onShareClick = () => {
         if (myConnectedWallet == null) {

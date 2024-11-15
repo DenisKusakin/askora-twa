@@ -19,7 +19,6 @@ export default function Home() {
                 const qId = tgStartParam.startParam.substring(2)
                 decodedUrl = `/my-question?id=${qId}`
             } else if (tgStartParam.startParam.startsWith("2_")) {
-                console.log(tgStartParam.startParam)
                 const secondDelIdx = tgStartParam.startParam.lastIndexOf("_")
                 const qId = tgStartParam.startParam.substring(2, secondDelIdx)
                 const accountId = tgStartParam.startParam.substring(secondDelIdx + 1)
