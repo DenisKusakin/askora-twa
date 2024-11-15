@@ -21,7 +21,6 @@ export default function CreateAccount() {
     const isInTelegram = !(tgInitData == null || tgInitData === '')
     const [description, setDescription] = useState('')
     const {sponsoredTransactionsEnabled} = useAuth()
-    const [test, setTest] = useState('')
 
     useEffect(() => {
         if (isInProgress) {
@@ -57,16 +56,12 @@ export default function CreateAccount() {
                     <input
                         defaultValue={isNaN(price) ? '' : price}
                         type={"number"}
-                        step={"0.01"}
-                        lang={"en-US"}
                         inputMode="decimal"
                         min={"0"}
                         className={`input text-5xl font-bold w-full text-center`}
                         onChange={(e) => {
-                            setTest(e.target.value)
                             setPrice(e.target.valueAsNumber)
                         }}/>
-                    <span className={"text text-sm"}>{test}</span>
                     <textarea
                         placeholder="Write a short description"
                         onChange={e => setDescription(e.target.value)}
