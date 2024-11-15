@@ -4,7 +4,7 @@ export default function AccountCreationStatusDialog() {
             <div className={"w-[125px] h-[125px] loading loading-ring"}></div>
             <div className={"p-4 flex items-center justify-center flex-col"}>
                 <div className={"text-lg"}>Account creation is in progress...</div>
-                <div className={"text-xs mt-2"}>It could take up to a minute</div>
+                <div className={"text-xs mt-2"}>Waiting for transaction processing, it could take up to a minute</div>
                 <div className={"mt-5"}>
 
                 </div>

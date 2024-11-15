@@ -27,7 +27,7 @@ export default function CreateAccount() {
             if (info?.status === 'active') {
                 setIsInProgress(false)
             } else {
-                const id = setInterval(refresh, 1000)
+                const id = setInterval(refresh, 2000)
                 return () => clearInterval(id)
             }
         }
@@ -36,13 +36,13 @@ export default function CreateAccount() {
     const onClick = () => {
         if (myConnectedWallet != null) {
             const sendTransactionPromise = sponsoredTransactionsEnabled ? createAccount(toNano(price), description) : tonConnectUI.sendTransaction(createAccountTransaction(toNano(price), description))
+            setIsInProgress(true)
             sendTransactionPromise
                 .then(() => {
                     if (isInTelegram && tgInitData != null) {
                         subscribe(tgInitData, myConnectedWallet.toString())
                             .then(tgConnectionStatusContext.refresh)
                     }
-                    setIsInProgress(true)
                 })
         }
     }
@@ -54,17 +54,13 @@ export default function CreateAccount() {
                 <div className={"text-neutral text-xl"}>Price (TON)</div>
                 <div className={"w-full flex flex-col justify-center"}>
                     <input
-                        value={isNaN(price) ? '' : price}
+                        defaultValue={isNaN(price) ? '' : price}
                         type={"number"}
                         inputMode="decimal"
                         min={"0"}
                         className={`input text-5xl font-bold w-full text-center`}
                         onChange={(e) => {
-                            if (isNaN(e.target.valueAsNumber)) {
-                                setPrice(0)
-                            } else {
-                                setPrice(e.target.valueAsNumber)
-                            }
+                            setPrice(e.target.valueAsNumber)
                         }}/>
                     <textarea
                         placeholder="Write a short description"
@@ -73,7 +69,7 @@ export default function CreateAccount() {
                 </div>
                 <div className={"text text-sm italic text-center mb-5 mt-5"}>To receive questions, you need to create an
                     account.
-                    Specify the price of your reply. It could be changed anytime
+                    Specify the price of your reply. It could be changed later
                 </div>
                 {isInTelegram && <div className={"mt-2"}>
                     <label className="label cursor-pointer">
