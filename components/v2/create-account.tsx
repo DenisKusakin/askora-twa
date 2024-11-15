@@ -57,6 +57,8 @@ export default function CreateAccount() {
                     <input
                         defaultValue={isNaN(price) ? '' : price}
                         type={"number"}
+                        step={"0.01"}
+                        lang={"en"}
                         inputMode="decimal"
                         min={"0"}
                         className={`input text-5xl font-bold w-full text-center`}
