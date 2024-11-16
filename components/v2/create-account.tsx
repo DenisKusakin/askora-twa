@@ -8,6 +8,7 @@ import {useMyConnectedWallet} from "@/hooks/ton-hooks";
 import {MyTgContext} from "@/context/tg-context";
 import {createAccount, subscribe} from "@/services/api";
 import {useAuth} from "@/hooks/auth-hook";
+import Link from "next/link";
 
 export default function CreateAccount() {
     const myConnectedWallet = useMyConnectedWallet()
@@ -20,7 +21,7 @@ export default function CreateAccount() {
     const tgInitData = useContext(MyTgContext).info?.tgInitData
     const isInTelegram = !(tgInitData == null || tgInitData === '')
     const [description, setDescription] = useState('')
-    const {sponsoredTransactionsEnabled} = useAuth()
+    const {sponsoredTransactionsEnabled, setSponsoredTransactionsEnabled} = useAuth()
 
     useEffect(() => {
         if (isInProgress) {
@@ -73,11 +74,31 @@ export default function CreateAccount() {
                 </div>
                 {isInTelegram && <div className={"mt-2"}>
                     <label className="label cursor-pointer">
-                        <input checked={enableTgNotifications} onChange={() => setEnableTgNotifications(x => !x)} type="checkbox"
+                        <input checked={enableTgNotifications} onChange={() => setEnableTgNotifications(x => !x)}
+                               type="checkbox"
                                className="checkbox checkbox-primary mr-2"/>
                         <span className="label-text text-lg">Receive notifications in Telegram</span>
                     </label>
                 </div>}
+            </div>
+            <div className="form-control">
+                <label className="label cursor-pointer">
+                    <input type="checkbox" className="toggle toggle-primary" checked={sponsoredTransactionsEnabled} onChange={() => setSponsoredTransactionsEnabled(!sponsoredTransactionsEnabled)}/>
+                    <span className="label-text">Use Sponsored Transaction</span>
+                    <Link className={"text-info ml-20"} href={"/configure/sponsored-transactions"}>
+                        <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            className="h-6 w-6 shrink-0 stroke-current">
+                            <path
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                stroke-width="2"
+                                d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                    </Link>
+                </label>
             </div>
             <button disabled={isNaN(price)} className={"btn btn-block btn-lg btn-primary mt-5"} onClick={onClick}>Create
                 Account
