@@ -20,10 +20,17 @@ export default function MySent() {
         .map(x => x as { isLoading: boolean, id: number, data: QuestionData })
         .sort((a, b) => b.data.createdAt - a.data.createdAt)
 
+    const isLoading = context.items.length != myAccountInfo?.submittedCount || context.items.find(x => x.isLoading) != null
+
     return <div className={"pt-10"}>
-        <div className={"text-xl"}>Sent</div>
+        <div className={"text-xl flex flex-row"}>
+            <div>
+                Sent
+            </div>
+            {isLoading && <div className={"loading loading-dots ml-2"}></div>}
+        </div>
         <div className={"flex w-full mt-4 flex-col"}>
-            {items.length === 0 && <h2 className={"text text-sm font-italic"}>No sent messages</h2>}
+            {items.length === 0 && !isLoading && <h2 className={"text text-sm font-italic"}>No sent messages</h2>}
             {items.map(({data}) => <MessageListItem key={data.addr.toString()}
                                                     addr={data.to}
                                                     link={`/q-details?owner_id=${data.to.toString()}&q_id=${data.id}`}

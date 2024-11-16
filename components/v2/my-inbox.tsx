@@ -20,10 +20,17 @@ export default function MyInbox() {
         .filter(x => x.data != null)
         .map(x => x as { isLoading: boolean, id: number, data: QuestionData })
         .sort((a, b) => b.data.createdAt - a.data.createdAt)
+    const isLoading = context.items.length != myAccountInfo?.assignedCount || context.items.find(x => x.isLoading) != null
+
     return <div className={"pt-10"}>
-        <div className={"text-xl"}>Inbox</div>
+        <div className={"text-xl flex flex-row"}>
+            <div>
+                Inbox
+            </div>
+            {isLoading && <div className={"loading loading-dots ml-2"}></div>}
+        </div>
         <div className={"flex w-full mt-4 flex-col"}>
-            {context.items.length === 0 &&
+            {context.items.length === 0 && !isLoading &&
                 <h2 className={"text text-sm font-italic"}>No incoming messages</h2>}
             {items.map(({data, id}) => <MessageListItem
                 key={data.addr.toString()} addr={data.from}
