@@ -85,7 +85,7 @@ export default function CreateAccount() {
                 <label className="label cursor-pointer">
                     <input type="checkbox" className="toggle toggle-primary" checked={sponsoredTransactionsEnabled} onChange={() => setSponsoredTransactionsEnabled(!sponsoredTransactionsEnabled)}/>
                     <span className="label-text">Use Sponsored Transaction</span>
-                    <Link className={"text-info ml-20"} href={"/configure/sponsored-transactions"}>
+                    <Link className={"text-info pl-20"} href={"/configure/sponsored-transactions"}>
                         <svg
                             xmlns="http://www.w3.org/2000/svg"
                             fill="none"
