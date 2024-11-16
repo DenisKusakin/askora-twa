@@ -11,7 +11,7 @@ import {useAuth} from "@/hooks/auth-hook";
 
 export default function CreateAccount() {
     const myConnectedWallet = useMyConnectedWallet()
-    const [price, setPrice] = useState(0)
+    const [price, setPrice] = useState(1)
     const {info, refresh} = useContext(MyAccountInfoContext)
     const [isInProgress, setIsInProgress] = useState(false)
     const [tonConnectUI] = useTonConnectUI();
@@ -63,7 +63,7 @@ export default function CreateAccount() {
                             setPrice(e.target.valueAsNumber)
                         }}/>
                     <textarea
-                        placeholder="Write a short description"
+                        placeholder="Write a short bio or a message to your visitors..."
                         onChange={e => setDescription(e.target.value)}
                         className="textarea mt-2 textarea-bordered text-center italic textarea-sm w-full h-[100px]"></textarea>
                 </div>

@@ -41,17 +41,31 @@ export default function MyProfile() {
     if (myConnectedWallet === null) {
         return <div className={"pt-10 text-center"}>
             <h1 className={"text text-center text-xl"}>Askora</h1>
-            <h2 className={"text text-xl mt-4"}>Open Q&N platform powered by TON</h2>
-            <div className={"mt-20 mb-20"}>
-                <h2 className={"text text-xl mt-2"}>Connect TON Wallet</h2>
-                <h2 className={"text text-xl mt-2"}>Create an account and set a price</h2>
-                <h2 className={"text text-xl mt-2"}>Share link with your audience</h2>
-                <h2 className={"text text-xl mt-2"}>💰Reply and earn reward</h2>
+            <h3 className={"text text-lg mt-4 font-light"}>Open Q&N platform powered by TON</h3>
+            <div className={"mt-10 mb-10"}>
+                {/*<h2 className={"text text-xl mt-2"}>Connect Your TON Wallet</h2>*/}
+                {/*<h2 className={"text text-xl mt-2"}>Create an Account & Set Your Price</h2>*/}
+                {/*<h2 className={"text text-xl mt-2"}>Share Your Link with Your Audience</h2>*/}
+                {/*<h2 className={"text text-xl mt-2"}>Reply & Earn Rewards 💰</h2>*/}
+                <div className="steps steps-vertical lg:steps-horizontal">
+                    <div className="step step-primary">
+                        <p className="font-bold">Connect Your TON Wallet</p>
+                    </div>
+                    <div className="step">
+                        <p className="font-bold">Create an Account & Set Your Price</p>
+                    </div>
+                    <div className="step">
+                        <p className="font-bold">Share Your Link with Your Audience</p>
+                    </div>
+                    <div className="step">
+                        <p className="font-bold">Reply & Earn Rewards 💰</p>
+                    </div>
+                </div>
             </div>
             <button className={"btn btn-block btn-primary btn-lg mt-4"} onClick={onConnectClick}>Connect
             </button>
             <Link href={"/find"} className={"btn btn-primary btn-outline btn-lg mt-4 btn-block"}>Find User</Link>
-            <Link href={"/about"} className={"btn btn-outline btn-success btn-lg btn-block mt-5"}>About</Link>
+            <Link href={"/about"} className={"btn btn-outline btn-info btn-lg btn-block mt-5"}>About</Link>
         </div>
     }
 

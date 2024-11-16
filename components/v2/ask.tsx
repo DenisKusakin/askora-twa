@@ -11,6 +11,7 @@ import {useMyConnectedWallet} from "@/hooks/ton-hooks";
 import {TgMainButtonContext, TgMainButtonProps} from "@/context/tg-main-button-context";
 import {MyTgContext} from "@/context/tg-context";
 import copyTextHandler from "@/utils/copy-util";
+import {TONVIEWER_BASE_PATH} from "@/conf";
 
 export default function Ask({addr}: { addr: Address }) {
     const [text, setText] = useState("")
@@ -81,7 +82,7 @@ export default function Ask({addr}: { addr: Address }) {
     const transactionSuccessLinks = <div>
         <div className={"text text-xs break-all"} onClick={copyTextHandler(transactionHash || '')}>
             <b>Hash</b>: {transactionHash}</div>
-        <Link className={"link link-primary"} href={`https://testnet.tonviewer.com/transaction/${transactionHash}`}
+        <Link className={"link link-primary"} href={`${TONVIEWER_BASE_PATH}/transaction/${transactionHash}`}
               target={"_blank"}>Tonviewer</Link>
         <Link href={`/account?id=${addr}`}
               className={"btn btn-block btn-primary mt-6"}>Close</Link>

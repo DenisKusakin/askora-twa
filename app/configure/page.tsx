@@ -13,6 +13,7 @@ import copyTextHandler from "@/utils/copy-util";
 import {useAuth} from "@/hooks/auth-hook";
 import {changePrice} from "@/services/api";
 import TransactionErrorDialog from "@/components/v2/transaction-failed-dialog";
+import {TONVIEWER_BASE_PATH} from "@/conf";
 
 export default function ConfigurePrice() {
     const myConnectedWallet = useMyConnectedWallet()
@@ -79,7 +80,7 @@ export default function ConfigurePrice() {
     const dialogContent = <div>
         {transaction?.hash != null && <><div className={"text text-xs break-all"} onClick={copyTextHandler(transaction.hash || '')}>
             <b>Hash</b>: {transaction.hash}</div>
-        <Link className={"link link-primary"} href={`https://testnet.tonviewer.com/transaction/${transaction.hash}`}
+        <Link className={"link link-primary"} href={`${TONVIEWER_BASE_PATH}/transaction/${transaction.hash}`}
               target={"_blank"}>Tonviewer</Link></>}
         <Link href={`/`}
               className={"btn btn-block btn-primary mt-6"}>Close</Link>
@@ -120,8 +121,7 @@ export default function ConfigurePrice() {
                         }}/>
                 </div>
             </div>
-            <p className={"text text-sm font-light text-center mt-2"}>You could update the price, it will be applied to
-                all new messages</p>
+            <p className={"text text-sm font-light text-center mt-2"}>The new price will apply to all future messages</p>
             <button className={"btn btn-lg btn-outline btn-block btn-primary mt-4"}
                     disabled={isNaN(newPrice) || !priceChanged} onClick={onClick}>Save
             </button>

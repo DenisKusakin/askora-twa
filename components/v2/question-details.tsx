@@ -12,6 +12,7 @@ import {TgMainButtonContext, TgMainButtonProps} from "@/context/tg-main-button-c
 import {useAuth} from "@/hooks/auth-hook";
 import {rejectQuestion, replyQuestion} from "@/services/api";
 import TransactionErrorDialog from "@/components/v2/transaction-failed-dialog";
+import {TONVIEWER_BASE_PATH} from "@/conf";
 
 export default function QuestionDetails({question}: { question: QuestionData }) {
     const myConnectedWallet = useMyConnectedWallet()
@@ -83,7 +84,7 @@ export default function QuestionDetails({question}: { question: QuestionData }) 
         {transaction?.hash != null && <>
             <div className={"text text-xs break-all"} onClick={copyTextHandler(transaction.hash)}>
                 <b>Hash</b>: {transaction.hash}</div>
-            <Link className={"link link-primary"} href={`https://testnet.tonviewer.com/transaction/${transaction}`}
+            <Link className={"link link-primary"} href={`${TONVIEWER_BASE_PATH}/transaction/${transaction}`}
                   target={"_blank"}>Tonviewer</Link></>}
         <Link href={`/`}
               className={"btn btn-block btn-primary mt-6"}>Close</Link>
