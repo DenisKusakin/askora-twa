@@ -14,6 +14,7 @@ import {useAuth} from "@/hooks/auth-hook";
 import {changeDescription} from "@/services/api";
 import TransactionErrorDialog from "@/components/v2/transaction-failed-dialog";
 import {TONVIEWER_BASE_PATH} from "@/conf";
+import {useRouter} from "next/navigation";
 
 export default function ConfigurePrice() {
     const myConnectedWallet = useMyConnectedWallet()
@@ -26,6 +27,14 @@ export default function ConfigurePrice() {
         error?: string
     } | null>(null)
     const {sponsoredTransactionsEnabled, updateTonProof} = useAuth()
+    const router = useRouter()
+    const [isInProgress, setInProgress] = useState(false)
+
+    useEffect(() => {
+        if (myConnectedWallet === null) {
+            router.push("/")
+        }
+    }, [myConnectedWallet, router]);
 
     useEffect(() => {
         setDescription(myProfileInfo?.description || '')
@@ -33,6 +42,7 @@ export default function ConfigurePrice() {
 
     const onClick = useCallback(() => {
         if (myProfileInfo?.address != null) {
+            setInProgress(true)
             const transactionPromise = sponsoredTransactionsEnabled ? changeDescription(description) : tonConnectUI
                 .sendTransaction(updateDescriptionTransaction(myProfileInfo?.address, description))
             transactionPromise
@@ -53,8 +63,9 @@ export default function ConfigurePrice() {
                     }
                     console.log("Err", e)
                 })
+                .then(() => setInProgress(false))
         }
-    }, [myProfileInfo?.address, description, tonConnectUI, sponsoredTransactionsEnabled])
+    }, [myProfileInfo?.address, description, tonConnectUI, sponsoredTransactionsEnabled, setInProgress])
 
     // useEffect(() => {
     //     if (sponsoredTransactionsEnabled && transaction?.error === 'unauthorized') {
@@ -66,16 +77,6 @@ export default function ConfigurePrice() {
         updateTonProof().then(() => setTransaction(null))
     }, [updateTonProof, setTransaction])
 
-    const onConnectClick = () => {
-        tonConnectUI.openModal()
-    }
-    if (myConnectedWallet === null) {
-        return <div className={"pt-10"}>
-            <button className={"btn btn-outline btn-block btn-primary btn-lg mt-50"}
-                    onClick={onConnectClick}>Connect
-            </button>
-        </div>
-    }
     if (myProfileInfo === undefined) {
         return <div className={"w-full mt-[50%] flex justify-center"}>
             <div className={"loading loading-ring w-[125px] h-[125px]"}></div>
@@ -125,7 +126,9 @@ export default function ConfigurePrice() {
             </div>
             <p className={"text text-sm font-light text-center mt-2"}>This text will be shown on your account page</p>
             <button className={"btn btn-lg btn-block btn-primary mt-4"}
-                    disabled={!descriptionChanged} onClick={onClick}>Save
+                    disabled={!descriptionChanged || isInProgress} onClick={onClick}>Save
+                {isInProgress &&
+                    <span className={"loading loading-dots"}></span>}
             </button>
             <Link href="/" className={"btn btn-lg btn-error btn-block btn-outline mt-2"}>Cancel</Link>
         </div>

@@ -14,6 +14,7 @@ import {useAuth} from "@/hooks/auth-hook";
 import {changePrice} from "@/services/api";
 import TransactionErrorDialog from "@/components/v2/transaction-failed-dialog";
 import {TONVIEWER_BASE_PATH} from "@/conf";
+import {useRouter} from "next/navigation";
 
 export default function ConfigurePrice() {
     const myConnectedWallet = useMyConnectedWallet()
@@ -26,6 +27,14 @@ export default function ConfigurePrice() {
         error?: string
     } | null>(null)
     const {sponsoredTransactionsEnabled, updateTonProof} = useAuth()
+    const [isInProgress, setInProgress] = useState(false)
+
+    const router = useRouter()
+    useEffect(() => {
+        if (myConnectedWallet === null) {
+            router.push("/")
+        }
+    }, [myConnectedWallet, router]);
 
     const renewSession = useCallback(() => {
         updateTonProof().then(() => setTransaction(null))
@@ -37,6 +46,7 @@ export default function ConfigurePrice() {
 
     const onClick = useCallback(() => {
         if (myProfileInfo?.address != null) {
+            setInProgress(true)
             const sendTransactionPromise = sponsoredTransactionsEnabled ? changePrice(toNano(newPrice)) : tonConnectUI.sendTransaction(updatePriceTransaction(myProfileInfo?.address, toNano(newPrice)))
             sendTransactionPromise
                 .then(resp => {
@@ -50,24 +60,15 @@ export default function ConfigurePrice() {
                         setTransaction({hash: null, isSponsored: true})
                     }
                 }).catch(e => {
-                    if (e instanceof Error) {
-                        setTransaction({hash: null, isSponsored: sponsoredTransactionsEnabled, error: e.message})
-                    }
-                    console.log("Err", e)
-                })
+                if (e instanceof Error) {
+                    setTransaction({hash: null, isSponsored: sponsoredTransactionsEnabled, error: e.message})
+                }
+                console.log("Err", e)
+            })
+                .then(() => setInProgress(false))
         }
     }, [myProfileInfo?.address, tonConnectUI, sponsoredTransactionsEnabled, newPrice])
 
-    const onConnectClick = () => {
-        tonConnectUI.openModal()
-    }
-    if (myConnectedWallet === null) {
-        return <div className={"pt-10"}>
-            <button className={"btn btn-outline btn-block btn-primary btn-lg mt-50"}
-                    onClick={onConnectClick}>Connect
-            </button>
-        </div>
-    }
     if (myProfileInfo === undefined) {
         return <div className={"w-full mt-[50%] flex justify-center"}>
             <div className={"loading loading-ring w-[125px] h-[125px]"}></div>
@@ -78,10 +79,11 @@ export default function ConfigurePrice() {
     }
     const priceChanged = !isNaN(newPrice) && toNano(newPrice) !== myProfileInfo.price
     const dialogContent = <div>
-        {transaction?.hash != null && <><div className={"text text-xs break-all"} onClick={copyTextHandler(transaction.hash || '')}>
-            <b>Hash</b>: {transaction.hash}</div>
-        <Link className={"link link-primary"} href={`${TONVIEWER_BASE_PATH}/transaction/${transaction.hash}`}
-              target={"_blank"}>Tonviewer</Link></>}
+        {transaction?.hash != null && <>
+            <div className={"text text-xs break-all"} onClick={copyTextHandler(transaction.hash || '')}>
+                <b>Hash</b>: {transaction.hash}</div>
+            <Link className={"link link-primary"} href={`${TONVIEWER_BASE_PATH}/transaction/${transaction.hash}`}
+                  target={"_blank"}>Tonviewer</Link></>}
         <Link href={`/`}
               className={"btn btn-block btn-primary mt-6"}>Close</Link>
     </div>
@@ -121,9 +123,12 @@ export default function ConfigurePrice() {
                         }}/>
                 </div>
             </div>
-            <p className={"text text-sm font-light text-center mt-2"}>The new price will apply to all future messages</p>
-            <button className={"btn btn-lg btn-outline btn-block btn-primary mt-4"}
-                    disabled={isNaN(newPrice) || !priceChanged} onClick={onClick}>Save
+            <p className={"text text-sm font-light text-center mt-2"}>The new price will apply to all future
+                messages</p>
+            <button className={"btn btn-lg btn-block btn-primary mt-4"}
+                    disabled={isNaN(newPrice) || !priceChanged || isInProgress} onClick={onClick}>Save
+                {isInProgress &&
+                    <span className={"loading loading-dots"}></span>}
             </button>
             <Link href="/" className={"btn btn-lg btn-error btn-block btn-outline mt-2"}>Cancel</Link>
         </div>
