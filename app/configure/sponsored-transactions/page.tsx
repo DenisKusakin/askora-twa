@@ -7,14 +7,12 @@ export default function SponsoredTransactionsPage() {
     const router = useRouter();
 
     return <div className={"pt-10"}>
-        <p className={"text text-sm font-light text-center mt-2"}>Askora operates entirely on-chain, meaning all actions
-            require transaction fees. To enhance your experience, the service can cover these fees and send transactions
-            on your behalf at no cost.</p>
-        <p className={"text text-sm font-light text-center mt-2"}>
-            You can disable sponsored transactions at any time to experience a true Web3 application. This setting is
-            flexible and does not impact the core functionality of the app.
-        </p>
-
+        <p className={"text text-base font-light text-center mt-2"}>Askora operates on-chain, meaning transaction fees
+            apply. To improve your experience, we can cover these fees for you. You can enable and disable sponsored
+            transactions
+            anytime without affecting app functionality</p>
+        <p className={"text text-base font-light text-center mt-2"}>Using your own wallet speeds up transactions and avoids
+            potential delays, while sponsored ones may take longer, as they depend on the app</p>
         {auth.sponsoredTransactionsEnabled &&
             <button className={"btn btn-lg btn-block btn-primary mt-4"}
                     onClick={() => auth.setSponsoredTransactionsEnabled(false)}>Disable Sponsored
@@ -23,6 +21,7 @@ export default function SponsoredTransactionsPage() {
             <button className={"btn btn-lg btn-block btn-primary mt-4"}
                     onClick={() => auth.setSponsoredTransactionsEnabled(true)}>Enable Sponsored
                 Transactions</button>}
-        <button onClick={() => router.back()} className={"btn btn-lg btn-error btn-block btn-outline mt-2"}>Cancel</button>
+        <button onClick={() => router.back()} className={"btn btn-lg btn-error btn-block btn-outline mt-2"}>Cancel
+        </button>
     </div>
 }
