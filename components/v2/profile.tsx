@@ -15,8 +15,8 @@ export default function Profile({owner}: { owner: Address }) {
             .catch(() => setData({isLoading: false, data: null}))
     }, [owner]);
     if (data.isLoading) {
-        return <div className={"pt-10"}>
-            <div className={"loading loading-dots loading-lg"}></div>
+        return <div className={"w-full mt-[50%] flex justify-center"}>
+            <div className={"loading loading-ring w-[125px] h-[125px]"}></div>
         </div>
     }
     if (data.data == null) {
