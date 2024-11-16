@@ -2,7 +2,7 @@ import {Address} from "@ton/core";
 
 export const API_BASE_PATH = "https://askora-backend-bffb2.ondigitalocean.app"
 // export const API_BASE_PATH = "http://localhost:3002"
-export const APP_CONTRACT_ADDR = Address.parse("EQArh5llfXaidCXfylLdE6zf845H0k8pGEPuzpXghVpS5A2X")
+export const APP_CONTRACT_ADDR = Address.parse("EQB7NrSxTqA1PNAO7b-RKLrCuGhBeC6A2FDn5-C1WiGIgsLC")
 
 export const TON_API_ENDPOINT = 'https://testnet.toncenter.com/api/v2/jsonRPC'
 export const TONVIEWER_BASE_PATH = "https://testnet.tonviewer.com"
