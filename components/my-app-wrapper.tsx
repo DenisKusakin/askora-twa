@@ -1,7 +1,7 @@
 'use client';
 
-import {ReactElement, ReactNode, useCallback, useContext, useEffect, useState} from "react";
-import {MyAssignedQuestionsContext, MySubmittedQuestionsContext} from "@/app/context/my-questions-context";
+import {ReactElement, ReactNode, useCallback, useContext, useEffect, useMemo, useRef, useState} from "react";
+import {MyAssignedQuestionsContext, MySubmittedQuestionsContext} from "@/context/my-questions-context";
 import {QuestionData} from "@/stores/questions-store";
 import {tonClient} from "@/wrappers/ton-client";
 import {
@@ -9,32 +9,109 @@ import {
     MyAccountContext,
     MyAccountInfoContext,
     TgConnectionStatus
-} from "@/app/context/my-account-context";
+} from "@/context/my-account-context";
 import {fetchIsSubscribed} from "@/services/api";
-import {MyTgContext} from "@/app/context/tg-context";
+import {MyTgContext} from "@/context/tg-context";
 import {OpenedContract} from "@ton/core";
 import {Account} from "@/wrappers/Account";
 import {Root} from "@/wrappers/Root";
 import {APP_CONTRACT_ADDR} from "@/conf";
-import {TonConnectUIProvider} from "@tonconnect/ui-react";
-import {useMyConnectedWallet} from "@/app/hooks/ton-hooks";
-import {TgMainButtonContext, TgMainButtonProps} from "@/app/context/tg-main-button-context";
+import {TonConnectUIProvider, useTonConnectUI} from "@tonconnect/ui-react";
+import {useMyConnectedWallet} from "@/hooks/ton-hooks";
+import {TgMainButtonContext, TgMainButtonProps} from "@/context/tg-main-button-context";
+import {AuthContext} from "@/context/auth-context";
+import {TonProofApi} from "@/services/TonProofApi";
+
+function AuthWrapper({children}: { children: ReactNode }) {
+    const firstProofLoading = useRef<boolean>(true);
+    const [tonConnectUI] = useTonConnectUI();
+    const sponsoredTransactionsSetting = typeof localStorage != 'undefined' ? localStorage.getItem('sponsored-transactions') : null
+    const [sponsoredTransactionsEnabled, setSponsoredTransactionsEnabled] = useState(sponsoredTransactionsSetting != null ? sponsoredTransactionsSetting === "true" : true)
+
+    const recreateProofPayload = useCallback(async () => {
+        if (tonConnectUI == null) {
+            return;
+        }
+        if (firstProofLoading.current) {
+            tonConnectUI.setConnectRequestParameters({state: 'loading'});
+            firstProofLoading.current = false;
+        }
+
+        const payload = sponsoredTransactionsEnabled ? await TonProofApi.generatePayload() : null;
+        if (payload) {
+            tonConnectUI.setConnectRequestParameters({state: 'ready', value: payload});
+        } else {
+            tonConnectUI.setConnectRequestParameters(null);
+        }
+    }, [tonConnectUI, firstProofLoading, sponsoredTransactionsEnabled])
+
+    const updateTonProof = useCallback(async () => {
+        await tonConnectUI.disconnect()
+        await recreateProofPayload()
+        return tonConnectUI.openModal()
+    }, [tonConnectUI, recreateProofPayload])
+
+    if (firstProofLoading.current) {
+        recreateProofPayload();
+    }
+
+    useEffect(() =>
+        tonConnectUI.onStatusChange(async w => {
+            if (!w) {
+                TonProofApi.reset();
+                return;
+            }
+            if (w.connectItems?.tonProof && 'proof' in w.connectItems.tonProof) {
+                await TonProofApi.checkProof(w.connectItems.tonProof.proof, w.account);
+            }
+
+            if (sponsoredTransactionsEnabled && !TonProofApi.accessToken) {
+                await tonConnectUI.disconnect();
+                return;
+            }
+        }), [tonConnectUI, sponsoredTransactionsEnabled]);
+
+    const connect = useCallback(() => {
+        return tonConnectUI.openModal()
+    }, [tonConnectUI])
+    const disconnect = useCallback(async () => {
+        await tonConnectUI.disconnect()
+        TonProofApi.reset()
+    }, [tonConnectUI])
+
+    const res = useMemo(() => ({
+        connect,
+        disconnect,
+        sponsoredTransactionsEnabled,
+        setSponsoredTransactionsEnabled: (enabled: boolean) => {
+            if (typeof localStorage != 'undefined') {
+                localStorage.setItem('sponsored-transactions', enabled ? "true" : "false")
+            }
+            setSponsoredTransactionsEnabled(enabled);
+        },
+        updateTonProof
+    }), [connect, disconnect, sponsoredTransactionsEnabled, updateTonProof])
+
+    return <AuthContext.Provider value={res}>
+        {children}
+    </AuthContext.Provider>
+}
 
 function TgMainButtonWrapper({children}: { children: ReactNode }) {
     const [currentProps, setCurrentProps] = useState<TgMainButtonProps | null>(null)
     //TODO: What if TG Api is not yet available?
     const setProps = (newProps: TgMainButtonProps) => {
-        if (newProps.visible != !currentProps?.visible){
-           if(newProps.visible){
-               // @ts-expect-error todo
-               window.Telegram.WebApp.MainButton.show();
-           } else {
-               // @ts-expect-error todo
-               window.Telegram.WebApp.MainButton.hide();
-           }
+        if (newProps.visible != !currentProps?.visible) {
+            if (newProps.visible) {
+                // @ts-expect-error todo
+                window.Telegram.WebApp.MainButton.show();
+            } else {
+                // @ts-expect-error todo
+                window.Telegram.WebApp.MainButton.hide();
+            }
         }
-        if(newProps.enabled !== !currentProps?.enabled) {
-            if(newProps.enabled){
+        if (newProps.enabled !== !currentProps?.enabled) {
+            if (newProps.enabled) {
                 // @ts-expect-error todo
                 window.Telegram.WebApp.MainButton.enable();
             } else {
@@ -42,11 +119,11 @@ function TgMainButtonWrapper({children}: { children: ReactNode }) {
                 window.Telegram.WebApp.MainButton.disable();
             }
         }
-        if(currentProps?.text !== newProps.text) {
+        if (currentProps?.text !== newProps.text) {
             // @ts-expect-error todo
             window.Telegram.WebApp.MainButton.setText(newProps.text);
         }
-        if(currentProps?.onClick != newProps.onClick) {
+        if (currentProps?.onClick != newProps.onClick) {
             if (currentProps?.onClick != null) {
                 // @ts-expect-error todo
                 window.Telegram.WebApp.MainButton.offClick(currentProps?.onClick)
@@ -281,17 +358,23 @@ function MyAssignedQuestionsWrapper({children}: { children: ReactElement }) {
 
 export default function MyAppWrapper({children}: { children: ReactNode }) {
 
-    return <TonConnectUIProvider manifestUrl={'https://askora-twa.vercel.app/tonconnect-manifest.json'} actionsConfiguration={{twaReturnUrl: `https://t.me/AskoraBot/app`, returnStrategy: 'back'}}>
-        <TgConnectionStatusWrapper>
-            <TgMainButtonWrapper>
-                <MyAccountInfoWrapper>
-                    <MyAssignedQuestionsWrapper>
-                        <SubmittedQuestions>
-                            {children}
-                        </SubmittedQuestions>
-                    </MyAssignedQuestionsWrapper>
-                </MyAccountInfoWrapper>
-            </TgMainButtonWrapper>
-        </TgConnectionStatusWrapper>
+    return <TonConnectUIProvider manifestUrl={'https://askora-twa.vercel.app/tonconnect-manifest.json'}
+                                 actionsConfiguration={{
+                                     twaReturnUrl: `https://t.me/AskoraBot/app`,
+                                     returnStrategy: 'back'
+                                 }}>
+        <AuthWrapper>
+            <TgConnectionStatusWrapper>
+                <TgMainButtonWrapper>
+                    <MyAccountInfoWrapper>
+                        <MyAssignedQuestionsWrapper>
+                            <SubmittedQuestions>
+                                {children}
+                            </SubmittedQuestions>
+                        </MyAssignedQuestionsWrapper>
+                    </MyAccountInfoWrapper>
+                </TgMainButtonWrapper>
+            </TgConnectionStatusWrapper>
+        </AuthWrapper>
     </TonConnectUIProvider>
 }

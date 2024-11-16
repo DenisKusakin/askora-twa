@@ -1,13 +1,13 @@
 import {useContext, useEffect, useState} from "react";
 import {toNano} from "@ton/core";
 import AccountCreationStatusDialog from "@/components/v2/account-creation-status-dialog";
-import {MyAccountInfoContext, TgConnectionStatus} from "@/app/context/my-account-context";
+import {MyAccountInfoContext, TgConnectionStatus} from "@/context/my-account-context";
 import {useTonConnectUI} from "@tonconnect/ui-react";
 import {createAccountTransaction} from "@/components/utils/transaction-utils";
-import {useMyConnectedWallet} from "@/app/hooks/ton-hooks";
-import {MyTgContext} from "@/app/context/tg-context";
+import {useMyConnectedWallet} from "@/hooks/ton-hooks";
+import {MyTgContext} from "@/context/tg-context";
 import {createAccount, subscribe} from "@/services/api";
-import {useAuth} from "@/app/hooks/auth-hook";
+import {useAuth} from "@/hooks/auth-hook";
 
 export default function CreateAccount() {
     const myConnectedWallet = useMyConnectedWallet()

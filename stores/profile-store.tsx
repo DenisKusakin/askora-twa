@@ -4,7 +4,7 @@ import {QuestionData} from "@/stores/questions-store";
 import {getAsignedQuestions, getSubmittedQuestions} from "@/wrappers/wrappers-utils";
 import {Root} from "@/wrappers/Root";
 import {APP_CONTRACT_ADDR} from "@/conf";
-import {AccountInfo} from "@/app/context/my-account-context";
+import {AccountInfo} from "@/context/my-account-context";
 
 export async function fetchAccountInfo(ownerAddr: Address): Promise<AccountInfo> {
     const rootContract = tonClient.open(Root.createFromAddress(APP_CONTRACT_ADDR))

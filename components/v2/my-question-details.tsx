@@ -1,6 +1,6 @@
 import QuestionDetails from "@/components/v2/question-details";
 import {useContext, useEffect} from "react";
-import {MyAssignedQuestionsContext} from "@/app/context/my-questions-context";
+import {MyAssignedQuestionsContext} from "@/context/my-questions-context";
 
 export default function MyQuestionDetails({id}: { id: number }) {
     const d = useContext(MyAssignedQuestionsContext)

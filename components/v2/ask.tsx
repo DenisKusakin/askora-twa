@@ -4,12 +4,12 @@ import {fetchAccountInfo} from "@/stores/profile-store";
 import {userFriendlyStr} from "@/components/utils/addr-utils";
 import Link from "next/link";
 import TransactionSucceedDialog from "@/components/v2/transaction-suceed-dialog";
-import {AccountInfo} from "@/app/context/my-account-context";
+import {AccountInfo} from "@/context/my-account-context";
 import {useTonConnectUI} from "@tonconnect/ui-react";
 import {createQuestionTransaction} from "@/components/utils/transaction-utils";
-import {useMyConnectedWallet} from "@/app/hooks/ton-hooks";
-import {TgMainButtonContext, TgMainButtonProps} from "@/app/context/tg-main-button-context";
-import {MyTgContext} from "@/app/context/tg-context";
+import {useMyConnectedWallet} from "@/hooks/ton-hooks";
+import {TgMainButtonContext, TgMainButtonProps} from "@/context/tg-main-button-context";
+import {MyTgContext} from "@/context/tg-context";
 import copyTextHandler from "@/utils/copy-util";
 
 export default function Ask({addr}: { addr: Address }) {

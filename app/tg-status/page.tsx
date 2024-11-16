@@ -3,9 +3,9 @@
 import {subscribe, unsubscribe} from "@/services/api";
 import Link from "next/link";
 import {useContext, useEffect, useState} from "react";
-import {TgConnectionStatus} from "@/app/context/my-account-context";
-import {MyTgContext} from "@/app/context/tg-context";
-import {useMyConnectedWallet} from "@/app/hooks/ton-hooks";
+import {TgConnectionStatus} from "@/context/my-account-context";
+import {MyTgContext} from "@/context/tg-context";
+import {useMyConnectedWallet} from "@/hooks/ton-hooks";
 
 export default function TgStatusPage() {
     const myConnectedWallet = useMyConnectedWallet()
@@ -56,7 +56,5 @@ export default function TgStatusPage() {
                     disabled={isStatusLoading}
                     onClick={onTgDisconnectClick}>Unlink Telegram {isStatusLoading &&
                 <span className={"loading loading-dots loading-lg"}></span>}</button>}
-        <p className={"text text-sm font-light text-center mt-2"}>🔐Your data is stored securely and only your Telegram
-            ID is saved</p>
     </div>
 }

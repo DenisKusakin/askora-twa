@@ -5,12 +5,12 @@ import Link from "next/link";
 import {updateDescriptionTransaction} from "@/components/utils/transaction-utils";
 import CreateAccount from "@/components/v2/create-account";
 import TransactionSucceedDialog from "@/components/v2/transaction-suceed-dialog";
-import {MyAccountInfoContext} from "@/app/context/my-account-context";
+import {MyAccountInfoContext} from "@/context/my-account-context";
 import {useTonConnectUI} from "@tonconnect/ui-react";
-import {useMyConnectedWallet} from "@/app/hooks/ton-hooks";
+import {useMyConnectedWallet} from "@/hooks/ton-hooks";
 import {Cell} from "@ton/core";
 import copyTextHandler from "@/utils/copy-util";
-import {useAuth} from "@/app/hooks/auth-hook";
+import {useAuth} from "@/hooks/auth-hook";
 import {changeDescription} from "@/services/api";
 import TransactionErrorDialog from "@/components/v2/transaction-failed-dialog";
 
@@ -76,7 +76,9 @@ export default function ConfigurePrice() {
         </div>
     }
     if (myProfileInfo === undefined) {
-        return <div className={"loading loading-lg loading-dots pt-10"}></div>
+        return <div className={"w-full mt-[50%] flex justify-center"}>
+            <div className={"loading loading-ring w-[125px] h-[125px]"}></div>
+        </div>
     }
     if (myProfileInfo === null) {
         return <CreateAccount/>

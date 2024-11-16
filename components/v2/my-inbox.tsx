@@ -1,8 +1,8 @@
 import MessageListItem from "@/components/v2/msg-list-item";
 import {useContext, useEffect} from "react";
-import {MyAssignedQuestionsContext} from "@/app/context/my-questions-context";
+import {MyAssignedQuestionsContext} from "@/context/my-questions-context";
 import {QuestionData} from "@/stores/questions-store";
-import {MyAccountInfoContext} from "@/app/context/my-account-context";
+import {MyAccountInfoContext} from "@/context/my-account-context";
 
 export default function MyInbox() {
     const context = useContext(MyAssignedQuestionsContext)

@@ -1,7 +1,7 @@
 import "./globals.css";
 import MyHead from "@/app/head";
-import MyAppWrapper from "@/app/my-app-wrapper";
-import MyTgContextWrapper from "@/app/MyTgContextWrapper";
+import MyTgContextWrapper from "@/components/MyTgContextWrapper";
+import MyAppWrapper from "@/components/my-app-wrapper";
 
 export const metadata = {
     title: 'Askora',

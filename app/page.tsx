@@ -3,7 +3,7 @@
 import MyProfile from "@/components/v2/my-profile";
 import {useContext, useEffect} from "react";
 import {useRouter} from "next/navigation";
-import {MyTgContext} from "@/app/context/tg-context";
+import {MyTgContext} from "@/context/tg-context";
 
 export default function Home() {
     const tgStartParam = useContext(MyTgContext).startParam

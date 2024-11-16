@@ -3,10 +3,10 @@ import Link from "next/link";
 import CreateAccount from "@/components/v2/create-account";
 import copyTextHandler from "@/utils/copy-util";
 import {useContext} from "react";
-import {MyAccountInfoContext, TgConnectionStatus} from "@/app/context/my-account-context";
-import {MyTgContext} from "@/app/context/tg-context";
-import {useMyConnectedWallet} from "@/app/hooks/ton-hooks";
-import {useAuth} from "@/app/hooks/auth-hook";
+import {MyAccountInfoContext, TgConnectionStatus} from "@/context/my-account-context";
+import {MyTgContext} from "@/context/tg-context";
+import {useMyConnectedWallet} from "@/hooks/ton-hooks";
+import {useAuth} from "@/hooks/auth-hook";
 
 export default function MyProfile() {
     const myConnectedWallet = useMyConnectedWallet()
@@ -15,14 +15,11 @@ export default function MyProfile() {
 
     const tgConnectionStatus = useContext(TgConnectionStatus).info
     const tgId = useContext(MyTgContext).info?.tgId
-    // const [tonConnectUI] = useTonConnectUI();
 
     const onDisconnectClick = () => {
-        //tonConnectUI?.disconnect()
         auth.disconnect()
     }
     const onConnectClick = () => {
-        //tonConnectUI?.modal?.open()
         auth.connect()
     }
     const onShareClick = () => {
@@ -82,13 +79,6 @@ export default function MyProfile() {
                 </Link> : <Link href={"/configure/description"}
                                 className={"text mt-2 text-base italic text-center font-extralight"}>Set
                     description</Link>}
-            {/*<div className={"mt-5 flex flex-row"}>*/}
-            {/*    <Link href={"/configure"} className={"btn btn-sm btn-primary btn-outline ml-4"}>Change The*/}
-            {/*        Price</Link>*/}
-            {/*    <button className={"btn btn-sm btn-primary ml-4"}*/}
-            {/*            onClick={onShareClick}>Share*/}
-            {/*    </button>*/}
-            {/*</div>*/}
             {tgConnectionBadge != null && <div className={"mt-5"}>{tgConnectionBadge}</div>}
             <div className={"mt-5 w-full"}>
                 <Link href={"/inbox"} className="btn btn-block">
@@ -106,6 +96,7 @@ export default function MyProfile() {
                 <button className={"btn btn-error btn-outline btn-block btn-lg mt-4"}
                         onClick={onDisconnectClick}>Disconnect
                 </button>
+                <Link href={"/configure/sponsored-transactions"} className={"btn btn-warning btn-outline btn-lg mt-4 btn-block"}>Advanced</Link>
             </div>
             <div className={"mt-20"}>
                 <div className={"text-xs break-all font-light mb-1"}

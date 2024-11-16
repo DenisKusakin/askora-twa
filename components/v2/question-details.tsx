@@ -4,12 +4,12 @@ import {useCallback, useContext, useEffect, useMemo, useState} from "react";
 import Link from "next/link";
 import TransactionSucceedDialog from "@/components/v2/transaction-suceed-dialog";
 import copyTextHandler from "@/utils/copy-util";
-import {MyTgContext} from "@/app/context/tg-context";
+import {MyTgContext} from "@/context/tg-context";
 import {rejectQuestionTransaction, replyTransaction} from "@/components/utils/transaction-utils";
 import {useTonConnectUI} from "@tonconnect/ui-react";
-import {useMyConnectedWallet} from "@/app/hooks/ton-hooks";
-import {TgMainButtonContext, TgMainButtonProps} from "@/app/context/tg-main-button-context";
-import {useAuth} from "@/app/hooks/auth-hook";
+import {useMyConnectedWallet} from "@/hooks/ton-hooks";
+import {TgMainButtonContext, TgMainButtonProps} from "@/context/tg-main-button-context";
+import {useAuth} from "@/hooks/auth-hook";
 import {rejectQuestion, replyQuestion} from "@/services/api";
 import TransactionErrorDialog from "@/components/v2/transaction-failed-dialog";
 

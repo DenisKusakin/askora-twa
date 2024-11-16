@@ -3,9 +3,9 @@
 import CreateAccount from "@/components/v2/create-account";
 import copyTextHandler from "@/utils/copy-util";
 import {useContext} from "react";
-import {MyAccountInfoContext} from "@/app/context/my-account-context";
+import {MyAccountInfoContext} from "@/context/my-account-context";
 import {useTonConnectUI} from "@tonconnect/ui-react";
-import {useMyConnectedWallet} from "@/app/hooks/ton-hooks";
+import {useMyConnectedWallet} from "@/hooks/ton-hooks";
 
 export default function MyDetailsPage() {
     const myAccountInfo = useContext(MyAccountInfoContext).info

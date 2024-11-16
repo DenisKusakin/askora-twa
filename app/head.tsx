@@ -2,7 +2,7 @@
 
 import Script from "next/script";
 import {useContext} from "react";
-import {MyTgContext} from "@/app/context/tg-context";
+import {MyTgContext} from "@/context/tg-context";
 
 export default function MyHead() {
     const tgContext = useContext(MyTgContext)

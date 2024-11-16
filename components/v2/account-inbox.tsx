@@ -17,7 +17,7 @@ export default function AccountInbox({owner}: { owner: Address }) {
         <div className={"flex w-full mt-4 flex-col"}>
             {assigned?.isLoading && <div className={"loading loading-dots loading-xl"}></div>}
             {!assigned?.isLoading && assigned?.data?.map(x => <MessageListItem key={x.addr.toString()} addr={x.from}
-                                                                               link={`/my-question?id=${x.id}`}
+                                                                               link={`/q-details?owner_id=${owner.toString()}&q_id=${x.id}`}
                                                                                isClosed={x.isClosed}
                                                                                isRejected={x.isRejected}
                                                                                className={"mt-1"}
