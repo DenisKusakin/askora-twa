@@ -171,7 +171,7 @@ function MyAccountInfoWrapper({children}: { children: ReactNode }) {
         if (myConnectedWallet === undefined) {
             setMyAccount(undefined)
         } else if (myConnectedWallet === null) {
-            setMyAccount(null)
+            setMyAccount(undefined)
         } else {
             const rootContract = tonClient.open(Root.createFromAddress(APP_CONTRACT_ADDR))
             rootContract.getAccount(myConnectedWallet)

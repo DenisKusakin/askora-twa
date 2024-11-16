@@ -28,7 +28,7 @@ export default function MyProfile() {
         }
         navigator.share({url: `https://t.me/AskoraBot/app?startapp=0_${myConnectedWallet}`})
     }
-    if (myConnectedWallet === undefined || myAccountInfo === undefined) {
+    if (myConnectedWallet === undefined || (myConnectedWallet !== null && myAccountInfo === undefined)) {
         return <div className={"w-full mt-[50%] flex justify-center"}>
             <div className={"loading loading-ring w-[125px] h-[125px]"}></div>
         </div>
@@ -83,7 +83,7 @@ export default function MyProfile() {
     return <div className={"pt-10"}>
         <div className={"flex flex-col items-center"}>
             {/*<div className={"text-neutral text-xl"}>Price</div>*/}
-            {myAccountInfo !== null && <Link href={"/configure"}>
+            {myAccountInfo != null && <Link href={"/configure"}>
                 <span className={"text-3xl font-bold"}>{parseFloat(fromNano(myAccountInfo.price))}</span>
                 <span className={"text-xl ml-2"}>TON</span>
             </Link>}
