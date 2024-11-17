@@ -28,7 +28,7 @@ export default function MessageListItem({addr, amount, createdAt, className, isC
             <div className={"flex flex-row w-3/12 justify-center"}>
                 <div className={"flex flex-row justify-center items-center"}>
                     <div
-                        className={`text-lg text-right ${additional_class}`}>{parseFloat(fromNano(amount)).toFixed(3)}</div>
+                        className={`text-lg text-right ${additional_class}`}>{parseFloat(fromNano(amount))}</div>
                     <div className={`ml-1 text-xs ${additional_class}`}>TON</div>
                 </div>
             </div>

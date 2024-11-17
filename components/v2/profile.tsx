@@ -29,7 +29,6 @@ export default function Profile({owner}: { owner: Address }) {
 
     return <div className={"pt-10"}>
         <div className={"flex flex-col items-center"}>
-            <div className={"text-neutral text-xl"}>Price</div>
             <div className={""}>
                 <span className={"text-5xl font-bold"}>{priceUserFriendly}</span>
                 <span className={"text-3xl ml-2"}>TON</span>

@@ -74,10 +74,10 @@ export default function Ask({addr}: { addr: Address }) {
         </>
     }
 
-    const accountRewardFormatted = parseFloat(fromNano(accountInfo.data.price)).toFixed(3)
-    const totalFeeFormatted = totalFee != null ? parseFloat(fromNano(totalFee)).toFixed(3) : null
-    const serviceFeeFormatted = serviceFee != null ? parseFloat(fromNano(serviceFee)).toFixed(3) : null
-    const transactionFeeFormatted = parseFloat(fromNano(transactionFee)).toFixed(3)
+    const accountRewardFormatted = parseFloat(fromNano(accountInfo.data.price))
+    const totalFeeFormatted = totalFee != null ? parseFloat(fromNano(totalFee)) : null
+    const serviceFeeFormatted = serviceFee != null ? parseFloat(fromNano(serviceFee)) : null
+    const transactionFeeFormatted = parseFloat(fromNano(transactionFee))
 
     const transactionSuccessLinks = <div>
         <div className={"text text-xs break-all"} onClick={copyTextHandler(transactionHash || '')}>
@@ -96,13 +96,17 @@ export default function Ask({addr}: { addr: Address }) {
         {(transactionHash !== null) && <TransactionSucceedDialog content={transactionSuccessLinks}/>}
         <div className={"pt-10"}>
             <div>
-                <div className={"text font-light"}>Question for</div>
-                <div className={""}>{userFriendlyStr(accountInfo.data.address.toString())}</div>
-                <div className={"text font-light mt-1"}>Price</div>
-                <div className={"text text-sm"}>reward + service fee + transaction const</div>
-                <div
-                    className={"text"}>{totalFeeFormatted}={accountRewardFormatted} + {serviceFeeFormatted} + {transactionFeeFormatted}</div>
-                <div className={"text text-sm"}>unused transaction fees are refunded instantly</div>
+                <div className={"flex flex-row"}>
+                    <div className={"text font-light"}>Question for</div>
+                    <Link className={"text text-base ml-4"} href={`/account?id=${addr.toString()}`}>{userFriendlyStr(addr.toString())}</Link>
+                </div>
+                <div className={"flex flex-row mt-1"}>
+                    <div className={"text font-light"}>Price</div>
+                    <div
+                        className={"text text-base ml-4"}>{totalFeeFormatted}={accountRewardFormatted} + {serviceFeeFormatted} + {transactionFeeFormatted}</div>
+                </div>
+                <div className={"text text-xs font-light"}>reward + service fee + transaction const</div>
+                <div className={"text text-xs font-light"}>unused transaction fees are refunded instantly</div>
             </div>
             <textarea className={"textarea textarea-bordered textarea-lg mt-4 w-full h-[200px]"} value={text}
                       onChange={e => setText(e.target.value)}/>

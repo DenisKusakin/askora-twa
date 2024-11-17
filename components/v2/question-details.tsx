@@ -132,7 +132,7 @@ export default function QuestionDetails({question}: { question: QuestionData }) 
             <div className={"flex flex-row mb-2"}>
                 <div className={"w-8/12"}>
                     <span
-                        className={`${!replyShown ? 'text-3xl' : 'text-xl'} ${additional_class}`}>{parseFloat(fromNano(question.minPrice)).toFixed(3)}</span>
+                        className={`${!replyShown ? 'text-3xl' : 'text-xl'} ${additional_class}`}>{parseFloat(fromNano(question.minPrice))}</span>
                     <span
                         className={`${!replyShown ? 'text-xl' : 'text-base'} text-3xl ml-2 ${additional_class}`}>TON</span>
                 </div>
