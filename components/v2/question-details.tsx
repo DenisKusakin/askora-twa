@@ -115,13 +115,13 @@ export default function QuestionDetails({question}: { question: QuestionData }) 
                 }
                 console.log("Err", e)
             })
-    }, [question.addr, question.id, tonConnectUI, sponsoredTransactionsEnabled])
+    }, [question.addr, tonConnectUI, sponsoredTransactionsEnabled])
 
     const dialogContent = <div>
         {transaction?.hash != null && <>
             <div className={"text text-xs break-all"} onClick={copyTextHandler(transaction.hash)}>
                 <b>Hash</b>: {transaction.hash}</div>
-            <Link className={"link link-primary"} href={`${TONVIEWER_BASE_PATH}/transaction/${transaction}`}
+            <Link className={"link link-primary"} href={`${TONVIEWER_BASE_PATH}/transaction/${transaction.hash}`}
                   target={"_blank"}>Tonviewer</Link></>}
         <Link href={`/`}
               className={"btn btn-block btn-primary mt-6"}>Close</Link>

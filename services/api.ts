@@ -58,7 +58,7 @@ export async function rejectQuestion(qId: number): Promise<void> {
 }
 
 export async function refundQuestion(questionAddr: Address): Promise<void> {
-    return callProtectedEndpoints('refund-question', {questionAddr})
+    return callProtectedEndpoints('refund-question', {questionAddr: questionAddr.toRawString()})
 }
 
 export async function changePrice(price: bigint): Promise<void> {

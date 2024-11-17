@@ -5,7 +5,7 @@ export default function AccountCreationStatusDialog({transactionHash}: {transact
             <div className={"p-4 flex items-center justify-center flex-col"}>
                 <div className={"text-lg"}>Account creation is in progress...</div>
                 {transactionHash === null && <div className={"text-xs mt-2"}>Waiting for transaction</div>}
-                {transactionHash !== null && <div className={"text-xs mt-2"}>Transaction has been issue, waiting for processing</div>}
+                {transactionHash !== null && <div className={"text-xs mt-2"}>Transaction has been issued, waiting for processing</div>}
                 <div className={"mt-5"}>
 
                 </div>

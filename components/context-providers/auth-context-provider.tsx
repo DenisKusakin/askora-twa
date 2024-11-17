@@ -8,6 +8,7 @@ export default function AuthContextProvider({children}: { children: ReactNode })
     const [tonConnectUI] = useTonConnectUI();
     const sponsoredTransactionsSetting = typeof localStorage != 'undefined' ? localStorage.getItem('sponsored-transactions') : null
     const [sponsoredTransactionsEnabled, setSponsoredTransactionsEnabled] = useState(sponsoredTransactionsSetting != null ? sponsoredTransactionsSetting === "true" : true)
+    const [canUseSponsoredTransactions, setCanUseSponsoredTransactions] = useState(false)
 
     const recreateProofPayload = useCallback(async () => {
         if (tonConnectUI == null) {
@@ -18,13 +19,13 @@ export default function AuthContextProvider({children}: { children: ReactNode })
             firstProofLoading.current = false;
         }
 
-        const payload = sponsoredTransactionsEnabled ? await TonProofApi.generatePayload() : null;
+        const payload = await TonProofApi.generatePayload();
         if (payload) {
             tonConnectUI.setConnectRequestParameters({state: 'ready', value: payload});
         } else {
             tonConnectUI.setConnectRequestParameters(null);
         }
-    }, [tonConnectUI, firstProofLoading, sponsoredTransactionsEnabled])
+    }, [tonConnectUI, firstProofLoading])
 
     const updateTonProof = useCallback(async () => {
         await tonConnectUI.disconnect()
@@ -46,11 +47,12 @@ export default function AuthContextProvider({children}: { children: ReactNode })
                 await TonProofApi.checkProof(w.connectItems.tonProof.proof, w.account);
             }
 
-            if (sponsoredTransactionsEnabled && !TonProofApi.accessToken) {
-                await tonConnectUI.disconnect();
-                return;
-            }
-        }), [tonConnectUI, sponsoredTransactionsEnabled]);
+            setCanUseSponsoredTransactions(TonProofApi.accessToken != null)
+            // if (sponsoredTransactionsEnabled && !TonProofApi.accessToken) {
+            //     await tonConnectUI.disconnect();
+            //     return;
+            // }
+        }), [tonConnectUI]);
 
     const connect = useCallback(() => {
         return tonConnectUI.openModal()
@@ -70,8 +72,9 @@ export default function AuthContextProvider({children}: { children: ReactNode })
             }
             setSponsoredTransactionsEnabled(enabled);
         },
-        updateTonProof
-    }), [connect, disconnect, sponsoredTransactionsEnabled, updateTonProof])
+        updateTonProof,
+        canUseSponsoredTransactions
+    }), [connect, disconnect, sponsoredTransactionsEnabled, updateTonProof, canUseSponsoredTransactions])
 
     return <AuthContext.Provider value={res}>
         {children}

@@ -22,7 +22,7 @@ export default function CreateAccount() {
     const tgInitData = useContext(MyTgContext).info?.tgInitData
     const isInTelegram = !(tgInitData == null || tgInitData === '')
     const [description, setDescription] = useState('')
-    const {sponsoredTransactionsEnabled, setSponsoredTransactionsEnabled, updateTonProof} = useAuth()
+    const {sponsoredTransactionsEnabled, setSponsoredTransactionsEnabled, updateTonProof, canUseSponsoredTransactions} = useAuth()
     const [error, setError] = useState<string| null>(null)
     const [pollingRunning, setPollingRunning] = useState(false)
 
@@ -46,6 +46,7 @@ export default function CreateAccount() {
                 .then(() => setPollingRunning(true))
                 .catch(e => {
                     setError(e.message)
+                    setIsInProgress(false)
                     console.log(e)
                 })
                 .then(() => {
@@ -115,10 +116,12 @@ export default function CreateAccount() {
                 </div>}
             </div>
             <div className="form-control">
-                <label className="label cursor-pointer">
-                    <input type="checkbox" className="toggle toggle-primary" checked={sponsoredTransactionsEnabled} onChange={() => setSponsoredTransactionsEnabled(!sponsoredTransactionsEnabled)}/>
-                    <span className="label-text">Use Sponsored Transaction</span>
-                    <Link className={"text-info pl-20"} href={"/configure/sponsored-transactions"}>
+                <div className={"flex flex-row items-center justify-between"}>
+                    <label className="label cursor-pointer">
+                        <input type="checkbox" className="toggle toggle-primary" disabled={!canUseSponsoredTransactions} checked={canUseSponsoredTransactions && sponsoredTransactionsEnabled} onChange={() => setSponsoredTransactionsEnabled(!sponsoredTransactionsEnabled)}/>
+                        <span className="label-text pl-2">Use Sponsored Transaction</span>
+                    </label>
+                    <Link className={"text-info pl-4"} href={"/configure/sponsored-transactions"}>
                         <svg
                             xmlns="http://www.w3.org/2000/svg"
                             fill="none"
@@ -131,7 +134,8 @@ export default function CreateAccount() {
                                 d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                         </svg>
                     </Link>
-                </label>
+                </div>
+                {!canUseSponsoredTransactions && <span className={"text text-xs text-red-700 italic"}>Sponsored transactions are not available at the moment. If you&apos;d like to use, please reconnect</span>}
             </div>
             <button disabled={isNaN(price)} className={"btn btn-block btn-lg btn-primary mt-5"} onClick={onClick}>Create
                 Account
