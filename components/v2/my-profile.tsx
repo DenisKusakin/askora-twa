@@ -26,7 +26,7 @@ export default function MyProfile() {
         if (myConnectedWallet == null) {
             return
         }
-        navigator.share({url: `https://t.me/AskoraBot/app?startapp=0_${myConnectedWallet}`})
+        navigator.share({url: `https://t.me/AskoraBot/app?startapp=0_${myConnectedWallet}`, title: 'Share this link with your audience'})
     }
     if (myConnectedWallet === undefined || (myConnectedWallet !== null && myAccountInfo === undefined)) {
         return <div className={"w-full mt-[50%] flex justify-center"}>
@@ -104,12 +104,12 @@ export default function MyProfile() {
                 <button className={"btn btn-block btn-primary btn-lg mt-10"}
                         onClick={onShareClick}>Share
                 </button>
-                <Link href={"/about"} className={"btn btn-outline btn-info btn-lg btn-block mt-4"}>About</Link>
                 <Link href={"/find"} className={"btn btn-primary btn-outline btn-lg mt-4 btn-block"}>Find
                     User</Link>
                 <button className={"btn btn-error btn-outline btn-block btn-lg mt-4"}
                         onClick={onDisconnectClick}>Disconnect
                 </button>
+                <Link href={"/about"} className={"btn btn-outline btn-info btn-lg btn-block mt-4"}>About</Link>
                 <Link href={"/configure/sponsored-transactions"} className={"btn btn-warning btn-outline btn-lg mt-4 btn-block"}>Advanced</Link>
             </div>
             <div className={"mt-20"}>

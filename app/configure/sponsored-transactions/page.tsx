@@ -11,8 +11,8 @@ export default function SponsoredTransactionsPage() {
             apply. To improve your experience, we can cover these fees for you. You can enable and disable sponsored
             transactions
             anytime without affecting app functionality</p>
-        <p className={"text text-base font-light text-center mt-2"}>Using your own wallet speeds up transactions and avoids
-            potential delays, while sponsored ones may take longer, as they depend on the app</p>
+        <p className={"text text-base font-light text-center mt-2"}>Using your own wallet speeds up transactions and
+            avoids delays, while sponsored transactions may take longer due to factors beyond the blockchain itself</p>
         {auth.sponsoredTransactionsEnabled &&
             <button className={"btn btn-lg btn-block btn-primary mt-4"}
                     onClick={() => auth.setSponsoredTransactionsEnabled(false)}>Disable Sponsored
