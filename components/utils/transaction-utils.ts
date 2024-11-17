@@ -51,6 +51,19 @@ export const rejectQuestionTransaction = (questionAddr: Address) => {
     }
 }
 
+export const refundQuestionTransaction = (questionAddr: Address) => {
+    const msg = beginCell().storeUint(BigInt("0x5616c572"), 32).endCell()
+
+    return {
+        validUntil: Math.floor(Date.now() / 1000) + 60,
+        messages: [{
+            address: questionAddr.toRawString(),
+            amount: toNano("0.1").toString(),
+            payload: msg.toBoc().toString('base64')
+        }]
+    }
+}
+
 export const updatePriceTransaction = (accountAddr: Address, price: bigint) => {
     const msg = beginCell()
         .storeUint(BigInt("0xaaacc05b"), 32)

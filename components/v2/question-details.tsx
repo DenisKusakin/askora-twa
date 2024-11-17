@@ -5,14 +5,20 @@ import Link from "next/link";
 import TransactionSucceedDialog from "@/components/v2/transaction-suceed-dialog";
 import copyTextHandler from "@/utils/copy-util";
 import {MyTgContext} from "@/context/tg-context";
-import {rejectQuestionTransaction, replyTransaction} from "@/components/utils/transaction-utils";
+import {
+    refundQuestionTransaction,
+    rejectQuestionTransaction,
+    replyTransaction
+} from "@/components/utils/transaction-utils";
 import {useTonConnectUI} from "@tonconnect/ui-react";
 import {useMyConnectedWallet} from "@/hooks/ton-hooks";
 import {TgMainButtonContext, TgMainButtonProps} from "@/context/tg-main-button-context";
 import {useAuth} from "@/hooks/auth-hook";
-import {rejectQuestion, replyQuestion} from "@/services/api";
+import {refundQuestion, rejectQuestion, replyQuestion} from "@/services/api";
 import TransactionErrorDialog from "@/components/v2/transaction-failed-dialog";
 import {TONVIEWER_BASE_PATH} from "@/conf";
+
+const questionValidForSec = 60//7 * 24 * 60 * 60;//7 days
 
 export default function QuestionDetails({question}: { question: QuestionData }) {
     const myConnectedWallet = useMyConnectedWallet()
@@ -87,6 +93,30 @@ export default function QuestionDetails({question}: { question: QuestionData }) 
             })
     }, [myReply, sponsoredTransactionsEnabled, question.addr, question.id, tonConnectUI])
 
+    const onRefundClick = useCallback(() => {
+        const transactionPromise = sponsoredTransactionsEnabled ? refundQuestion(question.addr) : tonConnectUI.sendTransaction(refundQuestionTransaction(question.addr))
+        setInProgress(true)
+        transactionPromise
+            .then(resp => {
+                if (resp) {
+                    const cell = Cell.fromBase64(resp.boc)
+                    const buffer = cell.hash();
+                    const hash = buffer.toString('hex');
+                    setTransaction({hash, isSponsored: false})
+                } else {
+                    setTransaction({hash: null, isSponsored: true})
+                }
+            })
+            .then(() => setInProgress(false))
+            .catch(e => {
+                setInProgress(false)
+                if (e instanceof Error) {
+                    setTransaction({hash: null, isSponsored: sponsoredTransactionsEnabled, error: e.message})
+                }
+                console.log("Err", e)
+            })
+    }, [question.addr, question.id, tonConnectUI, sponsoredTransactionsEnabled])
+
     const dialogContent = <div>
         {transaction?.hash != null && <>
             <div className={"text text-xs break-all"} onClick={copyTextHandler(transaction.hash)}>
@@ -121,6 +151,12 @@ export default function QuestionDetails({question}: { question: QuestionData }) 
         visible: replyShown && transaction === null,
         isProgressVisible: isProgress
     }), [onReplyClick, myReply, replyShown, transaction, isProgress])
+    const hasExpired = useMemo(() => {
+        const expiresAt = question.createdAt + questionValidForSec;
+        return (new Date().getTime()) / 1000 > expiresAt;
+
+    }, [question.createdAt])
+
     useEffect(() => {
         tgMainButton.setProps(tgMainButtonProps)
     }, [tgMainButtonProps, tgMainButton]);
@@ -222,6 +258,12 @@ export default function QuestionDetails({question}: { question: QuestionData }) 
                     </button>
                 </div>
             </>}
+            {!question.isClosed && hasExpired && isYou(question.from) &&
+                <button className={"btn btn-outline btn-block btn-lg btn-error mt-4"}
+                        disabled={isProgress}
+                        onClick={onRefundClick}>
+                    Refund
+                </button>}
         </div>
     </>
 }

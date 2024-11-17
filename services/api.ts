@@ -1,5 +1,6 @@
 import {API_BASE_PATH} from "@/conf";
 import {TonProofApi} from "@/services/TonProofApi";
+import {Address} from "@ton/core";
 
 export async function fetchIsSubscribed(tgId: string, walletAddr: string): Promise<boolean> {
     const response = await fetch(`${API_BASE_PATH}/subscribed?tg_id=${tgId}&wallet_addr=${walletAddr}`)
@@ -54,6 +55,10 @@ export async function replyQuestion(qId: number, replyContent: string): Promise<
 
 export async function rejectQuestion(qId: number): Promise<void> {
     return callProtectedEndpoints('reject-question', {qId})
+}
+
+export async function refundQuestion(questionAddr: Address): Promise<void> {
+    return callProtectedEndpoints('refund-question', {questionAddr})
 }
 
 export async function changePrice(price: bigint): Promise<void> {
