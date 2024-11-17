@@ -17,5 +17,6 @@ export default function FindUserPage() {
                           className={"btn mt-5 btn-primary btn-outline btn-block btn-lg"}>Go</Link>}
         {!isValid &&
             <button disabled={true} className={"btn mt-5 btn-primary btn-outline btn-block btn-lg"}>Go</button>}
+        <Link href="/" className={"btn btn-lg btn-error btn-block btn-outline mt-2"}>Back</Link>
     </div>
 }
