@@ -1,4 +1,4 @@
-import {useContext, useEffect, useState} from "react";
+import {useCallback, useContext, useEffect, useState} from "react";
 import {toNano} from "@ton/core";
 import AccountCreationStatusDialog from "@/components/v2/account-creation-status-dialog";
 import {MyAccountInfoContext, TgConnectionStatus} from "@/context/my-account-context";
@@ -9,6 +9,7 @@ import {MyTgContext} from "@/context/tg-context";
 import {createAccount, subscribe} from "@/services/api";
 import {useAuth} from "@/hooks/auth-hook";
 import Link from "next/link";
+import TransactionErrorDialog from "@/components/v2/transaction-failed-dialog";
 
 export default function CreateAccount() {
     const myConnectedWallet = useMyConnectedWallet()
@@ -21,35 +22,67 @@ export default function CreateAccount() {
     const tgInitData = useContext(MyTgContext).info?.tgInitData
     const isInTelegram = !(tgInitData == null || tgInitData === '')
     const [description, setDescription] = useState('')
-    const {sponsoredTransactionsEnabled, setSponsoredTransactionsEnabled} = useAuth()
+    const {sponsoredTransactionsEnabled, setSponsoredTransactionsEnabled, updateTonProof} = useAuth()
+    const [error, setError] = useState<string| null>(null)
+    const [pollingRunning, setPollingRunning] = useState(false)
 
     useEffect(() => {
-        if (isInProgress) {
+        if (pollingRunning) {
             if (info?.status === 'active') {
                 setIsInProgress(false)
+                setPollingRunning(false)
             } else {
                 const id = setInterval(refresh, 2000)
                 return () => clearInterval(id)
             }
         }
-    }, [isInProgress, info, refresh]);
+    }, [pollingRunning, info, refresh]);
 
     const onClick = () => {
         if (myConnectedWallet != null) {
             const sendTransactionPromise = sponsoredTransactionsEnabled ? createAccount(toNano(price), description) : tonConnectUI.sendTransaction(createAccountTransaction(toNano(price), description))
             setIsInProgress(true)
             sendTransactionPromise
+                .then(() => setPollingRunning(true))
+                .catch(e => {
+                    setError(e.message)
+                    console.log(e)
+                })
                 .then(() => {
                     if (isInTelegram && tgInitData != null) {
                         subscribe(tgInitData, myConnectedWallet.toString())
                             .then(tgConnectionStatusContext.refresh)
                     }
                 })
+                .catch(e => {
+                    //TODO: Add proper handling, fine for now
+                    console.log("Failed to connect telegram", e)
+                })
         }
     }
+    const renewSession = useCallback(() => {
+        updateTonProof().then(() => setError(null))
+    }, [updateTonProof, setError])
+
+    const sessionExpiredDialogContent = <>
+        <div className={"text text-lg text-center w-full"}>Session has expired</div>
+        <button className={"btn btn-block btn-primary mt-6"}
+                onClick={renewSession}>Renew Session
+        </button>
+        <button className={"btn btn-block btn-primary btn-outline mt-6"}
+                onClick={() => setError(null)}>Close
+        </button>
+    </>
+    const unknownErrorDialogContent = <div>
+        <span className={"text text-error"}>Something went wrong...</span>
+        <button className={"btn btn-block btn-primary mt-6"}
+                onClick={() => setError(null)}>Close
+        </button>
+    </div>
 
     return <>
-        {isInProgress && <AccountCreationStatusDialog/>}
+        {isInProgress && error === null && <AccountCreationStatusDialog transactionHash={pollingRunning ? '' : null}/>}
+        {error !== null && <TransactionErrorDialog content={error === 'unauthorized' ? sessionExpiredDialogContent : unknownErrorDialogContent}/>}
         <div className={"pt-10"}>
             <div className={"flex flex-col items-center"}>
                 <div className={"text-neutral text-xl"}>Price (TON)</div>
