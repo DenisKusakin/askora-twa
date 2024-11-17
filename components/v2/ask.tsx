@@ -50,7 +50,7 @@ export default function Ask({addr}: { addr: Address }) {
             .then(() => setActionProgress(false))
             .catch(() => setActionProgress(false))
 
-    }, [text, totalFee, accountInfo?.data, tonConnectUI, setActionProgress])
+    }, [text, totalFee, accountInfo?.data, tonConnectUI, setActionProgress, setTransactionHash])
     const isDisabled = text === '' || isActionInProgress
 
     const tgMainButtonProps: TgMainButtonProps = useMemo(() => ({
@@ -68,7 +68,7 @@ export default function Ask({addr}: { addr: Address }) {
             tgMainButton.setProps({...tgMainButtonProps, visible: false})
             setTransactionHash(null)
         }
-    }, [tgMainButton]);
+    }, []);
 
     if (accountInfo.isLoading || accountInfo.data == null || myConnectedWallet === undefined) {
         return <div className={"pt-10 loading loading-lg loading-dots"}/>
