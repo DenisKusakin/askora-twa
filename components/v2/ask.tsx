@@ -25,6 +25,7 @@ export default function Ask({addr}: { addr: Address }) {
     const serviceFee = accountInfo.data != null ? (accountInfo.data.price / 100n) * 5n : null
     const totalFee = accountInfo.data != null && serviceFee != null ? accountInfo.data.price + transactionFee + serviceFee : null
     const [transactionHash, setTransactionHash] = useState<null | string>(null)
+    const [isActionInProgress, setActionProgress] = useState(false)
 
     useEffect(() => {
         setAccountInfo({isLoading: true})
@@ -36,6 +37,7 @@ export default function Ask({addr}: { addr: Address }) {
         if (accountInfo.data == null || totalFee == null) {
             return;
         }
+        setActionProgress(true)
         const transaction = createQuestionTransaction(text, totalFee, accountInfo.data.address)
         tonConnectUI.sendTransaction(transaction)
             .then(resp => {
@@ -45,16 +47,19 @@ export default function Ask({addr}: { addr: Address }) {
 
                 setTransactionHash(hashHex)
             })
-    }, [text, totalFee, accountInfo?.data, tonConnectUI])
-    const isDisabled = text === ''
+            .then(() => setActionProgress(false))
+            .catch(() => setActionProgress(false))
+
+    }, [text, totalFee, accountInfo?.data, tonConnectUI, setActionProgress])
+    const isDisabled = text === '' || isActionInProgress
 
     const tgMainButtonProps: TgMainButtonProps = useMemo(() => ({
         text: `Submit`,
         visible: myConnectedWallet != null && transactionHash === null,
         enabled: !isDisabled,
         onClick: onSubmit,
-        isProgressVisible: false
-    }), [myConnectedWallet, isDisabled, onSubmit, transactionHash])
+        isProgressVisible: isActionInProgress
+    }), [myConnectedWallet, isDisabled, onSubmit, transactionHash, isActionInProgress])
     useEffect(() => {
         tgMainButton.setProps(tgMainButtonProps)
     }, [tgMainButtonProps, tgMainButton]);
