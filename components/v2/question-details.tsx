@@ -26,6 +26,7 @@ export default function QuestionDetails({question}: { question: QuestionData }) 
         error?: string
     } | null>(null)
     const {sponsoredTransactionsEnabled, updateTonProof} = useAuth()
+    const [isProgress, setInProgress] = useState(false)
 
     const renewSession = useCallback(() => {
         updateTonProof().then(() => setTransaction(null))
@@ -44,6 +45,7 @@ export default function QuestionDetails({question}: { question: QuestionData }) 
     }
 
     const onRejectClick = useCallback(() => {
+        setInProgress(true)
         const transactionPromise = sponsoredTransactionsEnabled ? rejectQuestion(question.id) : tonConnectUI.sendTransaction(rejectQuestionTransaction(question.addr))
         transactionPromise
             .then(resp => {
@@ -57,10 +59,13 @@ export default function QuestionDetails({question}: { question: QuestionData }) 
                     setTransaction({hash: null, isSponsored: true})
                 }
             })
-    }, [question.id, question.addr, sponsoredTransactionsEnabled, tonConnectUI])
+            .then(() => setInProgress(false))
+            .catch(() => setInProgress(false))
+    }, [question.id, question.addr, sponsoredTransactionsEnabled, tonConnectUI, setInProgress])
 
     const onReplyClick = useCallback(() => {
         const transactionPromise = sponsoredTransactionsEnabled ? replyQuestion(question.id, myReply) : tonConnectUI.sendTransaction(replyTransaction(question.addr, myReply))
+        setInProgress(true)
         transactionPromise
             .then(resp => {
                 if (resp) {
@@ -72,7 +77,9 @@ export default function QuestionDetails({question}: { question: QuestionData }) 
                     setTransaction({hash: null, isSponsored: true})
                 }
             })
+            .then(() => setInProgress(false))
             .catch(e => {
+                setInProgress(false)
                 if (e instanceof Error) {
                     setTransaction({hash: null, isSponsored: sponsoredTransactionsEnabled, error: e.message})
                 }
@@ -111,8 +118,9 @@ export default function QuestionDetails({question}: { question: QuestionData }) 
         text: "Send Reply",
         onClick: onReplyClick,
         enabled: myReply.trim() !== '',
-        visible: replyShown && transaction === null
-    }), [onReplyClick, myReply, replyShown, transaction])
+        visible: replyShown && transaction === null,
+        isProgressVisible: isProgress
+    }), [onReplyClick, myReply, replyShown, transaction, isProgress])
     useEffect(() => {
         tgMainButton.setProps(tgMainButtonProps)
     }, [tgMainButtonProps, tgMainButton]);
@@ -191,7 +199,7 @@ export default function QuestionDetails({question}: { question: QuestionData }) 
                         onClick={() => setReplyShown(true)}>
                     Reply
                 </button>
-                <button className={"btn btn-block btn-lg btn-error mt-2"}
+                <button className={"btn btn-block btn-lg btn-error mt-2"} disabled={isProgress}
                         onClick={onRejectClick}>Reject
                 </button>
             </div>}
@@ -207,7 +215,7 @@ export default function QuestionDetails({question}: { question: QuestionData }) 
                 <div className={"mt-4"}>
                     {!isInTelegram && <button className={"btn btn-block btn-lg btn-primary"}
                                               onClick={onReplyClick}
-                                              disabled={myReply.trim() === ''}>Send Reply
+                                              disabled={myReply.trim() === '' || isProgress}>Send Reply
                     </button>}
                     <button className={"btn btn-outline btn-block btn-lg btn-error mt-2"}
                             onClick={() => setReplyShown(false)}>Cancel

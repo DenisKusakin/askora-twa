@@ -27,6 +27,15 @@ export default function TgMainButtonContextProvider({children}: { children: Reac
             // @ts-expect-error todo
             window.Telegram.WebApp.MainButton.setText(newProps.text);
         }
+        if (currentProps?.isProgressVisible !== newProps?.isProgressVisible) {
+            if (newProps?.isProgressVisible) {
+                // @ts-expect-error todo
+                window.Telegram.WebApp.MainButton.showProgress();
+            } else {
+                // @ts-expect-error todo
+                window.Telegram.WebApp.MainButton.hideProgress();
+            }
+        }
         if (currentProps?.onClick != newProps.onClick) {
             if (currentProps?.onClick != null) {
                 // @ts-expect-error todo

@@ -52,7 +52,8 @@ export default function Ask({addr}: { addr: Address }) {
         text: `Submit`,
         visible: myConnectedWallet != null && transactionHash === null,
         enabled: !isDisabled,
-        onClick: onSubmit
+        onClick: onSubmit,
+        isProgressVisible: false
     }), [myConnectedWallet, isDisabled, onSubmit, transactionHash])
     useEffect(() => {
         tgMainButton.setProps(tgMainButtonProps)

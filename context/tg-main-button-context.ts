@@ -4,7 +4,8 @@ export type TgMainButtonProps = {
     onClick: () => void,
     text: string,
     enabled: boolean,
-    visible: boolean
+    visible: boolean,
+    isProgressVisible: boolean
 }
 
 export const TgMainButtonContext = createContext<{
