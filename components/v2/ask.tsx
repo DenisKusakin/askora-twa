@@ -63,7 +63,7 @@ export default function Ask({addr}: { addr: Address }) {
             tgMainButton.setProps({...tgMainButtonProps, visible: false})
             setTransactionHash(null)
         }
-    }, []);
+    }, [tgMainButton]);
 
     if (accountInfo.isLoading || accountInfo.data == null || myConnectedWallet === undefined) {
         return <div className={"pt-10 loading loading-lg loading-dots"}/>
