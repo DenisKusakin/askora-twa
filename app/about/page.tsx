@@ -41,6 +41,11 @@ export default function AboutPage() {
             </p>
             <h2>Links</h2>
             <div className={"flex flex-col"}>
+                {/*<span className={"text text-lg mb-1"}>Community:</span>*/}
+                <Link href={"https://t.me/askora_community"} target={"_blank"}
+                      className={"btn btn-primary mb-1"}>Join Telegram Community</Link>
+            </div>
+            <div className={"flex flex-col mt-4"}>
                 <span className={"text text-xs mb-1"}>Application Contract:</span>
                 <span className={"text text-xs font-light break-all"}>{APP_CONTRACT_ADDR.toString()}</span>
                 <Link target={"_blank"} className={"link link-sm text-xs link-primary mb-1"}

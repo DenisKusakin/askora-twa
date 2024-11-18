@@ -18,7 +18,7 @@ import {refundQuestion, rejectQuestion, replyQuestion} from "@/services/api";
 import TransactionErrorDialog from "@/components/v2/transaction-failed-dialog";
 import {TONVIEWER_BASE_PATH} from "@/conf";
 
-const questionValidForSec = 60//7 * 24 * 60 * 60;//7 days
+const questionValidForSec = 7 * 24 * 60 * 60;//7 days
 
 export default function QuestionDetails({question}: { question: QuestionData }) {
     const myConnectedWallet = useMyConnectedWallet()
@@ -174,6 +174,7 @@ export default function QuestionDetails({question}: { question: QuestionData }) 
                 content={transaction.error === 'unauthorized' ? sessionExpiredDialogContent : unknownErrorDialogContent}/>}
         <div className={"pt-10"}>
             <div className={"flex flex-row mb-2"}>
+                <p className={"text text-base text-xs font-light break-all"}>{question.addr.toString()}</p>
                 <div className={"w-8/12"}>
                     <span
                         className={`${!replyShown ? 'text-3xl' : 'text-xl'} ${additional_class}`}>{parseFloat(fromNano(question.minPrice))}</span>
