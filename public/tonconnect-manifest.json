@@ -1,7 +1,7 @@
 {
-  "url": "https://askora-twa.vercel.app",
+  "url": "https://askora.vercel.app",
   "name": "Askora",
-  "iconUrl": "https://askora-twa.vercel.app/app_icon_small.png",
-  "termsOfUseUrl": "https://askora-twa.vercel.app/terms.html",
-  "privacyPolicyUrl": "https://askora-twa.vercel.app/privacy-policy.html"
+  "iconUrl": "https://askora.vercel.app/app_icon_small.png",
+  "termsOfUseUrl": "https://askora.vercel.app/terms.html",
+  "privacyPolicyUrl": "https://askora.vercel.app/privacy-policy.html"
 }

@@ -13,7 +13,7 @@ import MyAssignedQuestionsContextProvider from "@/components/context-providers/m
 
 export default function MyAppWrapper({children}: { children: ReactNode }) {
 
-    return <TonConnectUIProvider manifestUrl={'https://askora-twa.vercel.app/tonconnect-manifest.json'}
+    return <TonConnectUIProvider manifestUrl={'https://askora.vercel.app/tonconnect-manifest.json'}
                                  actionsConfiguration={{
                                      twaReturnUrl: `https://t.me/AskoraBot/app`,
                                      returnStrategy: 'back'
