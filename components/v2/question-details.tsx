@@ -174,7 +174,6 @@ export default function QuestionDetails({question}: { question: QuestionData }) 
                 content={transaction.error === 'unauthorized' ? sessionExpiredDialogContent : unknownErrorDialogContent}/>}
         <div className={"pt-10"}>
             <div className={"flex flex-row mb-2"}>
-                <p className={"text text-base text-xs font-light break-all"}>{question.addr.toString()}</p>
                 <div className={"w-8/12"}>
                     <span
                         className={`${!replyShown ? 'text-3xl' : 'text-xl'} ${additional_class}`}>{parseFloat(fromNano(question.minPrice))}</span>
