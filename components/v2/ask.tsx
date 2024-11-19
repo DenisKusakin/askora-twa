@@ -12,6 +12,7 @@ import {TgMainButtonContext, TgMainButtonProps} from "@/context/tg-main-button-c
 import {MyTgContext} from "@/context/tg-context";
 import copyTextHandler from "@/utils/copy-util";
 import {TONVIEWER_BASE_PATH} from "@/conf";
+import TransactionErrorDialog from "@/components/v2/transaction-failed-dialog";
 
 export default function Ask({addr}: { addr: Address }) {
     const [text, setText] = useState("")
@@ -26,6 +27,7 @@ export default function Ask({addr}: { addr: Address }) {
     const totalFee = accountInfo.data != null && serviceFee != null ? accountInfo.data.price + transactionFee + serviceFee : null
     const [transactionHash, setTransactionHash] = useState<null | string>(null)
     const [isActionInProgress, setActionProgress] = useState(false)
+    const [error, setError] = useState<string| null>(null)
 
     useEffect(() => {
         setAccountInfo({isLoading: true})
@@ -40,7 +42,6 @@ export default function Ask({addr}: { addr: Address }) {
         setActionProgress(true)
         const transaction = createQuestionTransaction(text, totalFee, accountInfo.data.address)
         const promise = tonConnectUI.sendTransaction(transaction)
-
         promise
             .then(resp => {
                 const cell = Cell.fromBase64(resp.boc)
@@ -50,7 +51,11 @@ export default function Ask({addr}: { addr: Address }) {
                 setTransactionHash(hashHex)
             })
             .then(() => setActionProgress(false))
-            .catch(() => setActionProgress(false))
+            .catch(e => {
+                setError('Something went wrong')
+                setActionProgress(false)
+                console.log(e)
+            })
 
     }, [text, totalFee, accountInfo?.data, tonConnectUI, setActionProgress, setTransactionHash])
     const isDisabled = text === '' || isActionInProgress
@@ -102,13 +107,24 @@ export default function Ask({addr}: { addr: Address }) {
     }
     const isInTelegram = !(tgInitData == null || tgInitData === '')
 
+    const unknownErrorDialogContent = <div>
+        <span className={"text text-error"}>Something went wrong...</span>
+        <button className={"btn btn-block btn-primary mt-6"}
+                onClick={() => setError(null)}>Close
+        </button>
+    </div>
+
     return <>
         {(transactionHash !== null) && <TransactionSucceedDialog content={transactionSuccessLinks}/>}
+        {error != null &&
+            <TransactionErrorDialog
+                content={unknownErrorDialogContent}/>}
         <div className={"pt-10"}>
             <div>
                 <div className={"flex flex-row"}>
                     <div className={"text font-light"}>Question for</div>
-                    <Link className={"text text-base ml-4"} href={`/account?id=${addr.toString()}`}>{userFriendlyStr(addr.toString())}</Link>
+                    <Link className={"text text-base ml-4"}
+                          href={`/account?id=${addr.toString()}`}>{userFriendlyStr(addr.toString())}</Link>
                 </div>
                 <div className={"flex flex-row mt-1"}>
                     <div className={"text font-light"}>Price</div>
@@ -118,8 +134,9 @@ export default function Ask({addr}: { addr: Address }) {
                 <div className={"text text-xs font-light"}>reward + service fee + transaction const</div>
                 <div className={"text text-xs font-light"}>unused transaction fees are refunded instantly</div>
             </div>
-            {myConnectedWallet !== null && <textarea className={"textarea textarea-bordered textarea-lg mt-4 w-full h-[200px]"} value={text}
-                      onChange={e => setText(e.target.value)}/>}
+            {myConnectedWallet !== null &&
+                <textarea className={"textarea textarea-bordered textarea-lg mt-4 w-full h-[200px]"} value={text}
+                          onChange={e => setText(e.target.value)}/>}
             {myConnectedWallet != null && !isInTelegram && <button disabled={isDisabled} onClick={onSubmit}
                                                                    className={"btn btn-primary btn-block btn-lg mt-4"}>Submit
             </button>}
