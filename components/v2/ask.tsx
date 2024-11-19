@@ -39,7 +39,9 @@ export default function Ask({addr}: { addr: Address }) {
         }
         setActionProgress(true)
         const transaction = createQuestionTransaction(text, totalFee, accountInfo.data.address)
-        tonConnectUI.sendTransaction(transaction)
+        const promise = tonConnectUI.sendTransaction(transaction)
+
+        promise
             .then(resp => {
                 const cell = Cell.fromBase64(resp.boc)
                 const buffer = cell.hash();
@@ -71,7 +73,9 @@ export default function Ask({addr}: { addr: Address }) {
     }, []);
 
     if (accountInfo.isLoading || accountInfo.data == null || myConnectedWallet === undefined) {
-        return <div className={"pt-10 loading loading-lg loading-dots"}/>
+        return <div className={"w-full mt-[50%] flex justify-center"}>
+            <div className={"loading loading-ring w-[125px] h-[125px]"}></div>
+        </div>
     }
     if (myConnectedWallet !== null && myConnectedWallet.equals(addr)) {
         return <>
@@ -114,8 +118,8 @@ export default function Ask({addr}: { addr: Address }) {
                 <div className={"text text-xs font-light"}>reward + service fee + transaction const</div>
                 <div className={"text text-xs font-light"}>unused transaction fees are refunded instantly</div>
             </div>
-            <textarea className={"textarea textarea-bordered textarea-lg mt-4 w-full h-[200px]"} value={text}
-                      onChange={e => setText(e.target.value)}/>
+            {myConnectedWallet !== null && <textarea className={"textarea textarea-bordered textarea-lg mt-4 w-full h-[200px]"} value={text}
+                      onChange={e => setText(e.target.value)}/>}
             {myConnectedWallet != null && !isInTelegram && <button disabled={isDisabled} onClick={onSubmit}
                                                                    className={"btn btn-primary btn-block btn-lg mt-4"}>Submit
             </button>}
