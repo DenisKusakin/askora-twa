@@ -3,14 +3,18 @@ import Link from "next/link";
 import CreateAccount from "@/components/v2/create-account";
 import copyTextHandler from "@/utils/copy-util";
 import {useContext} from "react";
-import {MyAccountInfoContext, TgConnectionStatus} from "@/context/my-account-context";
+import {TgConnectionStatus} from "@/context/my-account-context";
 import {MyTgContext} from "@/context/tg-context";
 import {useMyConnectedWallet} from "@/hooks/ton-hooks";
 import {useAuth} from "@/hooks/auth-hook";
+import {useAccountInfo} from "@/components/queries/queries";
 
 export default function MyProfile() {
     const myConnectedWallet = useMyConnectedWallet()
-    const myAccountInfo = useContext(MyAccountInfoContext).info
+    const myAccountInfoQuery = useAccountInfo(myConnectedWallet)
+    const myAccountInfo = myAccountInfoQuery.data
+
+
     const auth = useAuth()
 
     const tgConnectionStatus = useContext(TgConnectionStatus).info
@@ -28,7 +32,7 @@ export default function MyProfile() {
         }
         navigator.share({url: `https://t.me/AskoraBot/app?startapp=0_${myConnectedWallet}`, title: 'Share this link with your audience'})
     }
-    if (myConnectedWallet === undefined || (myConnectedWallet !== null && myAccountInfo === undefined)) {
+    if (myConnectedWallet === undefined || (myConnectedWallet !== null && myAccountInfo === undefined || myAccountInfoQuery.isLoading)) {
         return <div className={"w-full mt-[50%] flex justify-center"}>
             <div className={"loading loading-ring w-[125px] h-[125px]"}></div>
         </div>

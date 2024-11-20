@@ -1,7 +1,6 @@
-import {useCallback, useContext, useEffect, useState} from "react";
+import {useCallback, useContext, useState} from "react";
 import {toNano} from "@ton/core";
 import AccountCreationStatusDialog from "@/components/v2/account-creation-status-dialog";
-import {MyAccountInfoContext, TgConnectionStatus} from "@/context/my-account-context";
 import {useTonConnectUI} from "@tonconnect/ui-react";
 import {createAccountTransaction} from "@/components/utils/transaction-utils";
 import {useMyConnectedWallet} from "@/hooks/ton-hooks";
@@ -10,60 +9,49 @@ import {createAccount, subscribe} from "@/services/api";
 import {useAuth} from "@/hooks/auth-hook";
 import Link from "next/link";
 import TransactionErrorDialog from "@/components/v2/transaction-failed-dialog";
+import {useMutation} from "@tanstack/react-query";
+import {useWaitForAccountActive} from "@/components/queries/queries";
 
 export default function CreateAccount() {
     const myConnectedWallet = useMyConnectedWallet()
     const [price, setPrice] = useState(1)
-    const {info, refresh} = useContext(MyAccountInfoContext)
-    const [isInProgress, setIsInProgress] = useState(false)
     const [tonConnectUI] = useTonConnectUI();
     const [enableTgNotifications, setEnableTgNotifications] = useState(true)
-    const tgConnectionStatusContext = useContext(TgConnectionStatus)
     const tgInitData = useContext(MyTgContext).info?.tgInitData
     const isInTelegram = !(tgInitData == null || tgInitData === '')
     const [description, setDescription] = useState('')
-    const {sponsoredTransactionsEnabled, setSponsoredTransactionsEnabled, updateTonProof, canUseSponsoredTransactions} = useAuth()
-    const [error, setError] = useState<string| null>(null)
-    const [pollingRunning, setPollingRunning] = useState(false)
-
-    useEffect(() => {
-        if (pollingRunning) {
-            if (info?.status === 'active') {
-                setIsInProgress(false)
-                setPollingRunning(false)
-            } else {
-                const id = setInterval(refresh, 2000)
-                return () => clearInterval(id)
-            }
+    const {
+        sponsoredTransactionsEnabled,
+        setSponsoredTransactionsEnabled,
+        updateTonProof,
+        canUseSponsoredTransactions
+    } = useAuth()
+    const createAccountMutation = useMutation({
+        mutationFn: () => {
+            const sendTransactionPromise = sponsoredTransactionsEnabled ? createAccount(toNano(price), description) : tonConnectUI.sendTransaction(createAccountTransaction(toNano(price), description))
+            return sendTransactionPromise
+                .then(() => {
+                    if (tgInitData == null || myConnectedWallet == null) {
+                        return
+                    }
+                    return subscribe(tgInitData, myConnectedWallet?.toString())
+                })
+                .then(() => {
+                })
+        },
+        onSuccess: () => {
         }
-    }, [pollingRunning, info, refresh]);
+    })
+    const infoQuery = useWaitForAccountActive(myConnectedWallet, createAccountMutation.isSuccess)
 
     const onClick = () => {
         if (myConnectedWallet != null) {
-            const sendTransactionPromise = sponsoredTransactionsEnabled ? createAccount(toNano(price), description) : tonConnectUI.sendTransaction(createAccountTransaction(toNano(price), description))
-            setIsInProgress(true)
-            sendTransactionPromise
-                .then(() => setPollingRunning(true))
-                .catch(e => {
-                    setError(e.message)
-                    setIsInProgress(false)
-                    console.log(e)
-                })
-                .then(() => {
-                    if (isInTelegram && tgInitData != null) {
-                        subscribe(tgInitData, myConnectedWallet.toString())
-                            .then(tgConnectionStatusContext.refresh)
-                    }
-                })
-                .catch(e => {
-                    //TODO: Add proper handling, fine for now
-                    console.log("Failed to connect telegram", e)
-                })
+            createAccountMutation.mutate()
         }
     }
     const renewSession = useCallback(() => {
-        updateTonProof().then(() => setError(null))
-    }, [updateTonProof, setError])
+        updateTonProof().then(() => createAccountMutation.reset())
+    }, [updateTonProof, createAccountMutation])
 
     const sessionExpiredDialogContent = <>
         <div className={"text text-lg text-center w-full"}>Session has expired</div>
@@ -71,19 +59,25 @@ export default function CreateAccount() {
                 onClick={renewSession}>Renew Session
         </button>
         <button className={"btn btn-block btn-primary btn-outline mt-6"}
-                onClick={() => setError(null)}>Close
+                onClick={() => createAccountMutation.reset()}>Close
         </button>
     </>
     const unknownErrorDialogContent = <div>
         <span className={"text text-error"}>Something went wrong...</span>
         <button className={"btn btn-block btn-primary mt-6"}
-                onClick={() => setError(null)}>Close
+                onClick={() => createAccountMutation.reset()}>Close
         </button>
     </div>
 
+    if(createAccountMutation.isPending) {
+        return <AccountCreationStatusDialog transactionHash={null}/>
+    } else if (createAccountMutation.isSuccess && !infoQuery.isSuccess) {
+        return <AccountCreationStatusDialog transactionHash={''}/>
+    } else if (createAccountMutation.isError) {
+        return <TransactionErrorDialog
+            content={createAccountMutation.error.message === 'unauthorized' ? sessionExpiredDialogContent : unknownErrorDialogContent}/>
+    }
     return <>
-        {isInProgress && error === null && <AccountCreationStatusDialog transactionHash={pollingRunning ? '' : null}/>}
-        {error !== null && <TransactionErrorDialog content={error === 'unauthorized' ? sessionExpiredDialogContent : unknownErrorDialogContent}/>}
         <div className={"pt-10"}>
             <div className={"flex flex-col items-center"}>
                 <div className={"text-neutral text-xl"}>Price (TON)</div>
@@ -118,7 +112,9 @@ export default function CreateAccount() {
             <div className="form-control">
                 <div className={"flex flex-row items-center justify-between"}>
                     <label className="label cursor-pointer">
-                        <input type="checkbox" className="toggle toggle-primary" disabled={!canUseSponsoredTransactions} checked={canUseSponsoredTransactions && sponsoredTransactionsEnabled} onChange={() => setSponsoredTransactionsEnabled(!sponsoredTransactionsEnabled)}/>
+                        <input type="checkbox" className="toggle toggle-primary" disabled={!canUseSponsoredTransactions}
+                               checked={canUseSponsoredTransactions && sponsoredTransactionsEnabled}
+                               onChange={() => setSponsoredTransactionsEnabled(!sponsoredTransactionsEnabled)}/>
                         <span className="label-text pl-2">Use Sponsored Transaction</span>
                     </label>
                     <Link className={"text-info pl-4"} href={"/configure/sponsored-transactions"}>
@@ -135,7 +131,8 @@ export default function CreateAccount() {
                         </svg>
                     </Link>
                 </div>
-                {!canUseSponsoredTransactions && <span className={"text text-xs text-red-700 italic"}>Sponsored transactions are not available at the moment. If you&apos;d like to use, please reconnect</span>}
+                {!canUseSponsoredTransactions &&
+                    <span className={"text text-xs text-red-700 italic"}>Sponsored transactions are not available at the moment. If you&apos;d like to use, please reconnect</span>}
             </div>
             <button disabled={isNaN(price)} className={"btn btn-block btn-lg btn-primary mt-5"} onClick={onClick}>Create
                 Account

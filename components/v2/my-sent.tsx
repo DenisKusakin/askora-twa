@@ -1,26 +1,34 @@
 import MessageListItem from "@/components/v2/msg-list-item";
-import {useContext, useEffect} from "react";
-import {MySubmittedQuestionsContext} from "@/context/my-questions-context";
-import {QuestionData} from "@/stores/questions-store";
-import {MyAccountInfoContext} from "@/context/my-account-context";
+import {useMyConnectedWallet} from "@/hooks/ton-hooks";
+import {useQueries, useQuery} from "@tanstack/react-query";
+import {
+    fetchAccountAddr,
+    fetchQuestionDetailsOptions,
+    fetchSubmittedQuestionAddrOptions, useAccountInfo
+} from "@/components/queries/queries";
 
 export default function MySent() {
-    const context = useContext(MySubmittedQuestionsContext)
-    const myAccountInfo = useContext(MyAccountInfoContext).info
-    useEffect(() => {
-        if (myAccountInfo != null) {
-            for (let i = 0; i < myAccountInfo.submittedCount; i++) {
-                setTimeout(() => context.fetch(myAccountInfo.submittedCount - 1 - i), 1000 * i)
-            }
-        }
-    }, [myAccountInfo, context.fetch]);
-    const items: { isLoading: boolean; id: number; data: QuestionData }[] = context.items
-        .filter(x => x != null)
-        .filter(x => x.data != null)
-        .map(x => x as { isLoading: boolean, id: number, data: QuestionData })
-        .sort((a, b) => b.data.createdAt - a.data.createdAt)
+    const myWallet = useMyConnectedWallet()
+    const accountInfo = useAccountInfo(myWallet, myWallet != null)
+    const accountContractAddr = useQuery(fetchAccountAddr({
+        ownerAddr: myWallet?.toString() || '',
+    }, myWallet != null)).data
 
-    const isLoading = context.items.length != myAccountInfo?.submittedCount || context.items.find(x => x.isLoading) != null
+    const questionContractsAddressesQuery = useQueries({
+        queries: Array.from(Array(accountInfo.data?.submittedCount).keys())
+            .map(i => fetchSubmittedQuestionAddrOptions(accountContractAddr?.toString() as string, i, accountContractAddr != null))
+    })
+    const questions = useQueries({
+        queries: questionContractsAddressesQuery
+            .map(x => x?.data?.toString())
+            .map(x => fetchQuestionDetailsOptions(x))
+    })
+    const data = questions
+        .map(x => x.data)
+        .filter(x => x != null)
+        .map((x, i) => ({...x, id: i}))
+        .sort((a, b) => b.createdAt - a.createdAt)
+    const isLoading = questions.find(x => x.isPending) != null
 
     return <div className={"pt-10"}>
         <div className={"text-xl flex flex-row"}>
@@ -30,15 +38,15 @@ export default function MySent() {
             {isLoading && <div className={"loading loading-dots ml-2"}></div>}
         </div>
         <div className={"flex w-full mt-4 flex-col"}>
-            {items.length === 0 && !isLoading && <h2 className={"text text-sm font-italic"}>No sent messages</h2>}
-            {items.map(({data}) => <MessageListItem key={data.addr.toString()}
-                                                    addr={data.to}
-                                                    link={`/q-details?owner_id=${data.to.toString()}&q_id=${data.id}`}
-                                                    isClosed={data.isClosed}
-                                                    isRejected={data.isRejected}
+            {data.length === 0 && !isLoading && <h2 className={"text text-sm font-italic"}>No sent messages</h2>}
+            {data.map(x => <MessageListItem key={x.addr.toString()}
+                                                    addr={x.to}
+                                                    link={`/q-details?owner_id=${x.to.toString()}&q_id=${x.id}`}
+                                                    isClosed={x.isClosed}
+                                                    isRejected={x.isRejected}
                                                     className={"mt-1"}
-                                                    createdAt={data.createdAt * 1000}
-                                                    amount={data.minPrice}/>)}
+                                                    createdAt={x.createdAt * 1000}
+                                                    amount={x.minPrice}/>)}
         </div>
     </div>
 }

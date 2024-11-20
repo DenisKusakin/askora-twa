@@ -5,11 +5,10 @@ import {TonConnectUIProvider} from "@tonconnect/ui-react";
 import AuthContextProvider from "@/components/context-providers/auth-context-provider";
 import TgMainButtonContextProvider from "@/components/context-providers/tg-main-button-context-provider";
 import TgConnectionStatusContextProvider from "@/components/context-providers/tg-connection-status-context-provider";
-import MyAccountContextProvider from "@/components/context-providers/my-account-context-provider";
-import MySubmittedQuestionsContextProvider
-    from "@/components/context-providers/my-submitted-questions-context-provider";
-import MyAssignedQuestionsContextProvider from "@/components/context-providers/my-assigned-questions-context-provider";
+import {QueryClient, QueryClientProvider} from "@tanstack/react-query";
+import {ReactQueryDevtools} from "@tanstack/react-query-devtools";
 
+const queryClient = new QueryClient()
 
 export default function MyAppWrapper({children}: { children: ReactNode }) {
 
@@ -18,18 +17,15 @@ export default function MyAppWrapper({children}: { children: ReactNode }) {
                                      twaReturnUrl: `https://t.me/AskoraBot/app`,
                                      returnStrategy: 'back'
                                  }}>
-        <AuthContextProvider>
-            <TgConnectionStatusContextProvider>
-                <TgMainButtonContextProvider>
-                    <MyAccountContextProvider>
-                        <MyAssignedQuestionsContextProvider>
-                            <MySubmittedQuestionsContextProvider>
-                                {children}
-                            </MySubmittedQuestionsContextProvider>
-                        </MyAssignedQuestionsContextProvider>
-                    </MyAccountContextProvider>
-                </TgMainButtonContextProvider>
-            </TgConnectionStatusContextProvider>
-        </AuthContextProvider>
+        <QueryClientProvider client={queryClient}>
+            <ReactQueryDevtools initialIsOpen={false}/>
+            <AuthContextProvider>
+                <TgConnectionStatusContextProvider>
+                    <TgMainButtonContextProvider>
+                        {children}
+                    </TgMainButtonContextProvider>
+                </TgConnectionStatusContextProvider>
+            </AuthContextProvider>
+        </QueryClientProvider>
     </TonConnectUIProvider>
 }

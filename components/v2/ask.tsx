@@ -1,10 +1,8 @@
 import {Address, Cell, fromNano, toNano} from "@ton/core";
 import {useCallback, useContext, useEffect, useMemo, useState} from "react";
-import {fetchAccountInfo} from "@/stores/profile-store";
 import {userFriendlyStr} from "@/components/utils/addr-utils";
 import Link from "next/link";
 import TransactionSucceedDialog from "@/components/v2/transaction-suceed-dialog";
-import {AccountInfo} from "@/context/my-account-context";
 import {useTonConnectUI} from "@tonconnect/ui-react";
 import {createQuestionTransaction} from "@/components/utils/transaction-utils";
 import {useMyConnectedWallet} from "@/hooks/ton-hooks";
@@ -13,11 +11,12 @@ import {MyTgContext} from "@/context/tg-context";
 import copyTextHandler from "@/utils/copy-util";
 import {TONVIEWER_BASE_PATH} from "@/conf";
 import TransactionErrorDialog from "@/components/v2/transaction-failed-dialog";
+import {useAccountInfo} from "@/components/queries/queries";
 
 export default function Ask({addr}: { addr: Address }) {
     const [text, setText] = useState("")
     const myConnectedWallet = useMyConnectedWallet()
-    const [accountInfo, setAccountInfo] = useState<{ isLoading: boolean, data?: AccountInfo }>({isLoading: true})
+    const accountInfo = useAccountInfo(addr)
     const tgInitData = useContext(MyTgContext).info?.tgInitData
     const [tonConnectUI] = useTonConnectUI();
     const tgMainButton = useContext(TgMainButtonContext)
@@ -28,12 +27,6 @@ export default function Ask({addr}: { addr: Address }) {
     const [transactionHash, setTransactionHash] = useState<null | string>(null)
     const [isActionInProgress, setActionProgress] = useState(false)
     const [error, setError] = useState<string| null>(null)
-
-    useEffect(() => {
-        setAccountInfo({isLoading: true})
-        fetchAccountInfo(addr)
-            .then(data => setAccountInfo({isLoading: false, data}))
-    }, [addr]);
 
     const onSubmit = useCallback(() => {
         if (accountInfo.data == null || totalFee == null) {
