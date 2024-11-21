@@ -67,7 +67,7 @@ export default function ConfigurePrice() {
             <div className={"loading loading-ring w-[125px] h-[125px]"}></div>
         </div>
     }
-    const descriptionChanged = description !== (myProfileInfo.description || '')
+    const descriptionChanged = description !== (myProfileInfo?.description || '')
     const dialogContent = <div>
         {updateDescriptionMutation.data?.hash != null && <>
             <div className={"text text-xs break-all"} onClick={copyTextHandler(updateDescriptionMutation.data.hash)}>

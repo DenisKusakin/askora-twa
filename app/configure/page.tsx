@@ -72,7 +72,7 @@ export default function ConfigurePrice() {
             <div className={"loading loading-ring w-[125px] h-[125px]"}></div>
         </div>
     }
-    const priceChanged = !isNaN(newPrice) && toNano(newPrice) !== myProfileInfo.price
+    const priceChanged = !isNaN(newPrice) && toNano(newPrice) !== myProfileInfo?.price
     const dialogContent = <div>
         {updatePriceMutation.data?.hash != null && <>
             <div className={"text text-xs break-all"} onClick={copyTextHandler(updatePriceMutation.data?.hash || '')}>

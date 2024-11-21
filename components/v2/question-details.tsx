@@ -17,6 +17,7 @@ import {useAuth} from "@/hooks/auth-hook";
 import {refundQuestion, rejectQuestion, replyQuestion} from "@/services/api";
 import TransactionErrorDialog from "@/components/v2/transaction-failed-dialog";
 import {TONVIEWER_BASE_PATH} from "@/conf";
+import {useMutation} from "@tanstack/react-query";
 
 const questionValidForSec = 7 * 24 * 60 * 60;//7 days
 
@@ -27,16 +28,7 @@ export default function QuestionDetails({question}: { question: QuestionData }) 
     const tgInitData = useContext(MyTgContext).info?.tgInitData
     const [tonConnectUI] = useTonConnectUI();
     const tgMainButton = useContext(TgMainButtonContext)
-    const [transaction, setTransaction] = useState<{
-        hash: string | null, isSponsored: boolean,
-        error?: string
-    } | null>(null)
     const {sponsoredTransactionsEnabled, updateTonProof} = useAuth()
-    const [isProgress, setInProgress] = useState(false)
-
-    const renewSession = useCallback(() => {
-        updateTonProof().then(() => setTransaction(null))
-    }, [updateTonProof, setTransaction])
 
     let additional_class = ""
     if (question.isRejected) {
@@ -50,74 +42,60 @@ export default function QuestionDetails({question}: { question: QuestionData }) 
         return myConnectedWallet != null && addr.equals(myConnectedWallet)
     }
 
-    const onRejectClick = useCallback(() => {
-        setInProgress(true)
-        const transactionPromise = sponsoredTransactionsEnabled ? rejectQuestion(question.id) : tonConnectUI.sendTransaction(rejectQuestionTransaction(question.addr))
-        transactionPromise
-            .then(resp => {
-                if (resp) {
-                    const cell = Cell.fromBase64(resp.boc)
-                    const buffer = cell.hash();
-                    const hash = buffer.toString('hex');
+    const rejectMutation = useMutation({
+        mutationFn: async () => {
+            const resp = await (sponsoredTransactionsEnabled ? rejectQuestion(question.id) : tonConnectUI.sendTransaction(rejectQuestionTransaction(question.addr)))
+            if (resp) {
+                const cell = Cell.fromBase64(resp.boc)
+                const buffer = cell.hash();
+                const hash = buffer.toString('hex');
 
-                    setTransaction({hash, isSponsored: false})
-                } else {
-                    setTransaction({hash: null, isSponsored: true})
-                }
-            })
-            .then(() => setInProgress(false))
-            .catch(() => setInProgress(false))
-    }, [question.id, question.addr, sponsoredTransactionsEnabled, tonConnectUI, setInProgress])
+                return {hash, isSponsored: false}
+            } else {
+                return {hash: null, isSponsored: true}
+            }
+        }
+    })
 
-    const onReplyClick = useCallback(() => {
-        const transactionPromise = sponsoredTransactionsEnabled ? replyQuestion(question.id, myReply) : tonConnectUI.sendTransaction(replyTransaction(question.addr, myReply))
-        setInProgress(true)
-        transactionPromise
-            .then(resp => {
-                if (resp) {
-                    const cell = Cell.fromBase64(resp.boc)
-                    const buffer = cell.hash();
-                    const hash = buffer.toString('hex');
-                    setTransaction({hash, isSponsored: false})
-                } else {
-                    setTransaction({hash: null, isSponsored: true})
-                }
-            })
-            .then(() => setInProgress(false))
-            .catch(e => {
-                setInProgress(false)
-                if (e instanceof Error) {
-                    setTransaction({hash: null, isSponsored: sponsoredTransactionsEnabled, error: e.message})
-                }
-                console.log("Err", e)
-            })
-    }, [myReply, sponsoredTransactionsEnabled, question.addr, question.id, tonConnectUI])
+    const replyMutation = useMutation({
+        mutationFn: async (myReply: string) => {
+            const resp = await (sponsoredTransactionsEnabled ? replyQuestion(question.id, myReply) : tonConnectUI.sendTransaction(replyTransaction(question.addr, myReply)))
+            if (resp) {
+                const cell = Cell.fromBase64(resp.boc)
+                const buffer = cell.hash();
+                const hash = buffer.toString('hex');
+                return {hash, isSponsored: false}
+            } else {
+                return {hash: null, isSponsored: true}
+            }
+        }
+    })
 
-    const onRefundClick = useCallback(() => {
-        const transactionPromise = sponsoredTransactionsEnabled ? refundQuestion(question.addr) : tonConnectUI.sendTransaction(refundQuestionTransaction(question.addr))
-        setInProgress(true)
-        transactionPromise
-            .then(resp => {
-                if (resp) {
-                    const cell = Cell.fromBase64(resp.boc)
-                    const buffer = cell.hash();
-                    const hash = buffer.toString('hex');
-                    setTransaction({hash, isSponsored: false})
-                } else {
-                    setTransaction({hash: null, isSponsored: true})
-                }
-            })
-            .then(() => setInProgress(false))
-            .catch(e => {
-                setInProgress(false)
-                if (e instanceof Error) {
-                    setTransaction({hash: null, isSponsored: sponsoredTransactionsEnabled, error: e.message})
-                }
-                console.log("Err", e)
-            })
-    }, [question.addr, tonConnectUI, sponsoredTransactionsEnabled])
+    const refundMutation = useMutation({
+        mutationFn: async () => {
+            const resp = await (sponsoredTransactionsEnabled ? refundQuestion(question.addr) : tonConnectUI.sendTransaction(refundQuestionTransaction(question.addr)))
+            if (resp) {
+                const cell = Cell.fromBase64(resp.boc)
+                const buffer = cell.hash();
+                const hash = buffer.toString('hex');
+                return {hash, isSponsored: false}
+            } else {
+                return {hash: null, isSponsored: true}
+            }
+        }
+    })
+    const reset = useCallback(() => {
+        replyMutation.reset()
+        rejectMutation.reset()
+        refundMutation.reset()
+    }, [replyMutation.reset, rejectMutation.reset, refundMutation.reset])
+    const renewSession = useCallback(() => {
+        updateTonProof().then(() => {
+            reset()
+        })
+    }, [updateTonProof, reset])
 
-    const dialogContent = <div>
+    const dialogContent = (transaction: { hash: string | null, isSponsored: boolean }) => <div>
         {transaction?.hash != null && <>
             <div className={"text text-xs break-all"} onClick={copyTextHandler(transaction.hash)}>
                 <b>Hash</b>: {transaction.hash}</div>
@@ -133,24 +111,25 @@ export default function QuestionDetails({question}: { question: QuestionData }) 
                 onClick={renewSession}>Renew Session
         </button>
         <button className={"btn btn-block btn-primary btn-outline mt-6"}
-                onClick={() => setTransaction(null)}>Close
+                onClick={reset}>Close
         </button>
     </>
     const unknownErrorDialogContent = <div>
         <span className={"text text-error"}>Something went wrong...</span>
         <button className={"btn btn-block btn-primary mt-6"}
-                onClick={() => setTransaction(null)}>Close
+                onClick={reset}>Close
         </button>
     </div>
-
+    const isProgress = replyMutation.isPending || rejectMutation.isPending || refundMutation.isPending
+    // console.log("Is pending", isProgress)
     const isInTelegram = !(tgInitData == null || tgInitData === '')
     const tgMainButtonProps: TgMainButtonProps = useMemo(() => ({
         text: "Send Reply",
-        onClick: onReplyClick,
+        onClick: () => replyMutation.mutate(myReply),
         enabled: myReply.trim() !== '',
-        visible: replyShown && transaction === null,
+        visible: replyShown,
         isProgressVisible: isProgress
-    }), [onReplyClick, myReply, replyShown, transaction, isProgress])
+    }), [myReply, replyShown, isProgress])
     const hasExpired = useMemo(() => {
         const expiresAt = question.createdAt + questionValidForSec;
         return (new Date().getTime()) / 1000 > expiresAt;
@@ -163,15 +142,36 @@ export default function QuestionDetails({question}: { question: QuestionData }) 
     useEffect(() => {
         return () => {
             tgMainButton.setProps({...tgMainButtonProps, visible: false})
-            setTransaction(null);
+            reset();
         }
     }, []);
 
+    if (replyMutation.data != null) {
+        return <TransactionSucceedDialog
+            content={dialogContent(replyMutation.data)}/>
+    }
+    if (rejectMutation.data != null) {
+        return <TransactionSucceedDialog
+            content={dialogContent(rejectMutation.data)}/>
+    }
+    if (refundMutation.data != null) {
+        return <TransactionSucceedDialog
+            content={dialogContent(refundMutation.data)}/>
+    }
+    let error = null;
+    if (replyMutation.error != null) {
+        error = replyMutation.error
+    } else if (rejectMutation.error != null) {
+        error = rejectMutation.error
+    } else if (refundMutation.error != null) {
+        error = refundMutation.error
+    }
+    if (error != null) {
+        return <TransactionErrorDialog
+            content={error.message === 'unauthorized' ? sessionExpiredDialogContent : unknownErrorDialogContent}/>
+    }
+
     return <>
-        {transaction != null && <TransactionSucceedDialog content={dialogContent}/>}
-        {transaction !== null && transaction.error != null &&
-            <TransactionErrorDialog
-                content={transaction.error === 'unauthorized' ? sessionExpiredDialogContent : unknownErrorDialogContent}/>}
         <div className={"pt-10"}>
             <div className={"flex flex-row mb-2"}>
                 <div className={"w-8/12"}>
@@ -236,7 +236,7 @@ export default function QuestionDetails({question}: { question: QuestionData }) 
                     Reply
                 </button>
                 <button className={"btn btn-block btn-lg btn-error mt-2"} disabled={isProgress}
-                        onClick={onRejectClick}>Reject
+                        onClick={() => rejectMutation.mutate()}>Reject
                 </button>
             </div>}
             {replyShown && !question.isClosed && isMyQuestion && <>
@@ -250,7 +250,7 @@ export default function QuestionDetails({question}: { question: QuestionData }) 
                 </div>
                 <div className={"mt-4"}>
                     {!isInTelegram && <button className={"btn btn-block btn-lg btn-primary"}
-                                              onClick={onReplyClick}
+                                              onClick={() => replyMutation.mutate(myReply)}
                                               disabled={myReply.trim() === '' || isProgress}>Send Reply
                     </button>}
                     <button className={"btn btn-outline btn-block btn-lg btn-error mt-2"}
@@ -261,7 +261,7 @@ export default function QuestionDetails({question}: { question: QuestionData }) 
             {!question.isClosed && hasExpired && isYou(question.from) &&
                 <button className={"btn btn-outline btn-block btn-lg btn-error mt-4"}
                         disabled={isProgress}
-                        onClick={onRefundClick}>
+                        onClick={() => refundMutation.mutate()}>
                     Refund
                 </button>}
         </div>

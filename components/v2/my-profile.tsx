@@ -14,7 +14,6 @@ export default function MyProfile() {
     const myAccountInfoQuery = useAccountInfo(myConnectedWallet)
     const myAccountInfo = myAccountInfoQuery.data
 
-
     const auth = useAuth()
 
     const tgConnectionStatus = useContext(TgConnectionStatus).info
@@ -32,14 +31,14 @@ export default function MyProfile() {
         }
         navigator.share({url: `https://t.me/AskoraBot/app?startapp=0_${myConnectedWallet}`, title: 'Share this link with your audience'})
     }
-    if (myConnectedWallet === undefined || (myConnectedWallet !== null && myAccountInfo === undefined || myAccountInfoQuery.isLoading)) {
+    if (myConnectedWallet === undefined || myAccountInfoQuery.isPending) {
         return <div className={"w-full mt-[50%] flex justify-center"}>
             <div className={"loading loading-ring w-[125px] h-[125px]"}></div>
         </div>
     }
     //TODO: Right after connecting a wallet, it is possible that this condition would be true even though account could exist
     //need to fix
-    if (myConnectedWallet !== null && myAccountInfo === null) {
+    if (myConnectedWallet !== null && myAccountInfo == null) {
         return <CreateAccount/>
     }
     if (myConnectedWallet === null) {

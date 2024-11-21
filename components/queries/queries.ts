@@ -83,7 +83,8 @@ export function fetchProfile({addr}: {addr: string}){
                     address: accountContract.address
                 });
             } else {
-                return Promise.reject()
+                // return Promise.reject(Error("account not found"))
+                return Promise.resolve(null)
             }
         }
     })
