@@ -128,7 +128,8 @@ export function useWaitForAccountActive(ownerAddr: Address | undefined | null, e
     const accountInfoQuery = useQuery({
         ...fetchProfile({addr: accountContractAddrQuery.data?.toString() || ''}),
         enabled: !!accountContractAddrQuery.data && enabled,
-        retry: true
+        retry: true,
+        retryDelay: 3000
     })
     // const accountInfo = accountInfoQuery.data
 

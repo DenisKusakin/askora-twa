@@ -69,10 +69,10 @@ export default function CreateAccount() {
         </button>
     </div>
 
-    if(createAccountMutation.isPending) {
-        return <AccountCreationStatusDialog transactionHash={null}/>
-    } else if (createAccountMutation.isSuccess && !infoQuery.isSuccess) {
-        return <AccountCreationStatusDialog transactionHash={''}/>
+    if (createAccountMutation.isPending) {
+        return <AccountCreationStatusDialog transactionSendingInProgress={true} pollingInProgress={false}/>
+    } else if (createAccountMutation.isSuccess && infoQuery.isPending) {
+        return <AccountCreationStatusDialog transactionSendingInProgress={false} pollingInProgress={true}/>
     } else if (createAccountMutation.isError) {
         return <TransactionErrorDialog
             content={createAccountMutation.error.message === 'unauthorized' ? sessionExpiredDialogContent : unknownErrorDialogContent}/>
@@ -100,16 +100,16 @@ export default function CreateAccount() {
                     account.
                     Specify the price of your reply. It could be changed later
                 </div>
-                {isInTelegram && <div className={"mt-2"}>
+            </div>
+            <div className="form-control">
+                {isInTelegram && <div className={"mt-2 flex flex-row items-center justify-between"}>
                     <label className="label cursor-pointer">
                         <input checked={enableTgNotifications} onChange={() => setEnableTgNotifications(x => !x)}
                                type="checkbox"
-                               className="checkbox checkbox-primary mr-2"/>
-                        <span className="label-text text-lg">Receive notifications in Telegram</span>
+                               className="checkbox checkbox-primary"/>
+                        <span className="label-text pl-8">Receive notifications in Telegram</span>
                     </label>
                 </div>}
-            </div>
-            <div className="form-control">
                 <div className={"flex flex-row items-center justify-between"}>
                     <label className="label cursor-pointer">
                         <input type="checkbox" className="toggle toggle-primary" disabled={!canUseSponsoredTransactions}
