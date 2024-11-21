@@ -65,7 +65,7 @@ export function fetchQuestionDetailsOptions(questionContractAddr: string | undef
     })
 }
 
-export function fetchProfile({addr}: {addr: string}){
+export function fetchProfile({addr}: {addr: string}, failIfNotExist: boolean = false){
     return queryOptions({
         queryKey: ['profile', addr],
         queryFn: async () => {
@@ -84,6 +84,9 @@ export function fetchProfile({addr}: {addr: string}){
                 });
             } else {
                 // return Promise.reject(Error("account not found"))
+                if(failIfNotExist){
+                    return Promise.reject(Error("account not found"))
+                }
                 return Promise.resolve(null)
             }
         }
@@ -126,7 +129,7 @@ export function useWaitForAccountActive(ownerAddr: Address | undefined | null, e
     }
     const accountContractAddrQuery = useQuery(ops)
     const accountInfoQuery = useQuery({
-        ...fetchProfile({addr: accountContractAddrQuery.data?.toString() || ''}),
+        ...fetchProfile({addr: accountContractAddrQuery.data?.toString() || ''}, true),
         enabled: !!accountContractAddrQuery.data && enabled,
         retry: true,
         retryDelay: 3000

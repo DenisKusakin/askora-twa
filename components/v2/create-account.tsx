@@ -34,9 +34,7 @@ export default function CreateAccount() {
                     if (tgInitData == null || myConnectedWallet == null) {
                         return
                     }
-                    return subscribe(tgInitData, myConnectedWallet?.toString())
-                })
-                .then(() => {
+                    return enableTgNotifications ? subscribe(tgInitData, myConnectedWallet?.toString()) : Promise.resolve()
                 })
         },
         onSuccess: () => {
