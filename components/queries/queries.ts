@@ -37,6 +37,7 @@ export function fetchQuestionDetailsOptions(questionContractAddr: string | undef
         queryFn: async () => {
             const contract = tonClient.open(Question.createFromAddress(Address.parse(questionContractAddr || '')))
             const data = await contract.getAllData()
+            const id = data.id;
             const content = data.content
             const replyContent = data.replyContent
             const minPrice = data.minPrice
@@ -55,7 +56,8 @@ export function fetchQuestionDetailsOptions(questionContractAddr: string | undef
                 isRejected,
                 from,
                 to,
-                createdAt
+                createdAt,
+                id
             }
         },
         enabled: questionContractAddr != undefined

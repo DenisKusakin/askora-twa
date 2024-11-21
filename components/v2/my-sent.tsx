@@ -26,7 +26,6 @@ export default function MySent() {
     const data = questions
         .map(x => x.data)
         .filter(x => x != null)
-        .map((x, i) => ({...x, id: i}))
         .sort((a, b) => b.createdAt - a.createdAt)
     const isLoading = questions.find(x => x.isPending) != null
 
