@@ -23,7 +23,7 @@ export default function SponsoredTransactionsPage() {
                        auth.setSponsoredTransactionsEnabled(e.target.checked)
                    }}
                    checked={enabled}/>
-            <span className="label-text text-lg">Use Sponsored Transactions {enabled.toString()}</span>
+            <span className="label-text text-lg">Use Sponsored Transactions</span>
         </label>}
         <button onClick={() => router.back()} className={"btn btn-lg btn-error btn-block btn-outline mt-2"}>Cancel
         </button>
