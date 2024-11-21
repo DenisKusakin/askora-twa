@@ -31,7 +31,8 @@ export default function MyProfile() {
         }
         navigator.share({url: `https://t.me/AskoraBot/app?startapp=0_${myConnectedWallet}`, title: 'Share this link with your audience'})
     }
-    if (myConnectedWallet === undefined || myAccountInfoQuery.isPending) {
+
+    if (myConnectedWallet === undefined || (myConnectedWallet !== null && myAccountInfoQuery.isPending)) {
         return <div className={"w-full mt-[50%] flex justify-center"}>
             <div className={"loading loading-ring w-[125px] h-[125px]"}></div>
         </div>
