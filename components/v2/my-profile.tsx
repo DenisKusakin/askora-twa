@@ -39,7 +39,7 @@ export default function MyProfile() {
             router.push('/account/create')
         }
     }, [myAccountInfoQuery.error, router]);
-    if (myConnectedWallet === undefined || myAccountInfoQuery.isPending || !myAccountInfoQuery.data) {
+    if (myConnectedWallet === undefined || myAccountInfoQuery.isPending || myAccountInfoQuery.error != null) {
         return <div className={"w-full mt-[50%] flex justify-center"}>
             <div className={"loading loading-ring w-[125px] h-[125px]"}></div>
         </div>
