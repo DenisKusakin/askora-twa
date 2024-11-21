@@ -1,19 +1,19 @@
 import {fromNano} from "@ton/core";
 import Link from "next/link";
-import CreateAccount from "@/components/v2/create-account";
 import copyTextHandler from "@/utils/copy-util";
-import {useContext} from "react";
+import {useContext, useEffect} from "react";
 import {TgConnectionStatus} from "@/context/my-account-context";
 import {MyTgContext} from "@/context/tg-context";
 import {useMyConnectedWallet} from "@/hooks/ton-hooks";
 import {useAuth} from "@/hooks/auth-hook";
 import {useAccountInfo} from "@/components/queries/queries";
+import {useRouter} from "next/navigation";
 
 export default function MyProfile() {
     const myConnectedWallet = useMyConnectedWallet()
     const myAccountInfoQuery = useAccountInfo(myConnectedWallet)
     const myAccountInfo = myAccountInfoQuery.data
-
+    const router = useRouter()
     const auth = useAuth()
 
     const tgConnectionStatus = useContext(TgConnectionStatus).info
@@ -29,19 +29,22 @@ export default function MyProfile() {
         if (myConnectedWallet == null) {
             return
         }
-        navigator.share({url: `https://t.me/AskoraBot/app?startapp=0_${myConnectedWallet}`, title: 'Share this link with your audience'})
+        navigator.share({
+            url: `https://t.me/AskoraBot/app?startapp=0_${myConnectedWallet}`,
+            title: 'Share this link with your audience'
+        })
     }
-
-    if (myConnectedWallet === undefined || (myConnectedWallet !== null && myAccountInfoQuery.isPending)) {
+    useEffect(() => {
+        if (myAccountInfoQuery.error?.message === 'account not found') {
+            router.push('/account/create')
+        }
+    }, [myAccountInfoQuery.error, router]);
+    if (myConnectedWallet === undefined || myAccountInfoQuery.isPending || !myAccountInfoQuery.data) {
         return <div className={"w-full mt-[50%] flex justify-center"}>
             <div className={"loading loading-ring w-[125px] h-[125px]"}></div>
         </div>
     }
-    //TODO: Right after connecting a wallet, it is possible that this condition would be true even though account could exist
-    //need to fix
-    if (myConnectedWallet !== null && myAccountInfo == null) {
-        return <CreateAccount/>
-    }
+
     if (myConnectedWallet === null) {
         return <div className={"pt-10 text-center"}>
             <h1 className={"text text-center text-xl"}>Askora</h1>
@@ -114,7 +117,8 @@ export default function MyProfile() {
                         onClick={onDisconnectClick}>Disconnect
                 </button>
                 <Link href={"/about"} className={"btn btn-outline btn-info btn-lg btn-block mt-4"}>About</Link>
-                <Link href={"/configure/sponsored-transactions"} className={"btn btn-warning btn-outline btn-lg mt-4 btn-block"}>Advanced</Link>
+                <Link href={"/configure/sponsored-transactions"}
+                      className={"btn btn-warning btn-outline btn-lg mt-4 btn-block"}>Advanced</Link>
             </div>
             <div className={"mt-20"}>
                 <div className={"text-xs break-all font-light mb-1"}

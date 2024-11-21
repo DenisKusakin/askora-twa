@@ -46,8 +46,8 @@ export default function Ask({addr}: { addr: Address }) {
             .then(() => setActionProgress(false))
             .catch(e => {
                 setError('Something went wrong')
-                setActionProgress(false)
                 console.log(e)
+                setActionProgress(false)
             })
 
     }, [text, totalFee, accountInfo?.data, tonConnectUI, setActionProgress, setTransactionHash])

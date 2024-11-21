@@ -1,4 +1,4 @@
-import {useCallback, useContext, useState} from "react";
+import {useCallback, useContext, useEffect, useState} from "react";
 import {toNano} from "@ton/core";
 import AccountCreationStatusDialog from "@/components/v2/account-creation-status-dialog";
 import {useTonConnectUI} from "@tonconnect/ui-react";
@@ -11,6 +11,7 @@ import Link from "next/link";
 import TransactionErrorDialog from "@/components/v2/transaction-failed-dialog";
 import {useMutation} from "@tanstack/react-query";
 import {useWaitForAccountActive} from "@/components/queries/queries";
+import {useRouter} from "next/navigation";
 
 export default function CreateAccount() {
     const myConnectedWallet = useMyConnectedWallet()
@@ -20,6 +21,7 @@ export default function CreateAccount() {
     const tgInitData = useContext(MyTgContext).info?.tgInitData
     const isInTelegram = !(tgInitData == null || tgInitData === '')
     const [description, setDescription] = useState('')
+    const router = useRouter();
     const {
         sponsoredTransactionsEnabled,
         setSponsoredTransactionsEnabled,
@@ -41,7 +43,11 @@ export default function CreateAccount() {
         }
     })
     const infoQuery = useWaitForAccountActive(myConnectedWallet, createAccountMutation.isSuccess)
-
+    useEffect(() => {
+        if (infoQuery.isSuccess) {
+            router.push("/")
+        }
+    }, [infoQuery.isSuccess]);
     const onClick = () => {
         if (myConnectedWallet != null) {
             createAccountMutation.mutate()
@@ -66,7 +72,6 @@ export default function CreateAccount() {
                 onClick={() => createAccountMutation.reset()}>Close
         </button>
     </div>
-
     if (createAccountMutation.isPending) {
         return <AccountCreationStatusDialog transactionSendingInProgress={true} pollingInProgress={false}/>
     } else if (createAccountMutation.isSuccess && infoQuery.isPending) {
@@ -136,7 +141,10 @@ export default function CreateAccount() {
                 Account
             </button>
             <button className={"btn btn-block btn-outline btn-lg btn-error mt-2"}
-                    onClick={() => tonConnectUI?.disconnect()}>Disconnect
+                    onClick={() => {
+                        tonConnectUI?.disconnect()
+                        router.push('/')
+                    }}>Disconnect
             </button>
         </div>
     </>

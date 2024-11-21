@@ -85,6 +85,9 @@ export function fetchProfile({addr}: {addr: string}){
             } else {
                 return Promise.reject(Error("account not found"))
             }
+        },
+        retry: (count, error) => {
+            return error.message !== 'account not found'
         }
     })
 }
