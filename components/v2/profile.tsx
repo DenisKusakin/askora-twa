@@ -3,6 +3,8 @@ import Link from "next/link";
 import copyTextHandler from "@/utils/copy-util";
 import {useQuery} from "@tanstack/react-query";
 import {fetchAccountAddr, fetchProfile} from "@/components/queries/queries";
+import ErrorDialog from "@/components/v2/error-dialog";
+import {useRouter} from "next/navigation";
 
 export default function Profile({owner}: { owner: Address }) {
     const addrQuery = useQuery(fetchAccountAddr({ownerAddr: owner.toString()}))
@@ -10,16 +12,23 @@ export default function Profile({owner}: { owner: Address }) {
         ...fetchProfile({addr: addrQuery.data?.toString() || ''}),
         enabled: addrQuery.data != null
     }
-    const {isLoading, data} = useQuery(fetchProfileOptions)
-    if (isLoading || data === undefined) {
+    const router = useRouter()
+    const {isLoading, data, isError, error} = useQuery(fetchProfileOptions)
+    if (isLoading || (!isError && data == null)) {
         return <div className={"w-full mt-[50%] flex justify-center"}>
             <div className={"loading loading-ring w-[125px] h-[125px]"}></div>
         </div>
     }
-    if (data === null) {
-        return <div className={"pt-10 text text-error text-xl"}>
-            Account does not exist
-        </div>
+    if (isError) {
+        if (error.message === 'account not found') {
+            return <ErrorDialog
+                content={<button onClick={() => router.back()} className={"btn btn-primary"}>Back</button>}
+                text={"Account does not exist"}/>
+        } else {
+            return <ErrorDialog
+                content={<button onClick={() => router.refresh()} className={"btn btn-primary"}>Reload</button>}
+                text={"Something went wrong"}/>
+        }
     }
 
     const priceUserFriendly = parseFloat(fromNano(data.price))
