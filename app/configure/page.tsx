@@ -62,15 +62,6 @@ export default function ConfigurePrice() {
         updateTonProof().then(() => updatePriceMutation.reset())
     }, [updateTonProof, updatePriceMutation])
 
-    // useEffect(() => {
-    //     setNewPrice(myProfileInfo != null ? parseFloat(fromNano(myProfileInfo.price)) : 0)
-    // }, [myProfileInfo]);
-
-    // useEffect(() => {
-    //     if(myProfileInfo === null){
-    //         router.push('/')
-    //     }
-    // }, [myProfileInfo, router]);
     if (myProfileInfo === undefined) {
         return <div className={"w-full mt-[50%] flex justify-center"}>
             <div className={"loading loading-ring w-[125px] h-[125px]"}></div>
@@ -113,12 +104,8 @@ export default function ConfigurePrice() {
                 <div className={"text-neutral text-xl"}>Price (TON)</div>
                 <div className={"w-full flex justify-center"}>
                     <input
-                        // value={isNaN(newPrice) ? '' : newPrice}
                         defaultValue={myParseFloat(fromNano(myProfileInfo.price)).toLocaleString()}
-                        lang={"en"}
-                        // type={"number"}
                         inputMode={"decimal"}
-                        // pattern="[0-9]+([\.][0-9]+)?"
                         step={"0.01"}
                         min={"0"}
                         className={`input text-5xl font-bold w-full text-center`}

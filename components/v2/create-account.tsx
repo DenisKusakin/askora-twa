@@ -13,9 +13,13 @@ import {useMutation, useQueryClient} from "@tanstack/react-query";
 import {useWaitForAccountActive} from "@/components/queries/queries";
 import SucceedDialog from "@/components/v2/suceess-dialog";
 
+function myParseFloat(str: string){
+    return parseFloat(str.replace(",", "."))
+}
+
 export default function CreateAccount() {
     const myConnectedWallet = useMyConnectedWallet()
-    const [price, setPrice] = useState(1)
+    const [price, setPrice] = useState('1')
     const [tonConnectUI] = useTonConnectUI();
     const [enableTgNotifications, setEnableTgNotifications] = useState(true)
     const tgInitData = useContext(MyTgContext).info?.tgInitData
@@ -29,10 +33,7 @@ export default function CreateAccount() {
     } = useAuth()
     const createAccountMutation = useMutation({
         mutationFn: () => {
-            const sendTransactionPromise = sponsoredTransactionsEnabled ? createAccount(toNano(price), description) : tonConnectUI.sendTransaction(createAccountTransaction(toNano(price), description))
-            // const sendTransactionPromise = new Promise(resolve => {
-            //     setTimeout(resolve, 3000)
-            // })
+            const sendTransactionPromise = sponsoredTransactionsEnabled ? createAccount(toNano(myParseFloat(price)), description) : tonConnectUI.sendTransaction(createAccountTransaction(toNano(myParseFloat(price)), description))
             return sendTransactionPromise
                 .then(() => {
                     if (tgInitData == null || myConnectedWallet == null) {
@@ -91,13 +92,13 @@ export default function CreateAccount() {
                 <div className={"text-neutral text-xl"}>Price (TON)</div>
                 <div className={"w-full flex flex-col justify-center"}>
                     <input
-                        defaultValue={isNaN(price) ? '' : price}
-                        type={"number"}
-                        inputMode="decimal"
+                        defaultValue={price}
+                        inputMode={"decimal"}
+                        step={"0.01"}
                         min={"0"}
                         className={`input text-5xl font-bold w-full text-center`}
                         onChange={(e) => {
-                            setPrice(e.target.valueAsNumber)
+                            setPrice(e.target.value)
                         }}/>
                     <textarea
                         placeholder="Write a short bio or a message to your visitors..."
@@ -142,7 +143,7 @@ export default function CreateAccount() {
                 {!canUseSponsoredTransactions &&
                     <span className={"text text-xs text-red-700 italic"}>Sponsored transactions are not available at the moment. If you&apos;d like to use, please reconnect</span>}
             </div>
-            <button disabled={isNaN(price)} className={"btn btn-block btn-lg btn-primary mt-5"} onClick={onClick}>Create
+            <button disabled={isNaN(myParseFloat(price))} className={"btn btn-block btn-lg btn-primary mt-5"} onClick={onClick}>Create
                 Account
             </button>
             <button className={"btn btn-block btn-outline btn-lg btn-error mt-2"}
