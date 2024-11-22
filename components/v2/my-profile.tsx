@@ -1,13 +1,12 @@
 import {fromNano} from "@ton/core";
 import Link from "next/link";
 import copyTextHandler from "@/utils/copy-util";
-import {useContext, useEffect} from "react";
+import {useContext} from "react";
 import {TgConnectionStatus} from "@/context/my-account-context";
 import {MyTgContext} from "@/context/tg-context";
 import {useMyConnectedWallet} from "@/hooks/ton-hooks";
 import {useAuth} from "@/hooks/auth-hook";
 import {useAccountInfo} from "@/components/queries/queries";
-import {useRouter} from "next/navigation";
 import CreateAccount from "@/components/v2/create-account";
 
 export default function MyProfile() {

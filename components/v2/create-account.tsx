@@ -83,7 +83,7 @@ export default function CreateAccount() {
         return <TransactionErrorDialog
             content={createAccountMutation.error.message === 'unauthorized' ? sessionExpiredDialogContent : unknownErrorDialogContent}/>
     } else if (infoQuery.isSuccess){
-        return <SucceedDialog content={<></>} title={"Account created successfully"} text={"Doing some final steps"}/>
+        return <SucceedDialog content={<></>} title={"Account created successfully"} text={""}/>
     }
     return <>
         <div className={"pt-10"}>
