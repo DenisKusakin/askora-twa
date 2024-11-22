@@ -14,8 +14,7 @@ export default function MyAppWrapper({children}: { children: ReactNode }) {
 
     return <TonConnectUIProvider manifestUrl={'https://askora.vercel.app/tonconnect-manifest.json'}
                                  actionsConfiguration={{
-                                     twaReturnUrl: `https://t.me/AskoraBot/app`,
-                                     returnStrategy: 'back'
+                                     twaReturnUrl: `https://t.me/AskoraBot`
                                  }}>
         <QueryClientProvider client={queryClient}>
             <ReactQueryDevtools initialIsOpen={false}/>
