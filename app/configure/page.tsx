@@ -115,6 +115,7 @@ export default function ConfigurePrice() {
                     <input
                         // value={isNaN(newPrice) ? '' : newPrice}
                         defaultValue={myParseFloat(fromNano(myProfileInfo.price)).toLocaleString()}
+                        lang={"en"}
                         // type={"number"}
                         inputMode={"decimal"}
                         // pattern="[0-9]+([\.][0-9]+)?"
