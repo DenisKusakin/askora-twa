@@ -121,7 +121,6 @@ export default function QuestionDetails({question}: { question: QuestionData }) 
         </button>
     </div>
     const isProgress = replyMutation.isPending || rejectMutation.isPending || refundMutation.isPending
-    // console.log("Is pending", isProgress)
     const isInTelegram = !(tgInitData == null || tgInitData === '')
     const tgMainButtonProps: TgMainButtonProps = useMemo(() => ({
         text: "Send Reply",

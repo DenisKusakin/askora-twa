@@ -9,9 +9,9 @@ import {createAccount, subscribe} from "@/services/api";
 import {useAuth} from "@/hooks/auth-hook";
 import Link from "next/link";
 import TransactionErrorDialog from "@/components/v2/transaction-failed-dialog";
-import {useMutation} from "@tanstack/react-query";
+import {useMutation, useQueryClient} from "@tanstack/react-query";
 import {useWaitForAccountActive} from "@/components/queries/queries";
-import {useRouter} from "next/navigation";
+import SucceedDialog from "@/components/v2/suceess-dialog";
 
 export default function CreateAccount() {
     const myConnectedWallet = useMyConnectedWallet()
@@ -21,7 +21,6 @@ export default function CreateAccount() {
     const tgInitData = useContext(MyTgContext).info?.tgInitData
     const isInTelegram = !(tgInitData == null || tgInitData === '')
     const [description, setDescription] = useState('')
-    const router = useRouter();
     const {
         sponsoredTransactionsEnabled,
         setSponsoredTransactionsEnabled,
@@ -31,6 +30,9 @@ export default function CreateAccount() {
     const createAccountMutation = useMutation({
         mutationFn: () => {
             const sendTransactionPromise = sponsoredTransactionsEnabled ? createAccount(toNano(price), description) : tonConnectUI.sendTransaction(createAccountTransaction(toNano(price), description))
+            // const sendTransactionPromise = new Promise(resolve => {
+            //     setTimeout(resolve, 3000)
+            // })
             return sendTransactionPromise
                 .then(() => {
                     if (tgInitData == null || myConnectedWallet == null) {
@@ -43,11 +45,12 @@ export default function CreateAccount() {
         }
     })
     const infoQuery = useWaitForAccountActive(myConnectedWallet, createAccountMutation.isSuccess)
+    const client = useQueryClient()
     useEffect(() => {
         if (infoQuery.isSuccess) {
-            router.push("/")
+            client.invalidateQueries({queryKey: ['profile']})
         }
-    }, [infoQuery.isSuccess]);
+    }, [infoQuery.isSuccess, myConnectedWallet, client]);
     const onClick = () => {
         if (myConnectedWallet != null) {
             createAccountMutation.mutate()
@@ -79,6 +82,8 @@ export default function CreateAccount() {
     } else if (createAccountMutation.isError) {
         return <TransactionErrorDialog
             content={createAccountMutation.error.message === 'unauthorized' ? sessionExpiredDialogContent : unknownErrorDialogContent}/>
+    } else if (infoQuery.isSuccess){
+        return <SucceedDialog content={<></>} title={"Account created successfully"} text={"Doing some final steps"}/>
     }
     return <>
         <div className={"pt-10"}>
@@ -143,7 +148,6 @@ export default function CreateAccount() {
             <button className={"btn btn-block btn-outline btn-lg btn-error mt-2"}
                     onClick={() => {
                         tonConnectUI?.disconnect()
-                        router.push('/')
                     }}>Disconnect
             </button>
         </div>

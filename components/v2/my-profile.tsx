@@ -8,12 +8,12 @@ import {useMyConnectedWallet} from "@/hooks/ton-hooks";
 import {useAuth} from "@/hooks/auth-hook";
 import {useAccountInfo} from "@/components/queries/queries";
 import {useRouter} from "next/navigation";
+import CreateAccount from "@/components/v2/create-account";
 
 export default function MyProfile() {
     const myConnectedWallet = useMyConnectedWallet()
     const myAccountInfoQuery = useAccountInfo(myConnectedWallet)
     const myAccountInfo = myAccountInfoQuery.data
-    const router = useRouter()
     const auth = useAuth()
 
     const tgConnectionStatus = useContext(TgConnectionStatus).info
@@ -34,12 +34,10 @@ export default function MyProfile() {
             title: 'Share this link with your audience'
         })
     }
-    useEffect(() => {
-        if (myAccountInfoQuery.error?.message === 'account not found') {
-            router.push('/account/create')
-        }
-    }, [myAccountInfoQuery.error, router]);
-    if (myConnectedWallet === undefined || myAccountInfoQuery.isLoading || myAccountInfoQuery.error != null) {
+    if(myConnectedWallet != null && myAccountInfoQuery.isError && myAccountInfoQuery.error?.message === 'account not found'){
+        return <CreateAccount/>
+    }
+    if (myConnectedWallet === undefined || (myConnectedWallet != null && myAccountInfoQuery.isPending)) {
         return <div className={"w-full mt-[50%] flex justify-center"}>
             <div className={"loading loading-ring w-[125px] h-[125px]"}></div>
         </div>

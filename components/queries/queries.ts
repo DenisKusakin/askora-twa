@@ -128,10 +128,20 @@ export function useWaitForAccountActive(ownerAddr: Address | undefined | null, e
     }
     const accountContractAddrQuery = useQuery(ops)
     const accountInfoQuery = useQuery({
-        ...fetchProfile({addr: accountContractAddrQuery.data?.toString() || ''}),
+        queryKey: ['profile-exists', ownerAddr?.toString()],
+        queryFn: async () => {
+            const accountContractAddr = accountContractAddrQuery.data!
+            const {state} = await tonClient.getContractState(accountContractAddr)
+            if(state === 'active') {
+                return Promise.resolve(1)
+            } else {
+                return Promise.reject(Error("account not found"))
+            }
+        },
         enabled: !!accountContractAddrQuery.data && enabled,
-        retry: true,
-        retryDelay: 3000
+        retry: (count, error) => {
+            return error.message === 'account not found'
+        }
     })
     // const accountInfo = accountInfoQuery.data
 

@@ -9,9 +9,9 @@ export default function AccountCreationStatusDialog({transactionSendingInProgres
             <div className={"pt-4 flex items-start justify-center flex-col"}>
                 <div className={"text-lg"}>Account creation is in progress...</div>
                 <div className={"flex flex-col"}>
-                    {transactionSendingInProgress && <div className={"text-sm mt-2"}>Sending transaction...</div>}
+                    {transactionSendingInProgress && <div className={"text-sm mt-2 font-bold"}>Sending transaction...</div>}
                     {!transactionSendingInProgress && <div className={"text-sm mt-1 text-success"}>Transaction has been issued</div>}
-                    {pollingInProgress && <div className={"text-sm mt-1"}>Waiting for processing...</div>}
+                    {pollingInProgress && <div className={"text-sm mt-1 font-bold"}>Waiting for processing...</div>}
                 </div>
             </div>
         </div>
