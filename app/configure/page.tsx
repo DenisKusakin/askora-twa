@@ -112,6 +112,7 @@ export default function ConfigurePrice() {
                         // value={isNaN(newPrice) ? '' : newPrice}
                         defaultValue={parseFloat(fromNano(myProfileInfo.price))}
                         pattern="[0-9]+([\.][0-9]+)?"
+                        ste-={"0.01"}
                         min={"0"}
                         className={`input text-5xl font-bold w-full text-center`}
                         onChange={(e) => {
