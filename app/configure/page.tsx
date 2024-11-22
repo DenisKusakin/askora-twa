@@ -114,7 +114,7 @@ export default function ConfigurePrice() {
                 <div className={"w-full flex justify-center"}>
                     <input
                         // value={isNaN(newPrice) ? '' : newPrice}
-                        defaultValue={myParseFloat(fromNano(myProfileInfo.price))}
+                        defaultValue={myParseFloat(fromNano(myProfileInfo.price)).toLocaleString()}
                         // type={"number"}
                         inputMode={"decimal"}
                         // pattern="[0-9]+([\.][0-9]+)?"
