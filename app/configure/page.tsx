@@ -22,7 +22,7 @@ export default function ConfigurePrice() {
     const myAccountInfoQuery = useAccountInfo(myConnectedWallet)
     const myProfileInfo = myAccountInfoQuery.data
 
-    const [newPrice, setNewPrice] = useState(myProfileInfo != null ? parseFloat(fromNano(myProfileInfo.price)) : 0)
+    const [newPrice, setNewPrice] = useState('')
     const [tonConnectUI] = useTonConnectUI()
     const {sponsoredTransactionsEnabled, updateTonProof} = useAuth()
 
@@ -58,21 +58,21 @@ export default function ConfigurePrice() {
         updateTonProof().then(() => updatePriceMutation.reset())
     }, [updateTonProof, updatePriceMutation])
 
-    useEffect(() => {
-        setNewPrice(myProfileInfo != null ? parseFloat(fromNano(myProfileInfo.price)) : 0)
-    }, [myProfileInfo]);
+    // useEffect(() => {
+    //     setNewPrice(myProfileInfo != null ? parseFloat(fromNano(myProfileInfo.price)) : 0)
+    // }, [myProfileInfo]);
 
-    useEffect(() => {
-        if(myProfileInfo === null){
-            router.push('/')
-        }
-    }, [myProfileInfo, router]);
+    // useEffect(() => {
+    //     if(myProfileInfo === null){
+    //         router.push('/')
+    //     }
+    // }, [myProfileInfo, router]);
     if (myProfileInfo === undefined) {
         return <div className={"w-full mt-[50%] flex justify-center"}>
             <div className={"loading loading-ring w-[125px] h-[125px]"}></div>
         </div>
     }
-    const priceChanged = !isNaN(newPrice) && toNano(newPrice) !== myProfileInfo?.price
+    const priceChanged = !isNaN(parseFloat(newPrice)) && toNano(parseFloat(newPrice)) !== myProfileInfo?.price
     const dialogContent = <div>
         {updatePriceMutation.data?.hash != null && <>
             <div className={"text text-xs break-all"} onClick={copyTextHandler(updatePriceMutation.data?.hash || '')}>
@@ -109,20 +109,20 @@ export default function ConfigurePrice() {
                 <div className={"text-neutral text-xl"}>Price (TON)</div>
                 <div className={"w-full flex justify-center"}>
                     <input
-                        value={isNaN(newPrice) ? '' : newPrice}
-                        type={"number"}
-                        inputMode="decimal"
+                        // value={isNaN(newPrice) ? '' : newPrice}
+                        defaultValue={parseFloat(fromNano(myProfileInfo.price))}
+                        pattern="[0-9]+([\.][0-9]+)?"
                         min={"0"}
                         className={`input text-5xl font-bold w-full text-center`}
                         onChange={(e) => {
-                            setNewPrice(e.target.valueAsNumber)
+                            setNewPrice(e.target.value)
                         }}/>
                 </div>
             </div>
             <p className={"text text-sm font-light text-center mt-2"}>The new price will apply to all future
                 messages</p>
             <button className={"btn btn-lg btn-block btn-primary mt-4"}
-                    disabled={isNaN(newPrice) || !priceChanged || updatePriceMutation.isPending}
+                    disabled={isNaN(parseFloat(newPrice)) || !priceChanged || updatePriceMutation.isPending}
                     onClick={() => updatePriceMutation.mutate()}>Save
                 {updatePriceMutation.isPending &&
                     <span className={"loading loading-dots"}></span>}
