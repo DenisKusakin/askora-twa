@@ -16,6 +16,10 @@ import {useRouter} from "next/navigation";
 import {useMutation} from "@tanstack/react-query";
 import {useAccountInfo} from "@/components/queries/queries";
 
+function myParseFloat(str: string){
+    return parseFloat(str.replace(",", "."))
+}
+
 export default function ConfigurePrice() {
     const myConnectedWallet = useMyConnectedWallet()
 
@@ -38,7 +42,7 @@ export default function ConfigurePrice() {
             if (myProfileInfo == null) {
                 return Promise.reject()
             }
-            const sendTransactionPromise = sponsoredTransactionsEnabled ? changePrice(toNano(newPrice)) : tonConnectUI.sendTransaction(updatePriceTransaction(myProfileInfo?.address, toNano(newPrice)))
+            const sendTransactionPromise = sponsoredTransactionsEnabled ? changePrice(toNano(myParseFloat(newPrice))) : tonConnectUI.sendTransaction(updatePriceTransaction(myProfileInfo?.address, toNano(myParseFloat(newPrice))))
             return sendTransactionPromise
                 .then(resp => {
                     if (resp) {
@@ -72,7 +76,7 @@ export default function ConfigurePrice() {
             <div className={"loading loading-ring w-[125px] h-[125px]"}></div>
         </div>
     }
-    const priceChanged = !isNaN(parseFloat(newPrice)) && toNano(parseFloat(newPrice)) !== myProfileInfo?.price
+    const priceChanged = !isNaN(myParseFloat(newPrice)) && toNano(myParseFloat(newPrice)) !== myProfileInfo?.price
     const dialogContent = <div>
         {updatePriceMutation.data?.hash != null && <>
             <div className={"text text-xs break-all"} onClick={copyTextHandler(updatePriceMutation.data?.hash || '')}>
@@ -110,10 +114,10 @@ export default function ConfigurePrice() {
                 <div className={"w-full flex justify-center"}>
                     <input
                         // value={isNaN(newPrice) ? '' : newPrice}
-                        defaultValue={parseFloat(fromNano(myProfileInfo.price))}
+                        defaultValue={myParseFloat(fromNano(myProfileInfo.price))}
                         // type={"number"}
                         inputMode={"decimal"}
-                        pattern="[0-9]+([\.][0-9]+)?"
+                        // pattern="[0-9]+([\.][0-9]+)?"
                         step={"0.01"}
                         min={"0"}
                         className={`input text-5xl font-bold w-full text-center`}
@@ -125,7 +129,7 @@ export default function ConfigurePrice() {
             <p className={"text text-sm font-light text-center mt-2"}>The new price will apply to all future
                 messages</p>
             <button className={"btn btn-lg btn-block btn-primary mt-4"}
-                    disabled={isNaN(parseFloat(newPrice)) || !priceChanged || updatePriceMutation.isPending}
+                    disabled={isNaN(myParseFloat(newPrice)) || !priceChanged || updatePriceMutation.isPending}
                     onClick={() => updatePriceMutation.mutate()}>Save
                 {updatePriceMutation.isPending &&
                     <span className={"loading loading-dots"}></span>}
