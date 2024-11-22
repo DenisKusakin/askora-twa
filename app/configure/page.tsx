@@ -111,7 +111,8 @@ export default function ConfigurePrice() {
                     <input
                         // value={isNaN(newPrice) ? '' : newPrice}
                         defaultValue={parseFloat(fromNano(myProfileInfo.price))}
-                        type={"number"}
+                        // type={"number"}
+                        inputMode={"decimal"}
                         pattern="[0-9]+([\.][0-9]+)?"
                         step={"0.01"}
                         min={"0"}
