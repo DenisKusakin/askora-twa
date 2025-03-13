@@ -18,12 +18,12 @@ export default function SponsoredTransactionsPage() {
         <p className={"text text-base font-light text-center mt-2"}>Using your own wallet speeds up transactions and
             avoids delays, while sponsored transactions may take longer due to factors beyond the blockchain itself</p>
         {isReady && <label className="label cursor-pointer mt-4 mb-4">
-            <input type="checkbox" className="toggle toggle-lg toggle-primary"
+            <input type="checkbox" className="toggle toggle-lg toggle-primary" disabled={true}
                    onChange={(e) => {
                        auth.setSponsoredTransactionsEnabled(e.target.checked)
                    }}
                    checked={enabled}/>
-            <span className="label-text text-lg">Use Sponsored Transactions</span>
+            <span className="label-text text-lg">Use Sponsored Transactions (Not available at the moment)</span>
         </label>}
         <button onClick={() => router.back()} className={"btn btn-lg btn-error btn-block btn-outline mt-2"}>Cancel
         </button>
